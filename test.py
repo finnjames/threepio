@@ -1,9 +1,17 @@
 import PyQt5.QtWidgets as qt
 
 app = qt.QApplication([])
+window = qt.QWidget()
+layout = qt.QVBoxLayout()
 
-label = qt.QLabel('Hello World!')
+layout.addWidget(qt.QPushButton('Top'))
 
-label.show() # show the label
+layout.addWidget(qt.QPushButton('Right'))
 
-app.exec_() # run the app
+window.setLayout(layout)
+
+app.setStyle('Fusion')
+
+window.show()
+
+app.exec_()
