@@ -1,33 +1,29 @@
-import PyQt5.QtWidgets as qt
+from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+
 import sys
 
-class GroupBox(qt.QWidget):
+class MainWindow(QMainWindow):
 
-    def __init__(self):
-        qt.QWidget.__init__(self)
+    def __init__(self, *args, **kwargs):
+        super(MainWindow, self).__init__(*args, **kwargs)
 
         self.setWindowTitle("GroupBox")
-        layout = qt.QGridLayout()
-        self.setLayout(layout)
+        layout = QVBoxLayout()
 
-        stripchart_speed_group = qt.QGroupBox("Stripchart speed")
-        layout.addWidget(stripchart_speed_group)
-        
-        vbox = qt.QVBoxLayout()
-        stripchart_speed_group.setLayout(vbox)
+        widget = QLabel("hello world")
+        widget.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
 
-        radiobutton = qt.QRadioButton("Faster")
-        vbox.addWidget(radiobutton)
-        
-        radiobutton = qt.QRadioButton("Default")
-        vbox.addWidget(radiobutton)
+        self.setCentralWidget(widget)
 
-        radiobutton = qt.QRadioButton("Slower")
-        vbox.addWidget(radiobutton)
         
         
-app = qt.QApplication(sys.argv)
+app = QApplication(sys.argv)
+
 app.setStyle("Fusion")
-screen = GroupBox()
-screen.show()
+
+window = MainWindow()
+window.show()
+
 sys.exit(app.exec_())
