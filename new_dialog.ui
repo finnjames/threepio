@@ -135,6 +135,12 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>start_value</tabstop>
+  <tabstop>end_value</tabstop>
+  <tabstop>data_acquisition_rate_value</tabstop>
+  <tabstop>file_name_value</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
