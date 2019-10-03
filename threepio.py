@@ -1,4 +1,4 @@
-from PyQt5 import QtCore, QtWidgets, QtGui
+from PyQt5 import QtCore, QtWidgets, QtGui, QtChart
 from main_ui import Ui_MainWindow  # pre compiled PyQt main ui
 from dialog_ui import Ui_Dialog    # pre compiled PyQt dialogue ui
 import time
@@ -12,9 +12,10 @@ class Dialog(QtWidgets.QDialog): # new observation dialog
         # get the window that spawned it
         self.parent_window = parent_window
 
-        self.ui.dialog_button_box.clicked.connect(self.handleOkay)
+        # what to do when press "ok"
+        self.ui.dialog_button_box.clicked.connect(self.handleOk)
 
-    def handleOkay(self):
+    def handleOk(self):
         self.parent_window.setRA(self.ui.start_value.text(), self.ui.end_value.text())
 
 
@@ -33,6 +34,7 @@ class Threepio(QtWidgets.QMainWindow): # whole app class
         self.end_RA = 0
 
         # timer for... everything
+        # does this need to be more precise?
         self.timer = QtCore.QTimer(self)
         self.timer.timeout.connect(self.handleHello)
         self.timer.start(1000)
