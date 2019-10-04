@@ -50,6 +50,7 @@ class Threepio(QtWidgets.QMainWindow): # whole app class
         self.end_RA = 0
 
         # timer for... everything
+        # does this need to be more precise?
         self.timer = QtCore.QTimer(self)
         self.timer.timeout.connect(self.handleHello)
         self.timer.start(1000)
