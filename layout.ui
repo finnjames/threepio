@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>735</width>
+    <height>578</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,88 +16,29 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="1" rowspan="2">
-     <widget class="QWidget" name="stripchart" native="true"/>
-    </item>
-    <item row="1" column="0">
-     <widget class="QGroupBox" name="stripchart_control_group">
-      <property name="title">
-       <string>Strip chart</string>
+     <widget class="QChartView" name="stripchart">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
       </property>
-      <widget class="QPushButton" name="chart_refresh_button">
-       <property name="geometry">
-        <rect>
-         <x>9</x>
-         <y>214</y>
-         <width>124</width>
-         <height>32</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Refresh chart</string>
-       </property>
-      </widget>
-      <widget class="QRadioButton" name="speed_slower_button">
-       <property name="geometry">
-        <rect>
-         <x>13</x>
-         <y>48</y>
-         <width>67</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Slower</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="chart_clear_button">
-       <property name="geometry">
-        <rect>
-         <x>9</x>
-         <y>163</y>
-         <width>109</width>
-         <height>32</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Clear chart</string>
-       </property>
-      </widget>
-      <widget class="QRadioButton" name="speed_default_radio">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-       <property name="geometry">
-        <rect>
-         <x>13</x>
-         <y>84</y>
-         <width>69</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Default</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-      <widget class="QRadioButton" name="speed_faster_radio">
-       <property name="geometry">
-        <rect>
-         <x>13</x>
-         <y>120</y>
-         <width>64</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Faster</string>
-       </property>
-      </widget>
+      <property name="minimumSize">
+       <size>
+        <width>100</width>
+        <height>0</height>
+       </size>
+      </property>
      </widget>
     </item>
     <item row="0" column="0">
      <widget class="QGroupBox" name="data_display_group">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
       <property name="title">
        <string>Data</string>
       </property>
@@ -254,6 +195,90 @@
       </layout>
      </widget>
     </item>
+    <item row="1" column="0">
+     <widget class="QGroupBox" name="stripchart_control_group">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="title">
+       <string>Strip chart</string>
+      </property>
+      <widget class="QPushButton" name="chart_refresh_button">
+       <property name="geometry">
+        <rect>
+         <x>9</x>
+         <y>214</y>
+         <width>124</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Refresh chart</string>
+       </property>
+      </widget>
+      <widget class="QRadioButton" name="speed_slower_button">
+       <property name="geometry">
+        <rect>
+         <x>13</x>
+         <y>48</y>
+         <width>67</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Slower</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="chart_clear_button">
+       <property name="geometry">
+        <rect>
+         <x>9</x>
+         <y>163</y>
+         <width>109</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Clear chart</string>
+       </property>
+      </widget>
+      <widget class="QRadioButton" name="speed_default_radio">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>13</x>
+         <y>84</y>
+         <width>69</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Default</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QRadioButton" name="speed_faster_radio">
+       <property name="geometry">
+        <rect>
+         <x>13</x>
+         <y>120</y>
+         <width>64</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Faster</string>
+       </property>
+      </widget>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -261,7 +286,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>735</width>
      <height>22</height>
     </rect>
    </property>
@@ -357,6 +382,13 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QChartView</class>
+   <extends>QGraphicsView</extends>
+   <header>PyQt5.QtChart</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
