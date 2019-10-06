@@ -36,27 +36,25 @@ class Threepio(QtWidgets.QMainWindow): # whole app class
         # chart clear button runs handleScan
         self.ui.chart_clear_button.clicked.connect(self.handleScan)
 
-        # basic time values
-        self.start_RA = 0
-        self.end_RA = 0
+        # basic time values; generally, default to milliseconds
+        self.start_RA = 0 # ms
+        self.end_RA = 0 # ms
         self.elapsed_time = 0 # ms
         self.timer_rate = 10 # ms
-        self.stripchart_display_ticks = 256 # how many data points to draw to stripchart
+        self.stripchart_display_ticks = 512 # how many data points to draw to stripchart
 
         # store data in... an array
-        # TODO: make this less terrible
+        # TODO: make this less terrible (at least delegate or something)
         self.data = []
 
         # initialize stripchart
         self.stripchart_series = QtChart.QLineSeries()
-        for i in range(self.stripchart_display_ticks):
+        for i in range(self.stripchart_display_ticks): # make line of zeros at start
             self.data.append(0)
-
         chart = QtChart.QChart()
         chart.addSeries(self.stripchart_series)
         # chart.createDefaultAxes()
         chart.legend().hide()
-
         self.ui.stripchart.setChart(chart)
         self.ui.stripchart.setRenderHint(QtGui.QPainter.Antialiasing)
 
@@ -67,8 +65,8 @@ class Threepio(QtWidgets.QMainWindow): # whole app class
 
     def tick(self): # primary controller for each clock tick
         self.elapsed_time += self.timer_rate
-        self.handleHello()
-        self.data.append(int(((math.sin((self.elapsed_time / (100 * math.pi)))*10)**2)))
+        self.updateGui()
+        self.data.append(int(((math.sin((self.elapsed_time / (100 * math.pi)))*10)**2))) # pretty sine wave
 
         # make the stripchart scroll
         self.stripchart_series.clear()
@@ -90,8 +88,9 @@ class Threepio(QtWidgets.QMainWindow): # whole app class
         self.end_RA = end_RA
         print(start_RA, end_RA)
 
-    def handleHello(self): # TODO: make this display in human time
+    def updateGui(self): # TODO: make this display in human time
         self.ui.ra_value.setText("T+" + str(round(self.start_RA + self.elapsed_time, 2)) + "ms")
+        # TODO: get data from declinometer
 
     def newObservation(self, observation_type):
         if (observation_type):
