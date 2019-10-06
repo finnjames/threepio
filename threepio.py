@@ -40,10 +40,11 @@ class Threepio(QtWidgets.QMainWindow): # whole app class
         self.start_RA = 0
         self.end_RA = 0
         self.elapsed_time = 0 # ms
+        self.timer_rate = 10 # ms
         self.stripchart_display_ticks = 256 # how many data points to draw to stripchart
 
         # store data in... an array
-        # TODO: make this less garbage
+        # TODO: make this less terrible
         self.data = []
 
         # initialize stripchart
@@ -53,7 +54,7 @@ class Threepio(QtWidgets.QMainWindow): # whole app class
 
         chart = QtChart.QChart()
         chart.addSeries(self.stripchart_series)
-        chart.createDefaultAxes()
+        # chart.createDefaultAxes()
         chart.legend().hide()
 
         self.ui.stripchart.setChart(chart)
@@ -62,12 +63,12 @@ class Threepio(QtWidgets.QMainWindow): # whole app class
         # timer for... everything
         self.timer = QtCore.QTimer(self)
         self.timer.timeout.connect(self.tick) # do everything
-        self.timer.start(10)
+        self.timer.start(self.timer_rate)
 
     def tick(self): # primary controller for each clock tick
-        self.elapsed_time += 10
+        self.elapsed_time += self.timer_rate
         self.handleHello()
-        self.data.append(int(random.randint(0,20)**(4)/10000))
+        self.data.append(int(((math.sin((self.elapsed_time / (100 * math.pi)))*10)**2)))
 
         # make the stripchart scroll
         self.stripchart_series.clear()
@@ -89,11 +90,8 @@ class Threepio(QtWidgets.QMainWindow): # whole app class
         self.end_RA = end_RA
         print(start_RA, end_RA)
 
-    def handleHello(self): # TODO: make this go to 1/100ths of a second
-        # current_time = time.localtime(time.clock_gettime(time.CLOCK_REALTIME))
-        # self.ui.ra_value.setText(str(current_time[3]) + " : " + str(current_time[4]) + " : " + str(current_time[5]))
-        self.ui.ra_value.setText(str(round(self.start_RA + self.elapsed_time, 2)))
-        # self.ui.progressBar.setValue(current_time[5] / 60 * 100)
+    def handleHello(self): # TODO: make this display in human time
+        self.ui.ra_value.setText("T+" + str(round(self.start_RA + self.elapsed_time, 2)) + "ms")
 
     def newObservation(self, observation_type):
         if (observation_type):
@@ -110,7 +108,7 @@ class Threepio(QtWidgets.QMainWindow): # whole app class
 
         chart = QtChart.QChart()
         chart.addSeries(series)
-        chart.createDefaultAxes()
+        # chart.createDefaultAxes()
         chart.legend().hide()
 
         self.ui.stripchart.setChart(chart)
