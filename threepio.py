@@ -17,7 +17,12 @@ class Dialog(QtWidgets.QDialog): # new observation dialog
         self.ui.dialog_button_box.clicked.connect(self.handleOk)
 
     def handleOk(self):
-        self.parent_window.setRA(self.ui.start_value.text(), self.ui.end_value.text())
+        # TODO: convert input to epoch time properly (not just assume everything is Jan 1 1970)
+        pattern = "%H:%M:%S"
+        start = int(time.mktime(time.strptime(self.ui.start_value.text(), pattern)))
+        end = int(time.mktime(time.strptime(self.ui.end_value.text(), pattern)))
+
+        self.parent_window.setRA(start, end)
 
 class Threepio(QtWidgets.QMainWindow): # whole app class
     def __init__(self):
@@ -28,32 +33,56 @@ class Threepio(QtWidgets.QMainWindow): # whole app class
         self.ui.setupUi(self)
         self.setWindowTitle("Threepio")
 
-        # make the line chart in the widget
-        series = QtChart.QLineSeries()
-        for i in range(100):
-            series.append((random.random()-0.5)**3, i)
+        # chart clear button runs handleScan
+        self.ui.chart_clear_button.clicked.connect(self.handleScan)
+
+        # basic time values
+        self.start_RA = 0
+        self.end_RA = 0
+        self.elapsed_time = 0 # ms
+        self.stripchart_display_ticks = 256 # how many data points to draw to stripchart
+
+        # store data in... an array
+        # TODO: make this less garbage
+        self.data = []
+
+        # initialize stripchart
+        self.stripchart_series = QtChart.QLineSeries()
+        for i in range(self.stripchart_display_ticks):
+            self.data.append(0)
 
         chart = QtChart.QChart()
-        chart.addSeries(series)
+        chart.addSeries(self.stripchart_series)
         chart.createDefaultAxes()
         chart.legend().hide()
 
         self.ui.stripchart.setChart(chart)
-
-        # self.ui.stripchart.show()
-
-        # chart clear button runs handleHello
-        self.ui.chart_clear_button.clicked.connect(self.handleScan)
-
-        # start/end RA default to 0
-        self.start_RA = 0
-        self.end_RA = 0
+        self.ui.stripchart.setRenderHint(QtGui.QPainter.Antialiasing)
 
         # timer for... everything
-        # does this need to be more precise?
         self.timer = QtCore.QTimer(self)
-        self.timer.timeout.connect(self.handleHello)
-        self.timer.start(1000)
+        self.timer.timeout.connect(self.tick) # do everything
+        self.timer.start(10)
+
+    def tick(self): # primary controller for each clock tick
+        self.elapsed_time += 10
+        self.handleHello()
+        self.data.append(int(random.randint(0,20)**(4)/10000))
+
+        # make the stripchart scroll
+        self.stripchart_series.clear()
+        if (len(self.data) >= self.stripchart_display_ticks): # ticks
+            for i in range(self.stripchart_display_ticks):
+                self.stripchart_series.append(self.data[len(self.data) - self.stripchart_display_ticks + i], i)
+        else:
+            for i in range(len(self.data)):
+                self.stripchart_series.append(self.data[i], i)
+
+        self.updateStripChart(self.stripchart_series)
+
+    def addData(self, data):
+        self.data.append(data)
+
 
     def setRA(self, start_RA, end_RA):
         self.start_RA = start_RA
@@ -61,9 +90,10 @@ class Threepio(QtWidgets.QMainWindow): # whole app class
         print(start_RA, end_RA)
 
     def handleHello(self): # TODO: make this go to 1/100ths of a second
-        current_time = time.localtime(time.clock_gettime(time.CLOCK_REALTIME))
-        self.ui.ra_value.setText(str(current_time[3]) + " : " + str(current_time[4]) + " : " + str(current_time[5]))
-        self.ui.progressBar.setValue(current_time[5] / 60 * 100)
+        # current_time = time.localtime(time.clock_gettime(time.CLOCK_REALTIME))
+        # self.ui.ra_value.setText(str(current_time[3]) + " : " + str(current_time[4]) + " : " + str(current_time[5]))
+        self.ui.ra_value.setText(str(round(self.start_RA + self.elapsed_time, 2)))
+        # self.ui.progressBar.setValue(current_time[5] / 60 * 100)
 
     def newObservation(self, observation_type):
         if (observation_type):
@@ -75,6 +105,15 @@ class Threepio(QtWidgets.QMainWindow): # whole app class
         dialog = Dialog(self)
         dialog.show()
         dialog.exec_()
+    
+    def updateStripChart(self, series): # updates chart based on passed series
+
+        chart = QtChart.QChart()
+        chart.addSeries(series)
+        chart.createDefaultAxes()
+        chart.legend().hide()
+
+        self.ui.stripchart.setChart(chart)
 
 
 if __name__ == '__main__':
@@ -83,5 +122,6 @@ if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     app.setStyle("Fusion")
     window = Threepio()
+    window.setMinimumSize(800,600)
     window.show()
     sys.exit(app.exec_())
