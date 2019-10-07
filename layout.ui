@@ -219,7 +219,7 @@
         <string>Refresh chart</string>
        </property>
       </widget>
-      <widget class="QRadioButton" name="speed_slower_button">
+      <widget class="QRadioButton" name="speed_slower_radio">
        <property name="geometry">
         <rect>
          <x>13</x>

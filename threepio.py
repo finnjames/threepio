@@ -33,15 +33,19 @@ class Threepio(QtWidgets.QMainWindow): # whole app class
         self.ui.setupUi(self)
         self.setWindowTitle("Threepio")
 
-        # chart clear button runs handleScan
+        # connect buttons
         self.ui.chart_clear_button.clicked.connect(self.handleScan)
+
+        self.ui.speed_faster_radio.clicked.connect(self.updateSpeed)
+        self.ui.speed_slower_radio.clicked.connect(self.updateSpeed)
+        self.ui.speed_default_radio.clicked.connect(self.updateSpeed)
 
         # basic time values; generally, default to milliseconds
         self.start_RA = 0 # ms
         self.end_RA = 0 # ms
         self.elapsed_time = 0 # ms
         self.timer_rate = 10 # ms
-        self.stripchart_display_ticks = 512 # how many data points to draw to stripchart
+        self.stripchart_display_ticks = 300 # how many data points to draw to stripchart
 
         # store data in... an array
         # TODO: make this less terrible (at least delegate or something)
@@ -53,12 +57,12 @@ class Threepio(QtWidgets.QMainWindow): # whole app class
             self.data.append(0)
         chart = QtChart.QChart()
         chart.addSeries(self.stripchart_series)
-        # chart.createDefaultAxes()
         chart.legend().hide()
         self.ui.stripchart.setChart(chart)
         self.ui.stripchart.setRenderHint(QtGui.QPainter.Antialiasing)
 
         # timer for... everything
+        self.flipflop = 0
         self.timer = QtCore.QTimer(self)
         self.timer.timeout.connect(self.tick) # do everything
         self.timer.start(self.timer_rate)
@@ -66,7 +70,7 @@ class Threepio(QtWidgets.QMainWindow): # whole app class
     def tick(self): # primary controller for each clock tick
         self.elapsed_time += self.timer_rate
         self.updateGui()
-        self.data.append(int(((math.sin((self.elapsed_time / (100 * math.pi)))*10)**2))) # pretty sine wave
+        self.data.append(int(((math.sin((self.getElapsedTime() / (200 * math.pi)))*300)**2))) # pretty sine wave
 
         # make the stripchart scroll
         self.stripchart_series.clear()
@@ -82,6 +86,16 @@ class Threepio(QtWidgets.QMainWindow): # whole app class
     def addData(self, data):
         self.data.append(data)
 
+    def getElapsedTime(self):
+        return self.elapsed_time
+
+    def updateSpeed(self):
+        if (self.ui.speed_faster_radio.isChecked()):
+            self.stripchart_display_ticks = 200
+        elif (self.ui.speed_slower_radio.isChecked()):
+            self.stripchart_display_ticks = 600
+        else:
+            self.stripchart_display_ticks = 400
 
     def setRA(self, start_RA, end_RA):
         self.start_RA = start_RA
@@ -89,7 +103,7 @@ class Threepio(QtWidgets.QMainWindow): # whole app class
         print(start_RA, end_RA)
 
     def updateGui(self): # TODO: make this display in human time
-        self.ui.ra_value.setText("T+" + str(round(self.start_RA + self.elapsed_time, 2)) + "ms")
+        self.ui.ra_value.setText("T+" + str(round(self.start_RA + self.getElapsedTime(), 2)) + "ms")
         # TODO: get data from declinometer
 
     def newObservation(self, observation_type):
