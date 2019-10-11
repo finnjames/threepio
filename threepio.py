@@ -1,9 +1,25 @@
+"""
+  __  __                    _                 
+ / /_/ /  _______ ___ ___  (_)__    ___  __ __
+/ __/ _ \/ __/ -_) -_) _ \/ / _ \_ / _ \/ // /
+\__/_//_/_/  \__/\__/ .__/_/\___(_) .__/\_, / 
+                   /_/           /_/   /___/  
+
+The helpful companion to the 40' telescope
+Written with frustration by Shengjie, Isabel, and Finn
+
+"""
+
+
 from PyQt5 import QtCore, QtWidgets, QtGui, QtChart
-from main_ui import Ui_MainWindow  # pre compiled PyQt main ui
-from dialog_ui import Ui_Dialog    # pre compiled PyQt dialogue ui
+from main_ui import Ui_MainWindow  # compiled PyQt main ui
+from dialog_ui import Ui_Dialog    # compiled PyQt dialogue ui
 import time, math, random
 
-class Dialog(QtWidgets.QDialog): # new observation dialog
+import tars
+
+class Dialog(QtWidgets.QDialog):
+    """New observation dialogue window"""
     def __init__(self, parent_window):
         QtWidgets.QWidget.__init__(self)
         self.ui = Ui_Dialog()
@@ -14,9 +30,9 @@ class Dialog(QtWidgets.QDialog): # new observation dialog
         self.parent_window = parent_window
 
         # what to do when press "ok"
-        self.ui.dialog_button_box.clicked.connect(self.handleOk)
+        self.ui.dialog_button_box.clicked.connect(self.handle_ok)
 
-    def handleOk(self):
+    def handle_ok(self):
         # TODO: convert input to epoch time properly (not just assume everything is Jan 1 1970)
         pattern = "%H:%M:%S"
         start = int(time.mktime(time.strptime(self.ui.start_value.text(), pattern)))
@@ -24,7 +40,25 @@ class Dialog(QtWidgets.QDialog): # new observation dialog
 
         self.parent_window.setRA(start, end)
 
-class Threepio(QtWidgets.QMainWindow): # whole app class
+class SuperClock():
+    """Clock object for encapsulation; keeps track of the time"""
+    def __init__(self, starting_time):
+        self.starting_time = starting_time
+    
+    def getTime(self):
+        return time.localtime(time.time())
+
+class Threepio(QtWidgets.QMainWindow):
+    """Main class for the app"""
+
+    # basic time values; generally, default to milliseconds
+    start_RA = 0 # ms
+    end_RA = 0 # ms
+    elapsed_time = 0 # ms
+    timer_rate = 20 # ms
+    stripchart_display_ticks = 300 # how many data points to draw to stripchart
+
+
     def __init__(self):
         QtWidgets.QWidget.__init__(self)
 
@@ -34,18 +68,13 @@ class Threepio(QtWidgets.QMainWindow): # whole app class
         self.setWindowTitle("Threepio")
 
         # connect buttons
-        self.ui.chart_clear_button.clicked.connect(self.handleScan)
+        self.ui.chart_clear_button.clicked.connect(self.handle_scan)
+        self.ui.speed_faster_radio.clicked.connect(self.update_speed)
+        self.ui.speed_slower_radio.clicked.connect(self.update_speed)
+        self.ui.speed_default_radio.clicked.connect(self.update_speed)
 
-        self.ui.speed_faster_radio.clicked.connect(self.updateSpeed)
-        self.ui.speed_slower_radio.clicked.connect(self.updateSpeed)
-        self.ui.speed_default_radio.clicked.connect(self.updateSpeed)
-
-        # basic time values; generally, default to milliseconds
-        self.start_RA = 0 # ms
-        self.end_RA = 0 # ms
-        self.elapsed_time = 0 # ms
-        self.timer_rate = 10 # ms
-        self.stripchart_display_ticks = 300 # how many data points to draw to stripchart
+        # time
+        self.clock = SuperClock(0)
 
         # store data in... an array
         # TODO: make this less terrible (at least delegate or something)
@@ -61,35 +90,35 @@ class Threepio(QtWidgets.QMainWindow): # whole app class
         self.ui.stripchart.setChart(chart)
         self.ui.stripchart.setRenderHint(QtGui.QPainter.Antialiasing)
 
+        # DATAQ stuff
+        self.tars = tars.Tars(tars.discovery())
+        self.tars.init()
+        self.tars.start()
+
+
         # timer for... everything
-        self.flipflop = 0
         self.timer = QtCore.QTimer(self)
         self.timer.timeout.connect(self.tick) # do everything
         self.timer.start(self.timer_rate)
 
     def tick(self): # primary controller for each clock tick
-        self.elapsed_time += self.timer_rate
-        self.updateGui()
-        self.data.append(int(((math.sin((self.getElapsedTime() / (200 * math.pi)))*300)**2))) # pretty sine wave
+        self.elapsed_time += self.timer_rate # 
+        self.update_gui()
+        # self.data.append(int(((math.sin((self.get_elapsed_time() / (200 * math.pi)))*300)**2))) # pretty sine wave
+
+        self.data.append(self.tars.read_one(1))
 
         # make the stripchart scroll
-        self.stripchart_series.clear()
-        if (len(self.data) >= self.stripchart_display_ticks): # ticks
-            for i in range(self.stripchart_display_ticks):
-                self.stripchart_series.append(self.data[len(self.data) - self.stripchart_display_ticks + i], i)
-        else:
-            for i in range(len(self.data)):
-                self.stripchart_series.append(self.data[i], i)
 
-        self.updateStripChart(self.stripchart_series)
+        self.update_strip_chart()
 
-    def addData(self, data):
+    def add_data(self, data):
         self.data.append(data)
 
-    def getElapsedTime(self):
+    def get_elapsed_time(self):
         return self.elapsed_time
 
-    def updateSpeed(self):
+    def update_speed(self):
         if (self.ui.speed_faster_radio.isChecked()):
             self.stripchart_display_ticks = 200
         elif (self.ui.speed_slower_radio.isChecked()):
@@ -97,30 +126,39 @@ class Threepio(QtWidgets.QMainWindow): # whole app class
         else:
             self.stripchart_display_ticks = 400
 
-    def setRA(self, start_RA, end_RA):
+    def set_ra(self, start_RA, end_RA):
         self.start_RA = start_RA
         self.end_RA = end_RA
         print(start_RA, end_RA)
 
-    def updateGui(self): # TODO: make this display in human time
-        self.ui.ra_value.setText("T+" + str(round(self.start_RA + self.getElapsedTime(), 2)) + "ms")
+    def update_gui(self): # TODO: make this display in human time
+        self.ui.ra_value.setText("T+" + str(round(self.start_RA + self.get_elapsed_time(), 2)) + "ms")
         # TODO: get data from declinometer
 
-    def newObservation(self, observation_type):
+    def new_observation(self, observation_type):
         if (observation_type):
             print(observation_type)
         else:
             print("no type")
 
-    def handleScan(self):
+    def handle_scan(self):
         dialog = Dialog(self)
         dialog.show()
         dialog.exec_()
     
-    def updateStripChart(self, series): # updates chart based on passed series
+    def update_strip_chart(self):
+
+        self.stripchart_series.clear()
+
+        if (len(self.data) >= self.stripchart_display_ticks): # ticks
+            for i in range(self.stripchart_display_ticks):
+                self.stripchart_series.append(self.data[len(self.data) - self.stripchart_display_ticks + i], i)
+        else:
+            for i in range(len(self.data)):
+                self.stripchart_series.append(self.data[i], i)
 
         chart = QtChart.QChart()
-        chart.addSeries(series)
+        chart.addSeries(self.stripchart_series)
         # chart.createDefaultAxes()
         chart.legend().hide()
 
@@ -128,7 +166,6 @@ class Threepio(QtWidgets.QMainWindow): # whole app class
 
 
 if __name__ == '__main__':
-
     import sys
     app = QtWidgets.QApplication(sys.argv)
     app.setStyle("Fusion")
