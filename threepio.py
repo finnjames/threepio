@@ -12,8 +12,9 @@ Written with frustration by Shengjie, Isabel, and Finn
 
 
 from PyQt5 import QtCore, QtWidgets, QtGui, QtChart
-from main_ui import Ui_MainWindow  # compiled PyQt main ui
-from dialog_ui import Ui_Dialog    # compiled PyQt dialogue ui
+from main_ui import Ui_MainWindow   # compiled PyQt main ui
+from dialog_ui import Ui_Dialog     # compiled PyQt dialogue ui
+from layout_legacy import Ui_Legacy # compiled legacy ui
 import time, math, random
 
 import tars
@@ -66,7 +67,7 @@ class Threepio(QtWidgets.QMainWindow):
         QtWidgets.QWidget.__init__(self)
 
         # use main_ui for window setup
-        self.ui = Ui_MainWindow()
+        self.ui = Ui_Legacy()
         self.ui.setupUi(self)
         self.setWindowTitle("Threepio")
 
@@ -94,9 +95,9 @@ class Threepio(QtWidgets.QMainWindow):
         self.ui.stripchart.setRenderHint(QtGui.QPainter.Antialiasing)
 
         # DATAQ stuff
-        self.tars = tars.Tars(tars.discovery())
-        self.tars.init()
-        self.tars.start()
+        # self.tars = tars.Tars(tars.discovery())
+        # self.tars.init()
+        # self.tars.start()
 
 
         # timer for... everything
@@ -107,9 +108,9 @@ class Threepio(QtWidgets.QMainWindow):
     def tick(self): # primary controller for each clock tick
         self.elapsed_time += self.timer_rate # 
         self.update_gui()
-        # self.data.append(int(((math.sin((self.elapsed_time / (200 * math.pi)))*300)**2))) # pretty sine wave
+        self.data.append(int(((math.sin((self.elapsed_time / (200 * math.pi)))*300)**2))) # pretty sine wave
 
-        self.data.append(self.tars.read_one(1))
+        # self.data.append(self.tars.read_one(1))
 
         # make the stripchart scroll
 
