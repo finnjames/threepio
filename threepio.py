@@ -42,11 +42,14 @@ class Dialog(QtWidgets.QDialog):
 
 class SuperClock():
     """Clock object for encapsulation; keeps track of the time"""
-    def __init__(self, starting_time):
+    def __init__(self, starting_time = time.time()):
         self.starting_time = starting_time
     
-    def getTime(self):
-        return time.localtime(time.time())
+    def get_time(self):
+        return time.time()
+
+    def get_elapsed_time(self):
+        return time.time() - self.starting_time
 
 class Threepio(QtWidgets.QMainWindow):
     """Main class for the app"""
@@ -74,7 +77,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.ui.speed_default_radio.clicked.connect(self.update_speed)
 
         # time
-        self.clock = SuperClock(0)
+        self.clock = SuperClock()
 
         # store data in... an array
         # TODO: make this less terrible (at least delegate or something)
@@ -104,7 +107,7 @@ class Threepio(QtWidgets.QMainWindow):
     def tick(self): # primary controller for each clock tick
         self.elapsed_time += self.timer_rate # 
         self.update_gui()
-        # self.data.append(int(((math.sin((self.get_elapsed_time() / (200 * math.pi)))*300)**2))) # pretty sine wave
+        # self.data.append(int(((math.sin((self.elapsed_time / (200 * math.pi)))*300)**2))) # pretty sine wave
 
         self.data.append(self.tars.read_one(1))
 
@@ -115,8 +118,8 @@ class Threepio(QtWidgets.QMainWindow):
     def add_data(self, data):
         self.data.append(data)
 
-    def get_elapsed_time(self):
-        return self.elapsed_time
+    # def get_elapsed_time(self):
+    #     return self.clock.get_time()
 
     def update_speed(self):
         if (self.ui.speed_faster_radio.isChecked()):
@@ -132,7 +135,8 @@ class Threepio(QtWidgets.QMainWindow):
         print(start_RA, end_RA)
 
     def update_gui(self): # TODO: make this display in human time
-        self.ui.ra_value.setText("T+" + str(round(self.start_RA + self.get_elapsed_time(), 2)) + "ms")
+        current_time = str(round(self.start_RA + self.clock.get_elapsed_time(), 2))
+        self.ui.ra_value.setText("T+" + current_time + "ms")
         # TODO: get data from declinometer
 
     def new_observation(self, observation_type):
