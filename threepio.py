@@ -58,16 +58,16 @@ class Threepio(QtWidgets.QMainWindow):
     # basic time values; generally, default to milliseconds
     start_RA = 0 # ms
     end_RA = 0 # ms
-    elapsed_time = 0 # ms
-    timer_rate = 20 # ms
-    stripchart_display_ticks = 300 # how many data points to draw to stripchart
-
+    ticker = 0 # ms
+    timer_rate = 10 # ms
+    stripchart_display_ticks = 1024 # how many data points to draw to stripchart
+    stripchart_offset = 0
 
     def __init__(self):
         QtWidgets.QWidget.__init__(self)
 
         # use main_ui for window setup
-        self.ui = Ui_Legacy()
+        self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.setWindowTitle("Threepio")
 
@@ -86,8 +86,6 @@ class Threepio(QtWidgets.QMainWindow):
 
         # initialize stripchart
         self.stripchart_series = QtChart.QLineSeries()
-        for i in range(self.stripchart_display_ticks): # make line of zeros at start
-            self.data.append(0)
         chart = QtChart.QChart()
         chart.addSeries(self.stripchart_series)
         chart.legend().hide()
@@ -106,9 +104,9 @@ class Threepio(QtWidgets.QMainWindow):
         self.timer.start(self.timer_rate)
 
     def tick(self): # primary controller for each clock tick
-        self.elapsed_time += self.timer_rate # 
+        self.ticker += 1 # 
         self.update_gui()
-        self.data.append(int(((math.sin((self.elapsed_time / (200 * math.pi)))*300)**2))) # pretty sine wave
+        self.data.append(int(((math.sin((self.ticker / (8 * math.pi)))*300)**2))) # pretty sine wave
 
         # self.data.append(self.tars.read_one(1))
 
@@ -124,11 +122,11 @@ class Threepio(QtWidgets.QMainWindow):
 
     def update_speed(self):
         if (self.ui.speed_faster_radio.isChecked()):
-            self.stripchart_display_ticks = 200
+            self.stripchart_display_ticks = 512
         elif (self.ui.speed_slower_radio.isChecked()):
-            self.stripchart_display_ticks = 600
+            self.stripchart_display_ticks = 2048
         else:
-            self.stripchart_display_ticks = 400
+            self.stripchart_display_ticks = 1024
 
     def set_ra(self, start_RA, end_RA):
         self.start_RA = start_RA
@@ -153,14 +151,13 @@ class Threepio(QtWidgets.QMainWindow):
     
     def update_strip_chart(self):
 
-        self.stripchart_series.clear()
+        self.stripchart_series.append(self.data[len(self.data) - 1], len(self.data))
 
-        if (len(self.data) >= self.stripchart_display_ticks): # ticks
-            for i in range(self.stripchart_display_ticks):
-                self.stripchart_series.append(self.data[len(self.data) - self.stripchart_display_ticks + i], i)
-        else:
-            for i in range(len(self.data)):
-                self.stripchart_series.append(self.data[i], i)
+        print(len(self.data))
+
+        while (len(self.data) - self.stripchart_offset >= self.stripchart_display_ticks):
+            self.stripchart_series.remove(0)
+            self.stripchart_offset += 1
 
         chart = QtChart.QChart()
         chart.addSeries(self.stripchart_series)
