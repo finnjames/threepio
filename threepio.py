@@ -66,8 +66,8 @@ class Threepio(QtWidgets.QMainWindow):
     stripchart_display_ticks = 2048 # how many data points to draw to stripchart
     stripchart_offset = 0
     
-    # seconds display format
-    display_decimal = Decimal('0.01')
+    # decimal display formats
+    TWOPLACES = Decimal('0.01')
 
     # test data
     ticker = 0
@@ -78,6 +78,7 @@ class Threepio(QtWidgets.QMainWindow):
 
         # use main_ui for window setup
         self.ui = Ui_MainWindow()
+        self.setStyleSheet(open('stylesheet.qss').read())
         self.ui.setupUi(self)
         self.setWindowTitle("Threepio")
 
@@ -93,7 +94,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.ui.chart_clear_button.clicked.connect(self.clear_strip_chart)
         self.ui.chart_refresh_button.clicked.connect(self.clear_strip_chart)
 
-        self.ui.actionLegacy.triggered.connect(self.handle_scan)
+        self.ui.actionLegacy.triggered.connect(self.legacy_mode)
 
         # store data in... an array; TODO: make this less terrible
         self.data = []
@@ -135,6 +136,12 @@ class Threepio(QtWidgets.QMainWindow):
 
     # def get_elapsed_time(self):
     #     return self.clock.get_time()
+    
+    def legacy_mode(self):
+        f = open("stylesheet.qss", "w")
+        f.write("background-color:#00ff00; color: #ff0000")
+        self.setStyleSheet("background-color:#00ff00; color: #ff0000")
+        self.setAutoFillBackground( True )
 
     def update_speed(self):
         if (self.ui.speed_faster_radio.isChecked()):
@@ -150,7 +157,7 @@ class Threepio(QtWidgets.QMainWindow):
         print(start_RA, end_RA)
 
     def update_gui(self): # TODO: make this display in human time
-        current_time = str(Decimal(self.clock.get_elapsed_time()).quantize(self.display_decimal))
+        current_time = str(Decimal(self.clock.get_elapsed_time()).quantize(self.TWOPLACES))
         self.ui.ra_value.setText("T+" + current_time + "s")
         
         # TODO: get data from declinometer

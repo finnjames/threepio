@@ -103,6 +103,8 @@ class Ui_MainWindow(object):
         font.setFamily("SF Mono")
         self.progressBar.setFont(font)
         self.progressBar.setProperty("value", 42)
+        self.progressBar.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
+        self.progressBar.setInvertedAppearance(False)
         self.progressBar.setObjectName("progressBar")
         self.gridLayout_2.addWidget(self.progressBar, 5, 0, 1, 2)
         self.ra_value = QtWidgets.QLabel(self.data_display_group)
