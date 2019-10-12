@@ -22,23 +22,32 @@ import tars
 
 class Dialog(QtWidgets.QDialog):
     """New observation dialogue window"""
-    def __init__(self, parent_window):
+    def __init__(self, parent_window, date):
         QtWidgets.QWidget.__init__(self)
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
         self.setWindowTitle("Threepio Dialogue")
+        
+        # set today's date
+        self.current_date = QtCore.QDate(time.localtime(date)[0], time.localtime(date)[1], time.localtime(date)[2])
+        self.current_time = QtCore.QTime(time.localtime(date)[3], time.localtime(date)[4], 0)
+        self.ui.start_time.setDate(self.current_date)
+        self.ui.start_time.setTime(self.current_time)
+        self.ui.end_time.setDate(self.current_date)
+        self.ui.end_time.setTime(self.current_time) 
 
-        # get the window that spawned it
+        # store the window that spawned it
         self.parent_window = parent_window
 
-        # what to do when press "ok"
-        self.ui.dialog_button_box.clicked.connect(self.handle_ok)
+        # when "ok" pressed
+        self.ui.dialog_button_box.accepted.connect(self.handle_ok)
 
     def handle_ok(self):
         # TODO: convert input to epoch time properly (not just assume everything is Jan 1 1970)
-        pattern = "%H:%M:%S"
-        start = int(time.mktime(time.strptime(self.ui.start_value.text(), pattern)))
-        end = int(time.mktime(time.strptime(self.ui.end_value.text(), pattern)))
+        pattern = "%Y.%m.%d %H:%M:%S"
+        print(self.ui.start_time.text())
+        start = int(time.mktime(time.strptime(self.ui.start_time.text(), pattern)))
+        end = int(time.mktime(time.strptime(self.ui.end_time.text(), pattern)))
 
         self.parent_window.set_ra(start, end)
 
@@ -66,7 +75,7 @@ class Threepio(QtWidgets.QMainWindow):
     stripchart_display_ticks = 2048 # how many data points to draw to stripchart
     stripchart_offset = 0
     
-    # decimal display formats
+    # decimal display formatsself.stripchart_series.count()self.stripchart_series.count()
     TWOPLACES = Decimal('0.01')
 
     # test data
@@ -91,8 +100,8 @@ class Threepio(QtWidgets.QMainWindow):
         self.ui.actionSurvey.triggered.connect(self.handle_survey)
         self.ui.actionSpectrum.triggered.connect(self.handle_spectrum)
 
-        self.ui.chart_clear_button.clicked.connect(self.clear_strip_chart)
-        self.ui.chart_refresh_button.clicked.connect(self.clear_strip_chart)
+        self.ui.chart_clear_button.clicked.connect(self.handle_clear)
+        self.ui.chart_refresh_button.clicked.connect(self.handle_scan)
 
         self.ui.actionLegacy.triggered.connect(self.legacy_mode)
 
@@ -111,7 +120,7 @@ class Threepio(QtWidgets.QMainWindow):
         #  clock
         self.clock = SuperClock(time.time())
         self.start_RA = time.time()
-        self.end_RA = time.time() + 1
+        self.end_RA = time.time() + 60
 
         # refresh timer
         self.timer = QtCore.QTimer(self)
@@ -128,8 +137,11 @@ class Threepio(QtWidgets.QMainWindow):
         self.data.append(int(self.other_ticker)) # random meander
 
         # self.data.append(self.tars.read_one(1)) # get data from DAQ
-
+        
         self.update_strip_chart() # make the stripchart scroll
+
+    def hello_world(self):
+        print("hello") # for testing
 
     def add_data(self, data):
         self.data.append(data)
@@ -145,7 +157,7 @@ class Threepio(QtWidgets.QMainWindow):
 
     def update_speed(self):
         if (self.ui.speed_faster_radio.isChecked()):
-            self.stripchart_display_ticks = 1024
+            self.stripchart_display_ticks = 512
         elif (self.ui.speed_slower_radio.isChecked()):
             self.stripchart_display_ticks = 3072
         else:
@@ -162,8 +174,8 @@ class Threepio(QtWidgets.QMainWindow):
         
         # TODO: get data from declinometer
         
-        # TODO: make this not crash on a /0
-        self.ui.progressBar.setValue(int((self.clock.get_elapsed_time() / (self.end_RA - self.start_RA))*100 % 100))
+        if not self.end_RA - self.start_RA == 0:
+            self.ui.progressBar.setValue(int((self.clock.get_elapsed_time() / (self.end_RA - self.start_RA))*100 % 100))
 
     def handle_survey(self):
         self.new_observation("survey")
@@ -175,13 +187,12 @@ class Threepio(QtWidgets.QMainWindow):
         self.new_observation("spectrum")
 
     def new_observation(self, type):
-        dialog = Dialog(self)
+        dialog = Dialog(self, self.clock.get_time())
         dialog.setWindowTitle("New " + type.capitalize())
         dialog.show()
         dialog.exec_()
     
     def update_strip_chart(self):
-
         self.stripchart_series.append(self.data[len(self.data) - 1], len(self.data))
 
         while (len(self.data) - self.stripchart_offset > self.stripchart_display_ticks):
@@ -196,11 +207,10 @@ class Threepio(QtWidgets.QMainWindow):
         chart.legend().hide()
 
         self.ui.stripchart.setChart(chart)
-    
-    def clear_strip_chart(self): # are clear and refresh supposed to be the same?
-        while (len(self.data) - self.stripchart_offset > 0):
-            self.stripchart_series.remove(0)
-            self.stripchart_offset += 1
+        
+    def handle_clear(self):
+        self.stripchart_offset += self.stripchart_series.count()
+        self.stripchart_series.clear()
 
 
 if __name__ == '__main__':
