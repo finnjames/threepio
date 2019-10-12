@@ -83,11 +83,12 @@
         <widget class="QLabel" name="dec_value">
          <property name="font">
           <font>
+           <family>SF Mono</family>
            <pointsize>22</pointsize>
            <weight>75</weight>
            <italic>false</italic>
            <bold>true</bold>
-           <kerning>true</kerning>
+           <kerning>false</kerning>
           </font>
          </property>
          <property name="text">
@@ -105,11 +106,12 @@
         <widget class="QLabel" name="channelA_value">
          <property name="font">
           <font>
+           <family>SF Mono</family>
            <pointsize>22</pointsize>
            <weight>75</weight>
            <italic>false</italic>
            <bold>true</bold>
-           <kerning>true</kerning>
+           <kerning>false</kerning>
           </font>
          </property>
          <property name="text">
@@ -127,11 +129,12 @@
         <widget class="QLabel" name="channelB_value">
          <property name="font">
           <font>
+           <family>SF Mono</family>
            <pointsize>22</pointsize>
            <weight>75</weight>
            <italic>false</italic>
            <bold>true</bold>
-           <kerning>true</kerning>
+           <kerning>false</kerning>
           </font>
          </property>
          <property name="text">
@@ -153,6 +156,11 @@
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="font">
+          <font>
+           <family>SF Mono</family>
+          </font>
+         </property>
          <property name="value">
           <number>42</number>
          </property>
@@ -162,11 +170,12 @@
         <widget class="QLabel" name="ra_value">
          <property name="font">
           <font>
+           <family>SF Mono</family>
            <pointsize>22</pointsize>
            <weight>75</weight>
            <italic>false</italic>
            <bold>true</bold>
-           <kerning>true</kerning>
+           <kerning>false</kerning>
           </font>
          </property>
          <property name="text">
@@ -215,6 +224,9 @@
          <height>32</height>
         </rect>
        </property>
+       <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
+       </property>
        <property name="text">
         <string>Refresh chart</string>
        </property>
@@ -228,6 +240,9 @@
          <height>20</height>
         </rect>
        </property>
+       <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
+       </property>
        <property name="text">
         <string>Slower</string>
        </property>
@@ -240,6 +255,9 @@
          <width>109</width>
          <height>32</height>
         </rect>
+       </property>
+       <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
        </property>
        <property name="text">
         <string>Clear chart</string>
@@ -257,6 +275,9 @@
          <height>20</height>
         </rect>
        </property>
+       <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
+       </property>
        <property name="text">
         <string>Default</string>
        </property>
@@ -272,6 +293,9 @@
          <width>64</width>
          <height>20</height>
         </rect>
+       </property>
+       <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
        </property>
        <property name="text">
         <string>Faster</string>
@@ -313,6 +337,7 @@
     <addaction name="separator"/>
     <addaction name="actionHelp"/>
     <addaction name="actionInfo"/>
+    <addaction name="actionLegacy"/>
     <addaction name="separator"/>
     <addaction name="actionStop"/>
     <addaction name="actionQuit"/>
@@ -321,11 +346,6 @@
    <addaction name="menuCalibration"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="actionSurevy">
-   <property name="text">
-    <string>Survey</string>
-   </property>
-  </action>
   <action name="actionRA">
    <property name="text">
     <string>RA...</string>
@@ -379,6 +399,11 @@
   <action name="actionSpectrum">
    <property name="text">
     <string>Spectrum</string>
+   </property>
+  </action>
+  <action name="actionLegacy">
+   <property name="text">
+    <string>Legacy...</string>
    </property>
   </action>
  </widget>
