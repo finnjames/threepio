@@ -62,6 +62,14 @@ class SuperClock():
     
     def get_time_until(self, destination_time):
         return time.time() - destination_time
+    
+class DataPoint():
+    """each data point taken"""
+    def __init__(self, timestamp, a, b):
+        self.timestamp = timestamp
+        self.a = a
+        self.b = b
+        
 
 class Threepio(QtWidgets.QMainWindow):
     """Main class for the app"""
@@ -100,11 +108,11 @@ class Threepio(QtWidgets.QMainWindow):
 
         self.ui.actionLegacy.triggered.connect(self.legacy_mode)
 
-        # store data in... an array; TODO: make this less terrible
         self.data = []
 
         # initialize stripchart
-        self.stripchart_series = QtChart.QLineSeries()
+        self.stripchart_series_a = QtChart.QLineSeries()
+        self.stripchart_series_b = QtChart.QLineSeries()
         self.ui.stripchart.setRenderHint(QtGui.QPainter.Antialiasing)
 
         # DATAQ stuff
@@ -115,7 +123,7 @@ class Threepio(QtWidgets.QMainWindow):
         #  clock
         self.clock = SuperClock(time.time())
         self.start_RA = time.time()
-        self.end_RA = time.time() + 60
+        self.end_RA = time.time()
 
         # refresh timer
         self.timer = QtCore.QTimer(self)
@@ -126,10 +134,10 @@ class Threepio(QtWidgets.QMainWindow):
 
         self.update_gui() # update gui
 
-        self.ticker += 1 # for the test data
         # self.data.append(int(((math.sin((self.ticker / (8 * math.pi)))*300)**2))) # pretty sine wave
-        self.other_ticker += random.randint(-2,2)
-        self.data.append(int(self.other_ticker)) # random meander
+        self.ticker += random.random()*random.randint(-1,1)       # \ for the test data
+        self.other_ticker += random.random()*random.randint(-1,1) # /
+        self.data.append(DataPoint(self.clock.get_time(), self.ticker, self.other_ticker)) # random meander
 
         # self.data.append(self.tars.read_one(1)) # get data from DAQ
         
@@ -154,14 +162,19 @@ class Threepio(QtWidgets.QMainWindow):
         self.end_RA = end_RA
         print(start_RA, end_RA)
 
-    def update_gui(self): # TODO: make this display in human time
-        mystring = "T%+.2f s" % (self.clock.get_time_until(self.start_RA))
-        self.ui.ra_value.setText(mystring)
+    def update_gui(self):
+        self.ui.ra_value.setText("T%+.2fs" % (self.clock.get_time_until(self.start_RA)))
         
         # TODO: get data from declinometer
+        if len(self.data) > 0:
+            self.ui.channelA_value.setText("%.2f" % (self.data[len(self.data) - 1].a))
+            self.ui.channelB_value.setText("%.2f" % (self.data[len(self.data) - 1].b))
         
-        if not self.end_RA - self.start_RA == 0:
-            self.ui.progressBar.setValue(int((self.clock.get_elapsed_time() / (self.end_RA - self.start_RA))*100 % 100))
+        if not self.end_RA - self.start_RA <= 1:
+            # TODO: make the progress bar always go left to right (even before obs start)
+            self.ui.progressBar.setValue(int((self.clock.get_time_until(self.end_RA) / (self.end_RA - self.start_RA)) * 10 % 100))
+        else:
+            self.ui.progressBar.setValue(0)
 
     def handle_survey(self):
         self.new_observation("survey")
@@ -179,24 +192,29 @@ class Threepio(QtWidgets.QMainWindow):
         dialog.exec_()
     
     def update_strip_chart(self):
-        self.stripchart_series.append(self.data[len(self.data) - 1], len(self.data))
+        self.stripchart_series_a.append(self.data[len(self.data) - 1].a, len(self.data))
+        self.stripchart_series_b.append(self.data[len(self.data) - 1].b, len(self.data))
 
         while (len(self.data) - self.stripchart_offset > self.stripchart_display_ticks):
-            self.stripchart_series.remove(0)
+            # TODO: make this not lag when there's a big delta in display_ticks
+            self.stripchart_series_a.remove(0)
+            self.stripchart_series_b.remove(0)
             self.stripchart_offset += 1
 
         # TODO: make the stripchart fill in old data when slowed down
 
         chart = QtChart.QChart()
-        chart.addSeries(self.stripchart_series)
+        chart.addSeries(self.stripchart_series_a)
+        chart.addSeries(self.stripchart_series_b)
         # chart.createDefaultAxes()
         chart.legend().hide()
 
         self.ui.stripchart.setChart(chart)
         
     def handle_clear(self):
-        self.stripchart_offset += self.stripchart_series.count()
-        self.stripchart_series.clear()
+        self.stripchart_offset += self.stripchart_series_a.count()
+        self.stripchart_series_a.clear()
+        self.stripchart_series_b.clear()
 
 
 def main():
