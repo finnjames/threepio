@@ -12,160 +12,212 @@ Written with frustration by Shengjie, Isabel, and Finn
 
 
 from PyQt5 import QtCore, QtWidgets, QtGui, QtChart
-from main_ui import Ui_MainWindow  # compiled PyQt main ui
-from dialog_ui import Ui_Dialog    # compiled PyQt dialogue ui
+from main_ui import Ui_MainWindow   # compiled PyQt main ui
+from dialog_ui import Ui_Dialog     # compiled PyQt dialogue ui
+from layout_legacy import Ui_Legacy # compiled legacy ui
 import time, math, random
 
 import tars
 
 class Dialog(QtWidgets.QDialog):
     """New observation dialogue window"""
-    def __init__(self, parent_window):
+    def __init__(self, parent_window, date):
         QtWidgets.QWidget.__init__(self)
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
         self.setWindowTitle("Threepio Dialogue")
+        
+        # set today's date
+        self.current_date = QtCore.QDate(time.localtime(date)[0], time.localtime(date)[1], time.localtime(date)[2])
+        self.current_time = QtCore.QTime(time.localtime(date)[3], time.localtime(date)[4], 0)
+        self.ui.start_time.setDate(self.current_date)
+        self.ui.start_time.setTime(self.current_time)
+        self.ui.end_time.setDate(self.current_date)
+        self.ui.end_time.setTime(self.current_time) 
 
-        # get the window that spawned it
+        # store the window that spawned it
         self.parent_window = parent_window
 
-        # what to do when press "ok"
-        self.ui.dialog_button_box.clicked.connect(self.handle_ok)
+        # when "ok" pressed
+        self.ui.dialog_button_box.accepted.connect(self.handle_ok)
 
     def handle_ok(self):
-        # TODO: convert input to epoch time properly (not just assume everything is Jan 1 1970)
-        pattern = "%H:%M:%S"
-        start = int(time.mktime(time.strptime(self.ui.start_value.text(), pattern)))
-        end = int(time.mktime(time.strptime(self.ui.end_value.text(), pattern)))
+        pattern = "%Y.%m.%d %H:%M:%S"
+        print(self.ui.start_time.text())
+        start = int(time.mktime(time.strptime(self.ui.start_time.text(), pattern)))
+        end = int(time.mktime(time.strptime(self.ui.end_time.text(), pattern)))
 
-        self.parent_window.setRA(start, end)
+        self.parent_window.set_ra(start, end)
 
 class SuperClock():
     """Clock object for encapsulation; keeps track of the time"""
-    def __init__(self, starting_time):
+    def __init__(self, starting_time = time.time()):
         self.starting_time = starting_time
     
-    def getTime(self):
-        return time.localtime(time.time())
+    def get_time(self):
+        return time.time()
+
+    def get_elapsed_time(self):
+        return time.time() - self.starting_time
+    
+    def get_time_until(self, destination_time):
+        return time.time() - destination_time
+    
+class DataPoint():
+    """each data point taken"""
+    def __init__(self, timestamp, a, b):
+        self.timestamp = timestamp
+        self.a = a
+        self.b = b
+        
 
 class Threepio(QtWidgets.QMainWindow):
     """Main class for the app"""
 
-    # basic time values; generally, default to milliseconds
-    start_RA = 0 # ms
-    end_RA = 0 # ms
-    elapsed_time = 0 # ms
-    timer_rate = 20 # ms
-    stripchart_display_ticks = 300 # how many data points to draw to stripchart
+    # basic time
+    start_RA = 0
+    end_RA = 0
+    timer_rate = 10 # ms
+    stripchart_display_ticks = 2048 # how many data points to draw to stripchart
+    stripchart_offset = 0
 
+    # test data
+    ticker = 0
+    other_ticker = 0
 
     def __init__(self):
         QtWidgets.QWidget.__init__(self)
 
         # use main_ui for window setup
         self.ui = Ui_MainWindow()
+        self.setStyleSheet(open('stylesheet.qss').read())
         self.ui.setupUi(self)
         self.setWindowTitle("Threepio")
 
         # connect buttons
-        self.ui.chart_clear_button.clicked.connect(self.handle_scan)
         self.ui.speed_faster_radio.clicked.connect(self.update_speed)
         self.ui.speed_slower_radio.clicked.connect(self.update_speed)
         self.ui.speed_default_radio.clicked.connect(self.update_speed)
 
-        # time
-        self.clock = SuperClock(0)
+        self.ui.actionScan.triggered.connect(self.handle_scan)
+        self.ui.actionSurvey.triggered.connect(self.handle_survey)
+        self.ui.actionSpectrum.triggered.connect(self.handle_spectrum)
 
-        # store data in... an array
-        # TODO: make this less terrible (at least delegate or something)
+        self.ui.chart_clear_button.clicked.connect(self.handle_clear)
+        self.ui.chart_refresh_button.clicked.connect(self.handle_scan)
+
+        self.ui.actionLegacy.triggered.connect(self.legacy_mode)
+
         self.data = []
 
         # initialize stripchart
-        self.stripchart_series = QtChart.QLineSeries()
-        for i in range(self.stripchart_display_ticks): # make line of zeros at start
-            self.data.append(0)
-        chart = QtChart.QChart()
-        chart.addSeries(self.stripchart_series)
-        chart.legend().hide()
-        self.ui.stripchart.setChart(chart)
+        self.stripchart_series_a = QtChart.QLineSeries()
+        self.stripchart_series_b = QtChart.QLineSeries()
         self.ui.stripchart.setRenderHint(QtGui.QPainter.Antialiasing)
 
         # DATAQ stuff
-        self.tars = tars.Tars(tars.discovery())
-        self.tars.init()
-        self.tars.start()
+        # self.tars = tars.Tars(tars.discovery())
+        # self.tars.init()
+        # self.tars.start()
+        
+        #  clock
+        self.clock = SuperClock(time.time())
+        self.start_RA = time.time()
+        self.end_RA = time.time()
 
-
-        # timer for... everything
+        # refresh timer
         self.timer = QtCore.QTimer(self)
         self.timer.timeout.connect(self.tick) # do everything
-        self.timer.start(self.timer_rate)
+        self.timer.start(self.timer_rate) # set refresh rate
 
     def tick(self): # primary controller for each clock tick
-        self.elapsed_time += self.timer_rate # 
-        self.update_gui()
-        # self.data.append(int(((math.sin((self.get_elapsed_time() / (200 * math.pi)))*300)**2))) # pretty sine wave
 
-        self.data.append(self.tars.read_one(1))
+        self.update_gui() # update gui
 
-        # make the stripchart scroll
+        # self.data.append(int(((math.sin((self.ticker / (8 * math.pi)))*300)**2))) # pretty sine wave
+        self.ticker += random.random()*random.randint(-1,1)       # \ for the test data
+        self.other_ticker += random.random()*random.randint(-1,1) # /
+        self.data.append(DataPoint(self.clock.get_time(), self.ticker, self.other_ticker)) # random meander
 
-        self.update_strip_chart()
-
-    def add_data(self, data):
-        self.data.append(data)
-
-    def get_elapsed_time(self):
-        return self.elapsed_time
+        # self.data.append(self.tars.read_one(1)) # get data from DAQ
+        
+        self.update_strip_chart() # make the stripchart scroll
+        
+    def legacy_mode(self):
+        f = open("stylesheet.qss", "w")
+        f.write("background-color:#00ff00; color: #ff0000")
+        self.setStyleSheet("background-color:#00ff00; color: #ff0000")
+        self.setAutoFillBackground( True )
 
     def update_speed(self):
         if (self.ui.speed_faster_radio.isChecked()):
-            self.stripchart_display_ticks = 200
+            self.stripchart_display_ticks = 512
         elif (self.ui.speed_slower_radio.isChecked()):
-            self.stripchart_display_ticks = 600
+            self.stripchart_display_ticks = 3072
         else:
-            self.stripchart_display_ticks = 400
+            self.stripchart_display_ticks = 2048
 
     def set_ra(self, start_RA, end_RA):
         self.start_RA = start_RA
         self.end_RA = end_RA
         print(start_RA, end_RA)
 
-    def update_gui(self): # TODO: make this display in human time
-        self.ui.ra_value.setText("T+" + str(round(self.start_RA + self.get_elapsed_time(), 2)) + "ms")
+    def update_gui(self):
+        self.ui.ra_value.setText("T%+.2fs" % (self.clock.get_time_until(self.start_RA)))
+        
         # TODO: get data from declinometer
-
-    def new_observation(self, observation_type):
-        if (observation_type):
-            print(observation_type)
+        if len(self.data) > 0:
+            self.ui.channelA_value.setText("%.2f" % (self.data[len(self.data) - 1].a))
+            self.ui.channelB_value.setText("%.2f" % (self.data[len(self.data) - 1].b))
+        
+        if not self.end_RA - self.start_RA <= 1:
+            # TODO: make the progress bar always go left to right (even before obs start)
+            self.ui.progressBar.setValue(int((self.clock.get_time_until(self.end_RA) / (self.end_RA - self.start_RA)) * 10 % 100))
         else:
-            print("no type")
+            self.ui.progressBar.setValue(0)
+
+    def handle_survey(self):
+        self.new_observation("survey")
 
     def handle_scan(self):
-        dialog = Dialog(self)
+        self.new_observation("scan")
+
+    def handle_spectrum(self):
+        self.new_observation("spectrum")
+
+    def new_observation(self, type):
+        dialog = Dialog(self, self.clock.get_time())
+        dialog.setWindowTitle("New " + type.capitalize())
         dialog.show()
         dialog.exec_()
     
     def update_strip_chart(self):
+        self.stripchart_series_a.append(self.data[len(self.data) - 1].a, len(self.data))
+        self.stripchart_series_b.append(self.data[len(self.data) - 1].b, len(self.data))
 
-        self.stripchart_series.clear()
+        while (len(self.data) - self.stripchart_offset > self.stripchart_display_ticks):
+            # TODO: make this not lag when there's a big delta in display_ticks
+            self.stripchart_series_a.remove(0)
+            self.stripchart_series_b.remove(0)
+            self.stripchart_offset += 1
 
-        if (len(self.data) >= self.stripchart_display_ticks): # ticks
-            for i in range(self.stripchart_display_ticks):
-                self.stripchart_series.append(self.data[len(self.data) - self.stripchart_display_ticks + i], i)
-        else:
-            for i in range(len(self.data)):
-                self.stripchart_series.append(self.data[i], i)
+        # TODO: make the stripchart fill in old data when slowed down
 
         chart = QtChart.QChart()
-        chart.addSeries(self.stripchart_series)
+        chart.addSeries(self.stripchart_series_a)
+        chart.addSeries(self.stripchart_series_b)
         # chart.createDefaultAxes()
         chart.legend().hide()
 
         self.ui.stripchart.setChart(chart)
+        
+    def handle_clear(self):
+        self.stripchart_offset += self.stripchart_series_a.count()
+        self.stripchart_series_a.clear()
+        self.stripchart_series_b.clear()
 
 
-if __name__ == '__main__':
+def main():
     import sys
     app = QtWidgets.QApplication(sys.argv)
     app.setStyle("Fusion")
@@ -173,3 +225,6 @@ if __name__ == '__main__':
     window.setMinimumSize(800,600)
     window.show()
     sys.exit(app.exec_())
+    
+if __name__ == '__main__':
+    main()
