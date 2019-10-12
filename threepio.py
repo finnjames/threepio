@@ -15,7 +15,6 @@ from PyQt5 import QtCore, QtWidgets, QtGui, QtChart
 from main_ui import Ui_MainWindow   # compiled PyQt main ui
 from dialog_ui import Ui_Dialog     # compiled PyQt dialogue ui
 from layout_legacy import Ui_Legacy # compiled legacy ui
-from decimal import Decimal
 import time, math, random
 
 import tars
@@ -43,7 +42,6 @@ class Dialog(QtWidgets.QDialog):
         self.ui.dialog_button_box.accepted.connect(self.handle_ok)
 
     def handle_ok(self):
-        # TODO: convert input to epoch time properly (not just assume everything is Jan 1 1970)
         pattern = "%Y.%m.%d %H:%M:%S"
         print(self.ui.start_time.text())
         start = int(time.mktime(time.strptime(self.ui.start_time.text(), pattern)))
@@ -62,8 +60,8 @@ class SuperClock():
     def get_elapsed_time(self):
         return time.time() - self.starting_time
     
-    def get_time_until(self, time):
-        return time.time() - time
+    def get_time_until(self, destination_time):
+        return time.time() - destination_time
 
 class Threepio(QtWidgets.QMainWindow):
     """Main class for the app"""
@@ -74,9 +72,6 @@ class Threepio(QtWidgets.QMainWindow):
     timer_rate = 10 # ms
     stripchart_display_ticks = 2048 # how many data points to draw to stripchart
     stripchart_offset = 0
-    
-    # decimal display formatsself.stripchart_series.count()self.stripchart_series.count()
-    TWOPLACES = Decimal('0.01')
 
     # test data
     ticker = 0
@@ -139,16 +134,7 @@ class Threepio(QtWidgets.QMainWindow):
         # self.data.append(self.tars.read_one(1)) # get data from DAQ
         
         self.update_strip_chart() # make the stripchart scroll
-
-    def hello_world(self):
-        print("hello") # for testing
-
-    def add_data(self, data):
-        self.data.append(data)
-
-    # def get_elapsed_time(self):
-    #     return self.clock.get_time()
-    
+        
     def legacy_mode(self):
         f = open("stylesheet.qss", "w")
         f.write("background-color:#00ff00; color: #ff0000")
@@ -169,8 +155,8 @@ class Threepio(QtWidgets.QMainWindow):
         print(start_RA, end_RA)
 
     def update_gui(self): # TODO: make this display in human time
-        current_time = str(Decimal(self.clock.get_elapsed_time()).quantize(self.TWOPLACES))
-        self.ui.ra_value.setText("T+" + current_time + "s")
+        mystring = "T%+.2f s" % (self.clock.get_time_until(self.start_RA))
+        self.ui.ra_value.setText(mystring)
         
         # TODO: get data from declinometer
         
@@ -213,7 +199,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.stripchart_series.clear()
 
 
-if __name__ == '__main__':
+def main():
     import sys
     app = QtWidgets.QApplication(sys.argv)
     app.setStyle("Fusion")
@@ -221,3 +207,6 @@ if __name__ == '__main__':
     window.setMinimumSize(800,600)
     window.show()
     sys.exit(app.exec_())
+    
+if __name__ == '__main__':
+    main()
