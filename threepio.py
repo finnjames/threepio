@@ -14,7 +14,6 @@ Written with frustration by Shengjie, Isabel, and Finn
 from PyQt5 import QtCore, QtWidgets, QtGui, QtChart
 from main_ui import Ui_MainWindow   # compiled PyQt main ui
 from dialog_ui import Ui_Dialog     # compiled PyQt dialogue ui
-from layout_legacy import Ui_Legacy # compiled legacy ui
 import time, math, random
 
 import tars
@@ -84,6 +83,10 @@ class Threepio(QtWidgets.QMainWindow):
     # test data
     ticker = 0
     other_ticker = 0
+    
+    # palette
+    BLUE = 0x2196f3
+    RED = 0xff5252
 
     def __init__(self):
         QtWidgets.QWidget.__init__(self)
@@ -108,12 +111,18 @@ class Threepio(QtWidgets.QMainWindow):
 
         self.ui.actionLegacy.triggered.connect(self.legacy_mode)
 
+        # init data array
         self.data = []
 
         # initialize stripchart
         self.stripchart_series_a = QtChart.QLineSeries()
         self.stripchart_series_b = QtChart.QLineSeries()
         self.ui.stripchart.setRenderHint(QtGui.QPainter.Antialiasing)
+        pen = QtGui.QPen(QtGui.QColor(self.BLUE))
+        pen.setWidth(3)
+        self.stripchart_series_a.setPen(pen)
+        pen.setColor(QtGui.QColor(self.RED))
+        self.stripchart_series_b.setPen(pen)
 
         # DATAQ stuff
         # self.tars = tars.Tars(tars.discovery())
