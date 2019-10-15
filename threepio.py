@@ -44,7 +44,6 @@ class Dialog(QtWidgets.QDialog):
 
     def handle_ok(self):
         pattern = "%Y.%m.%d %H:%M:%S"
-        print(self.ui.start_time.text())
         start = int(time.mktime(time.strptime(self.ui.start_time.text(), pattern)))
         end = int(time.mktime(time.strptime(self.ui.end_time.text(), pattern)))
 
@@ -183,7 +182,6 @@ class Threepio(QtWidgets.QMainWindow):
     def set_ra(self, start_RA, end_RA):
         self.start_RA = start_RA
         self.end_RA = end_RA
-        print(start_RA, end_RA)
 
     def update_gui(self):
         self.ui.ra_value.setText(self.clock.get_sidereal_time() + "UTC")
@@ -193,12 +191,16 @@ class Threepio(QtWidgets.QMainWindow):
             self.ui.channelA_value.setText("%.2f" % (self.data[len(self.data) - 1].a))
             self.ui.channelB_value.setText("%.2f" % (self.data[len(self.data) - 1].b))
         
+        # this mess makes the progress bar display "T+/- XX.XX" when
+        # assigned, and progress the bar when taking data
         if not self.end_RA - self.start_RA <= 1:
-            # TODO: make the progress bar always go left to right (even before obs start)
             if self.clock.get_time_until(self.start_RA) > 0 and self.clock.get_time_until(self.end_RA) < 0:
                 self.ui.progressBar.setValue(int((self.clock.get_time_until(self.end_RA) / (self.end_RA - self.start_RA)) * 100 % 100))
+            else:
+                self.ui.progressBar.setValue(0)
             self.ui.progressBar.setFormat("T%+.1fs" % (self.clock.get_time_until(self.start_RA)))
         else:
+            self.ui.progressBar.setFormat("n/a")
             self.ui.progressBar.setValue(0)
 
     def handle_survey(self):
