@@ -14,6 +14,8 @@ Written with frustration by Shengjie, Isabel, and Finn
 from PyQt5 import QtCore, QtWidgets, QtGui, QtChart
 from main_ui import Ui_MainWindow   # compiled PyQt main ui
 from dialog_ui import Ui_Dialog     # compiled PyQt dialogue ui
+from astropy.time import Time
+import numpy as np
 import time, math, random
 
 import tars
@@ -62,6 +64,13 @@ class SuperClock():
     def get_time_until(self, destination_time):
         return time.time() - destination_time
     
+    def get_local_time(self):
+        return time.localtime(time.time())
+    
+    def get_sidereal_time(self):
+        sidereal = Time(time.time(), format="unix")
+        return sidereal.fits[-12:][:11] # TODO: make this less wack, also local time
+    
 class DataPoint():
     """each data point taken"""
     def __init__(self, timestamp, a, b):
@@ -109,7 +118,9 @@ class Threepio(QtWidgets.QMainWindow):
         self.ui.chart_clear_button.clicked.connect(self.handle_clear)
         self.ui.chart_refresh_button.clicked.connect(self.handle_scan)
 
+        # TODO: maybe just choose one of these?
         self.ui.actionLegacy.triggered.connect(self.legacy_mode)
+        self.ui.chart_legacy_button.clicked.connect(self.legacy_mode)
 
         # init data array
         self.data = []
@@ -118,6 +129,8 @@ class Threepio(QtWidgets.QMainWindow):
         self.stripchart_series_a = QtChart.QLineSeries()
         self.stripchart_series_b = QtChart.QLineSeries()
         self.ui.stripchart.setRenderHint(QtGui.QPainter.Antialiasing)
+        
+        # make the charts m a t e r i a l (blue and red)
         pen = QtGui.QPen(QtGui.QColor(self.BLUE))
         pen.setWidth(3)
         self.stripchart_series_a.setPen(pen)
@@ -165,6 +178,7 @@ class Threepio(QtWidgets.QMainWindow):
             self.stripchart_display_ticks = 3072
         else:
             self.stripchart_display_ticks = 2048
+        self.handle_clear()
 
     def set_ra(self, start_RA, end_RA):
         self.start_RA = start_RA
@@ -172,7 +186,7 @@ class Threepio(QtWidgets.QMainWindow):
         print(start_RA, end_RA)
 
     def update_gui(self):
-        self.ui.ra_value.setText("T%+.2fs" % (self.clock.get_time_until(self.start_RA)))
+        self.ui.ra_value.setText(self.clock.get_sidereal_time() + "UTC")
         
         # TODO: get data from declinometer
         if len(self.data) > 0:
@@ -181,7 +195,9 @@ class Threepio(QtWidgets.QMainWindow):
         
         if not self.end_RA - self.start_RA <= 1:
             # TODO: make the progress bar always go left to right (even before obs start)
-            self.ui.progressBar.setValue(int((self.clock.get_time_until(self.end_RA) / (self.end_RA - self.start_RA)) * 10 % 100))
+            if self.clock.get_time_until(self.start_RA) > 0 and self.clock.get_time_until(self.end_RA) < 0:
+                self.ui.progressBar.setValue(int((self.clock.get_time_until(self.end_RA) / (self.end_RA - self.start_RA)) * 100 % 100))
+            self.ui.progressBar.setFormat("T%+.1fs" % (self.clock.get_time_until(self.start_RA)))
         else:
             self.ui.progressBar.setValue(0)
 
