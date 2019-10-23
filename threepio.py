@@ -1,9 +1,9 @@
 """
-  __  __                    _                 
+  __  __                    _
  / /_/ /  _______ ___ ___  (_)__    ___  __ __
 / __/ _ \/ __/ -_) -_) _ \/ / _ \_ / _ \/ // /
-\__/_//_/_/  \__/\__/ .__/_/\___(_) .__/\_, / 
-                   /_/           /_/   /___/  
+\__/_//_/_/  \__/\__/ .__/_/\___(_) .__/\_, /
+                   /_/           /_/   /___/
 
 The helpful companion to the 40' telescope
 Written with frustration by Shengjie, Isabel, and Finn
@@ -34,7 +34,7 @@ class Dialog(QtWidgets.QDialog):
         self.ui.start_time.setDate(self.current_date)
         self.ui.start_time.setTime(self.current_time)
         self.ui.end_time.setDate(self.current_date)
-        self.ui.end_time.setTime(self.current_time) 
+        self.ui.end_time.setTime(self.current_time)
 
         # store the window that spawned it
         self.parent_window = parent_window
@@ -50,7 +50,7 @@ class Dialog(QtWidgets.QDialog):
         self.parent_window.set_ra(start, end)
 
 class SuperClock():
-    """Clock object for encapsulation; keeps track of the time"""
+    """Clock object for encapsulation; keeps track of the time(tm)"""
     def __init__(self, starting_time = time.time()):
         self.starting_time = starting_time
     
@@ -66,18 +66,17 @@ class SuperClock():
     def get_local_time(self):
         return time.localtime(time.time())
     
-    def get_sidereal_time(self):
+    def get_sidereal_time(self): # TODO: make this actually be sidereal
         sidereal = Time(time.time(), format="unix")
-        return sidereal.fits[-12:][:11] # TODO: make this less wack, also local time
+        return sidereal.fits[-12:][:11] # TODO: make this less wack
     
 class DataPoint():
-    """each data point taken"""
+    """each data point taken, has a timestamp and two voltage channels"""
     def __init__(self, timestamp, a, b):
         self.timestamp = timestamp
         self.a = a
         self.b = b
         
-
 class Threepio(QtWidgets.QMainWindow):
     """Main class for the app"""
 
@@ -91,6 +90,10 @@ class Threepio(QtWidgets.QMainWindow):
     # test data
     ticker = 0
     other_ticker = 0
+    
+    # stripchart
+    stripchart_low = -1
+    stripchart_high = 1
     
     # palette
     BLUE = 0x2196f3
@@ -115,7 +118,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.ui.actionSpectrum.triggered.connect(self.handle_spectrum)
 
         self.ui.chart_clear_button.clicked.connect(self.handle_clear)
-        self.ui.chart_refresh_button.clicked.connect(self.handle_scan)
+        self.ui.chart_refresh_button.clicked.connect(self.handle_refresh)
 
         # TODO: maybe just choose one of these?
         self.ui.actionLegacy.triggered.connect(self.legacy_mode)
@@ -219,8 +222,10 @@ class Threepio(QtWidgets.QMainWindow):
         dialog.exec_()
     
     def update_strip_chart(self):
-        self.stripchart_series_a.append(self.data[len(self.data) - 1].a, len(self.data))
-        self.stripchart_series_b.append(self.data[len(self.data) - 1].b, len(self.data))
+        new_a = self.data[len(self.data) - 1].a
+        new_b = self.data[len(self.data) - 1].b
+        self.stripchart_series_a.append(new_a, len(self.data))
+        self.stripchart_series_b.append(new_b, len(self.data))
 
         while (len(self.data) - self.stripchart_offset > self.stripchart_display_ticks):
             # TODO: make this not lag when there's a big delta in display_ticks
@@ -233,6 +238,29 @@ class Threepio(QtWidgets.QMainWindow):
         chart = QtChart.QChart()
         chart.addSeries(self.stripchart_series_a)
         chart.addSeries(self.stripchart_series_b)
+        
+        
+        axisX = QtChart.QValueAxis()
+
+        if (new_a < new_b):
+            if (new_a < self.stripchart_low):
+                self.stripchart_low = new_a
+            if (new_b > self.stripchart_high):
+                self.stripchart_high = new_b
+        else:
+            if (new_b < self.stripchart_low):
+                self.stripchart_low = new_b
+            if (new_a > self.stripchart_high):
+                self.stripchart_high = new_a
+                
+        axisX.setRange(self.stripchart_low, self.stripchart_high)
+        
+        # axisX.setLabelFormat("%g")
+        chart.setAxisX(axisX)
+
+        self.stripchart_series_a.attachAxis(axisX)
+        self.stripchart_series_b.attachAxis(axisX)
+        
         # chart.createDefaultAxes()
         chart.legend().hide()
 
@@ -242,6 +270,10 @@ class Threepio(QtWidgets.QMainWindow):
         self.stripchart_offset += self.stripchart_series_a.count()
         self.stripchart_series_a.clear()
         self.stripchart_series_b.clear()
+    
+    def handle_refresh(self):
+        self.stripchart_low = 32767
+        self.stripchart_high = -32768
 
 
 def main():
