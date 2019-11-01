@@ -14,7 +14,7 @@ class MyPrecious:
         """
         This function accepts a tuple of values and append them to the output buffer
         one value per line. A tuple should represent one single data point with its
-        values being RA, DEC and the voltage read.
+        values being RA, DEC and the voltage value(s).
         """
         for val in data:
             self.buffer_append(str(val))
