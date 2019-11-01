@@ -9,19 +9,31 @@ class MyPrecious:
         self.filename = filename
         self.buffer = []
 
+    # Use the following functions for interacting with the file.
     def write_data(self, data: tuple):
+        """
+        This function accepts a tuple of values and append them to the output buffer
+        one value per line. A tuple should represent one single data point with its
+        values being RA, DEC and the voltage read.
+        """
         for val in data:
             self.buffer_append(str(val))
     
     def write_sep(self):
+        """
+        Use this function for separation for calibration, turing points, etc.
+        """
         self.buffer_append('*')
 
     def write_meta(self, start_datetime: datetime, stop_datetime: datetime):
+        """
+        Append meta data about the file. Use this function once with 
+        """
         self.buffer_append('TELESCOPE: The Mighty Forty')
-        self.buffer_append('LOCAL START DATE: ' + start_datetime.date)
-        self.buffer_append('LOCAL START TIME: ' + start_datetime.time)
-        self.buffer_append('LOCAL STOP DATE: ' + stop_datetime.date)
-        self.buffer_append('LOCAL STOP TIME: ' + stop_datetime.time)
+        self.buffer_append('LOCAL START DATE: ' + str(start_datetime.date()))
+        self.buffer_append('LOCAL START TIME: ' + str(start_datetime.time()))
+        self.buffer_append('LOCAL STOP DATE: ' + str(stop_datetime.date()))
+        self.buffer_append('LOCAL STOP TIME: ' + str(stop_datetime.time()))
 
     def buffer_clear(self):
         self.buffer = []

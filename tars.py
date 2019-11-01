@@ -74,7 +74,7 @@ class Tars:
 
     def read_one(self, channel: int) -> float:
         buffer = self.ser.read(2)
-        return self.RANGE_VOLT[channel >> 8] * int.from_bytes(buffer, byteorder='little', signed=True) / 32768
+        return Tars.RANGE_VOLT[channel >> 8] * int.from_bytes(buffer, byteorder='little', signed=True) / 32768
     
     def read_all(self) -> list:
         if self.in_waiting() < (2 * len(self.channels)):
