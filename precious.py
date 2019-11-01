@@ -36,14 +36,22 @@ class MyPrecious:
         self.buffer_append('LOCAL STOP TIME: ' + str(stop_datetime.time()))
 
     def buffer_clear(self):
+        """
+        Run this function at the beginning, or each time when the buffer needs to be resetted.
+        """
         self.buffer = []
+
+    def buffer_write(self):
+        """
+        Run this function to actually write to the file. It will automatically clear the buffer
+        """
+        self.file_append('\n'.join(self.buffer))
+        self.buffer_clear()
+
+    ### Helper functions below ###
 
     def buffer_append(self, data: str):
         self.buffer.append(data)
-
-    def buffer_write(self):
-        self.file_append('\n'.join(self.buffer))
-        self.buffer_clear()
 
     def file_write(self, data, mode='a'):
         if mode != 'a' and mode != 'w':
