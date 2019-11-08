@@ -15,7 +15,7 @@ from PyQt5 import QtCore, QtWidgets, QtGui, QtChart
 from main_ui import Ui_MainWindow   # compiled PyQt main ui
 from dialog_ui import Ui_Dialog     # compiled PyQt dialogue ui
 from astropy.time import Time
-from playsound import playsound # TODO: test on Windows
+# from playsound import playsound # TODO: test on Windows 
 import numpy as np
 import time, math, random
 
