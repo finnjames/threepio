@@ -10,7 +10,6 @@ Written with frustration by Shengjie, Isabel, and Finn
 
 """
 
-
 from PyQt5 import QtCore, QtWidgets, QtGui, QtChart
 from main_ui import Ui_MainWindow   # compiled PyQt main ui
 from dialog_ui import Ui_Dialog     # compiled PyQt dialogue ui
@@ -20,158 +19,15 @@ import numpy as np
 import time, math, random
 
 import tars
-import precious
-
-class Dialog(QtWidgets.QDialog):
-    """New observation dialogue window"""
-    def __init__(self, parent_window, date, observation):
-        QtWidgets.QWidget.__init__(self)
-        self.ui = Ui_Dialog()
-        self.ui.setupUi(self)
-        self.setWindowTitle("Threepio Dialogue")
-        self.observation = observation
-        
-        # If a scan, only one Dec needed
-        if self.observation.obs_type == "Scan":
-            self.ui.ending_dec.hide()
-            self.ui.end_dec_label.hide()
-            self.ui.start_dec_label.setText("Declination")
-        
-        # set today's date
-        self.current_date = QtCore.QDate(time.localtime(date)[0], time.localtime(date)[1], time.localtime(date)[2])
-        self.current_time = QtCore.QTime(time.localtime(date)[3], time.localtime(date)[4], 0)
-        self.ui.start_time.setDate(self.current_date)
-        self.ui.start_time.setTime(self.current_time)
-        self.ui.end_time.setDate(self.current_date)
-        self.ui.end_time.setTime(self.current_time)
-
-        # store parent window
-        self.parent_window = parent_window
-
-        # connect okay button
-        self.ui.dialog_button_box.accepted.connect(self.handle_ok)
-
-    def handle_ok(self):
-        self.set_observation()
-        self.parent_window.observation = None
-        self.parent_window.observation = self.observation
-        
-        # this should fix the stripchart, #nojudgement
-        self.parent_window.stripchart_offset = 0
-        self.parent_window.stripchart_series_a.clear()
-        self.parent_window.stripchart_series_b.clear()
-        
-    def set_observation(self):
-        pattern = "%Y.%m.%d %H:%M:%S"
-        
-        self.observation.set_RA(int(time.mktime(time.strptime(self.ui.start_time.text(), pattern))), int(time.mktime(time.strptime(self.ui.end_time.text(), pattern))))
-        self.observation.set_dec(self.ui.starting_dec.text(), self.ui.ending_dec.text())
-        
-        self.observation.set_precious(self.ui.file_name_value)
-        print(self.observation.precious.filename)
-        
-
-class SuperClock():
-    """Clock object for encapsulation; keeps track of the time(tm)"""
-    
-    SIDEREAL = 1.00273790935
-    
-    def __init__(self, starting_sidereal_time = time.time()):
-        self.starting_time = time.time()
-        self.starting_sidereal_time = starting_sidereal_time
-    
-    def get_time(self):
-        return time.time()
-    
-    def get_elapsed_time(self):
-        return time.time() - self.starting_time
-    
-    def get_time_until(self, destination_time):
-        return time.time() - destination_time
-    
-    def get_local_time(self):
-        return time.localtime(time.time())
-    
-    def get_sidereal_time(self): # TODO: make this actually be sidereal
-        sidereal = self.starting_sidereal_time + ((time.time() - self.starting_time) * self.SIDEREAL)
-        print(time.time(), sidereal)
-        sidereal = Time(sidereal, format="unix")
-        return sidereal.fits[-12:][:11] # TODO: make this less wack
-    
-class Observation():
-    """superclass for each of the three types of observation you might encounter on your Pokemon journey"""
-    
-    obs_type = None
-    
-    data = []
-    written_to = -1
-    
-    start_RA = 0
-    end_RA = 0
-    start_dec = 0 # if only one dec, this is it
-    end_dec = 0
-    
-    def __init__(self):
-        pass
-    
-    def set_RA(self, start_RA, end_RA):
-        self.start_RA = start_RA
-        self.end_RA = end_RA
-    
-    def set_dec(self, start_dec, end_dec):
-        self.start_dec = start_dec
-        self.end_dec = end_dec
-        
-    def set_precious(self, filename):
-        self.precious = precious.MyPrecious(filename)
-    
-    def add_data(self, data_point):
-        self.data.append(data_point)
-    
-    def get_last_data(self):
-        return self.data[len(self.data) - 1]
-    
-    # TODO: implement MyPrecious encapsulation
-
-
-class Scan(Observation):
-    """for all your scan observation needs"""
-    obs_type = "Scan"
-    data = []
-    
-    def set_dec(self, start_dec, end_dec):
-        self.start_dec = start_dec
-
-class Survey(Observation):
-    """for all your survey observation needs"""
-    obs_type = "Survey"
-    data = []
-
-class Spectrum(Observation):
-    """for all your spectrum observation needs"""
-    obs_type = "Spectrum"
-    data = []
-    
-    def set_dec(self, start_dec, end_dec):
-        self.start_dec = start_dec
-
-class DataPoint():
-    """each data point taken, has a timestamp and two voltage channels"""
-    def __init__(self, timestamp, a, b, dec):
-        self.timestamp = timestamp
-        self.a = a
-        self.b = b
-        self.dec = dec
-        
-    def to_tuple(self):
-        return (self.timestamp, self.a, self.b, self.dec)
+from precious import MyPrecious
+from dialog import Dialog
+from superclock import SuperClock
+from observation import Observation, Survey, Scan, Spectrum, DataPoint
         
 class Threepio(QtWidgets.QMainWindow):
     """Main class for the app"""
 
     # basic time
-    start_RA = 0
-    end_RA = 0
     timer_rate = 10 # ms
     stripchart_display_ticks = 2048 # how many data points to draw to stripchart
     stripchart_offset = 0
@@ -233,9 +89,7 @@ class Threepio(QtWidgets.QMainWindow):
         # self.tars.start()
         
         #  clock
-        self.clock = SuperClock(time.time())
-        self.start_RA = time.time()
-        self.end_RA = time.time()
+        self.clock = SuperClock()
         
         # blank obs
         self.observation = Observation()
