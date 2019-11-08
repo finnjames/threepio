@@ -1,3 +1,5 @@
+"""dialogue box for keying in a new observation"""
+
 from PyQt5 import QtCore, QtWidgets, QtGui, QtChart
 from dialog_ui import Ui_Dialog     # compiled PyQt dialogue ui
 import time

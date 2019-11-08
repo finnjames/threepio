@@ -1,4 +1,4 @@
-
+"""classes for the three types of observations as well as DataPoint"""
 
 class Observation():
     """superclass for each of the three types of observation you might encounter on your Pokemon journey"""
