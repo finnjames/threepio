@@ -12,7 +12,7 @@ Written with frustration by Shengjie, Isabel, and Finn
 
 from PyQt5 import QtCore, QtWidgets, QtGui, QtChart
 from main_ui import Ui_MainWindow   # compiled PyQt main ui
-from playsound import playsound # TODO: test on Windows
+# from playsound import playsound # TODO: test on Windows
 import numpy as np
 import time, math, random
 
