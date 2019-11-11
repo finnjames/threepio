@@ -1,20 +1,26 @@
+<<<<<<< HEAD
 """classes for the three types of observations as well as DataPoint"""
+=======
+from datetime import datetime
+>>>>>>> dc7593acce82d2dfe885f4e57434893c55841932
 
 class Observation():
     """superclass for each of the three types of observation you might encounter on your Pokemon journey"""
     
     obs_type = None
     
-    data = []
-    written_to = -1
-    
-    start_RA = 0
-    end_RA = 0
-    start_dec = 0 # if only one dec, this is it
-    end_dec = 0
-    
     def __init__(self):
-        pass
+        self.data = []
+        self.written_to = -1
+        self.calibration = False
+        
+        self.start_RA   = 0
+        self.end_RA     = 0
+        self.start_dec  = 0     # if only one dec, this is it
+        self.end_dec    = 0
+
+        self.start_time = None
+        self.end_time   = None
     
     def set_RA(self, start_RA, end_RA):
         self.start_RA = start_RA
@@ -34,7 +40,32 @@ class Observation():
         return self.data[len(self.data) - 1]
     
     # TODO: implement MyPrecious encapsulation
+    def start(self):
+        self.start_time = datetime.now()
 
+    def stop(self):
+        self.end_time = datetime.now()
+        self.precious.write('*')
+        self.precious.write('*')
+        self.write_meta()
+
+    def write(self, list_of_data: list):
+        """
+        Take in a list of DataPoints. Each has four values: 
+        RA, DEC, and voltages from the two channels.
+        """
+        for point in list_of_data:
+            self.precious.write(point.timestamp)
+            self.precious.write(point.dec)
+            self.precious.write(point.a)
+            self.precious.write(point.b)
+
+    def write_meta(self):
+        self.precious.write('TELESCOPE: The Mighty Forty')
+        self.precious.write('LOCAL START DATE: ' + str(self.start_time.date()))
+        self.precious.write('LOCAL START TIME: ' + str(self.start_time.time()))
+        self.precious.write('LOCAL STOP DATE: '  + str(self.end_time.date()))
+        self.precious.write('LOCAL STOP TIME: '  + str(self.end_time.time()))
 
 class Scan(Observation):
     """for all your scan observation needs"""

@@ -3,7 +3,7 @@
  / /_/ /  _______ ___ ___  (_)__    ___  __ __
 / __/ _ \/ __/ -_) -_) _ \/ / _ \_ / _ \/ // /
 \__/_//_/_/  \__/\__/ .__/_/\___(_) .__/\_, / 
-                   /_/           /_/   /___/  
+                   /_/           /_/   /___/   
 
 The helpful companion to the 40' telescope
 Written with frustration by Shengjie, Isabel, and Finn
@@ -12,7 +12,8 @@ Written with frustration by Shengjie, Isabel, and Finn
 
 from PyQt5 import QtCore, QtWidgets, QtGui, QtChart
 from main_ui import Ui_MainWindow   # compiled PyQt main ui
-from dialog_ui import Ui_Dialog     # compiled PyQt dialogue ui
+# from dialog_ui import Ui_Dialog     # compiled PyQt dialogue ui
+from time_ui import Ui_Dialog     # compiled PyQt dialogue ui
 from astropy.time import Time
 # from playsound import playsound # TODO: test on Windows 
 import numpy as np
@@ -88,8 +89,8 @@ class Threepio(QtWidgets.QMainWindow):
         # self.tars.init()
         # self.tars.start()
         
-        #  clock
-        self.clock = SuperClock()
+        # clock
+        self.clock = self.set_time()
         
         # blank obs
         self.observation = Observation()
@@ -116,6 +117,20 @@ class Threepio(QtWidgets.QMainWindow):
         f.write("background-color:#00ff00; color: #ff0000")
         self.setStyleSheet("background-color:#00ff00; color: #ff0000")
         self.setAutoFillBackground( True )
+
+    def set_time(self):
+        new_clock = SuperClock()
+        
+        # TODO: abstract this better
+        dialog = QtWidgets.QDialog()
+        dialog.ui = Ui_Dialog()
+        dialog.ui.setupUi(dialog)
+        dialog.setWindowTitle("Set Time")
+        dialog.show()
+        dialog.exec_()
+        
+        new_clock.starting_time = time.time()
+        return new_clock
 
     def update_speed(self):
         if (self.ui.speed_faster_radio.isChecked()):

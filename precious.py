@@ -5,63 +5,57 @@ Functionalities needed for working with files.
 from datetime import datetime
 
 class MyPrecious:
+    MAX_BUFFER_SIZE = 100
+
     def __init__(self, filename: str):
         self.filename = filename
-        self.buffer = []
+        self.__buffer = []
 
-    # Use the following functions for interacting with the file.
-    def write_data(self, data: tuple):
-        """
-        This function accepts a tuple of values and append them to the output buffer
-        one value per line. A tuple should represent one single data point with its
-        values being RA, DEC and the voltage value(s).
-        """
-        for val in data:
-            self.buffer_append(str(val))
-    
-    def write_sep(self):
-        """
-        Use this function for separation for calibration, turing points, etc.
-        """
-        self.buffer_append('*')
+    def __del__(self):
+        if self.__buffer_size() > 0:
+            self.__buffer_write()
 
-    def write_meta(self, start_datetime: datetime, stop_datetime: datetime):
-        """
-        Append meta data about the file. Use this function once with 
-        """
-        self.buffer_append('TELESCOPE: The Mighty Forty')
-        self.buffer_append('LOCAL START DATE: ' + str(start_datetime.date()))
-        self.buffer_append('LOCAL START TIME: ' + str(start_datetime.time()))
-        self.buffer_append('LOCAL STOP DATE: ' + str(stop_datetime.date()))
-        self.buffer_append('LOCAL STOP TIME: ' + str(stop_datetime.time()))
+    def write(self, val):
+        self.__buffer_append(str(val))
+        if self.__buffer_size() > MyPrecious.MAX_BUFFER_SIZE:
+            self.__buffer_write()
 
-    def buffer_clear(self):
+    def clear(self):
+        self.__buffer_clear()
+
+    def close(self):
+        self.__buffer_write()
+
+    ### Helpfer functions below ###
+
+    def __buffer_clear(self):
         """
         Run this function at the beginning, or each time when the buffer needs to be resetted.
         """
-        self.buffer = []
+        self.__buffer = []
 
-    def buffer_write(self):
+    def __buffer_write(self):
         """
         Run this function to actually write to the file. It will automatically clear the buffer
         """
-        self.file_append('\n'.join(self.buffer))
-        self.buffer_clear()
+        self.__file_append('\n'.join(self.__buffer))
+        self.__buffer_clear()
 
-    ### Helper functions below ###
+    def __buffer_append(self, data: str):
+        self.__buffer.append(data)
+    
+    def __buffer_size(self) -> int:
+        return len(self.__buffer)
 
-    def buffer_append(self, data: str):
-        self.buffer.append(data)
-
-    def file_write(self, data, mode='a'):
+    def __file_write(self, data, mode='a'):
         if mode != 'a' and mode != 'w':
             print("Write mode not recognized. Please use " +
             "'a' for append and 'w' for write (overwrite).")
         with open(self.filename, mode) as file:
             print(data, end='\n', file=file)
 
-    def file_overwrite(self, data):
-        self.file_write(data, mode='w')
+    def __file_overwrite(self, data):
+        self.__file_write(data, mode='w')
 
-    def file_append(self, data):
-        self.file_write(data, mode='a')
+    def __file_append(self, data):
+        self.__file_write(data, mode='a')
