@@ -113,6 +113,8 @@ class Threepio(QtWidgets.QMainWindow):
         
         self.update_strip_chart() # make the stripchart scroll
         
+        self.clock.get_sidereal_seconds()
+        
     def legacy_mode(self):
         f = open("stylesheet.qss", "w")
         f.write("background-color:#00ff00; color: #ff0000")

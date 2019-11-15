@@ -27,12 +27,17 @@ class SuperClock():
     def get_local_time(self):
         return time.localtime(time.time())
     
-    def get_sidereal_time(self): # TODO: make this actually be sidereal
-        astro_time = self.starting_sidereal_time + self.SIDEREAL*(self.get_elapsed_time())
-        # sidereal = astro_time.sidereal_time("apparent", longitude=self.LONGITUDE, model='IAU2000A')
-        hours = time.localtime(astro_time)[3]
-        minutes = time.localtime(astro_time)[4]
-        seconds = time.localtime(astro_time)[5]
+    def get_sidereal_time(self): 
+        elapsed_sidereal_time = self.starting_sidereal_time + self.SIDEREAL*(self.get_elapsed_time())
+        hours = time.localtime(elapsed_sidereal_time)[3]
+        minutes = time.localtime(elapsed_sidereal_time)[4]
+        seconds = time.localtime(elapsed_sidereal_time)[5]
         sidereal = "%02d:%02d:%02d" % (hours, minutes, seconds)
-        # print(sidereal)
         return sidereal
+    
+    def get_sidereal_seconds(self):
+        epoch_date = time.localtime(time.time())
+        epoch_date = 3600*epoch_date[3] + 60*epoch_date[4] + epoch_date[5]
+        epoch_date *= self.SIDEREAL
+        print(epoch_date)
+        return epoch_date
