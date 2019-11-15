@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-"""classes for the three types of observations as well as DataPoint"""
-=======
 from datetime import datetime
->>>>>>> dc7593acce82d2dfe885f4e57434893c55841932
 
 class Observation():
     """superclass for each of the three types of observation you might encounter on your Pokemon journey"""

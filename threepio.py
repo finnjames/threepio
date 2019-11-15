@@ -22,6 +22,7 @@ import time, math, random
 import tars
 from precious import MyPrecious
 from dialog import Dialog
+from time_dialog import TimeDialog
 from superclock import SuperClock
 from observation import Observation, Survey, Scan, Spectrum, DataPoint
         
@@ -122,14 +123,10 @@ class Threepio(QtWidgets.QMainWindow):
         new_clock = SuperClock()
         
         # TODO: abstract this better
-        dialog = QtWidgets.QDialog()
-        dialog.ui = Ui_Dialog()
-        dialog.ui.setupUi(dialog)
-        dialog.setWindowTitle("Set Time")
+        dialog = TimeDialog(new_clock)
         dialog.show()
         dialog.exec_()
         
-        new_clock.starting_time = time.time()
         return new_clock
 
     def update_speed(self):
@@ -142,7 +139,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.handle_clear()
 
     def update_gui(self):
-        self.ui.ra_value.setText(self.clock.get_sidereal_time() + "UTC")
+        self.ui.ra_value.setText(self.clock.get_sidereal_time())
         
         # TODO: get data from declinometer
         self.ui.dec_value.setText(str(self.observation.start_dec) + "deg")
