@@ -43,31 +43,19 @@
        <string>Data</string>
       </property>
       <layout class="QGridLayout" name="gridLayout_2">
-       <item row="4" column="0">
-        <widget class="QLabel" name="channelB_label">
+       <item row="1" column="0">
+        <widget class="QLabel" name="ra_label">
          <property name="font">
           <font>
            <pointsize>22</pointsize>
           </font>
          </property>
          <property name="text">
-          <string>Channel B voltage:</string>
+          <string>Right Ascension:</string>
          </property>
         </widget>
        </item>
        <item row="2" column="0">
-        <widget class="QLabel" name="channelA_label">
-         <property name="font">
-          <font>
-           <pointsize>22</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>Channel A voltage:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
         <widget class="QLabel" name="dec_label">
          <property name="font">
           <font>
@@ -79,7 +67,31 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="1">
+       <item row="5" column="0">
+        <widget class="QLabel" name="channelB_label">
+         <property name="font">
+          <font>
+           <pointsize>22</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Channel B voltage:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="channelA_label">
+         <property name="font">
+          <font>
+           <pointsize>22</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Channel A voltage:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
         <widget class="QLabel" name="dec_value">
          <property name="font">
           <font>
@@ -102,7 +114,7 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="1">
+       <item row="3" column="1">
         <widget class="QLabel" name="channelA_value">
          <property name="palette">
           <palette>
@@ -189,7 +201,54 @@
          </property>
         </widget>
        </item>
-       <item row="4" column="1">
+       <item row="1" column="1">
+        <widget class="QLabel" name="ra_value">
+         <property name="font">
+          <font>
+           <family>SF Mono</family>
+           <pointsize>22</pointsize>
+           <weight>75</weight>
+           <italic>false</italic>
+           <bold>true</bold>
+           <kerning>false</kerning>
+          </font>
+         </property>
+         <property name="text">
+          <string>00:00:00</string>
+         </property>
+         <property name="scaledContents">
+          <bool>false</bool>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="0" colspan="2">
+        <widget class="QProgressBar" name="progressBar">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="font">
+          <font>
+           <family>SF Mono</family>
+          </font>
+         </property>
+         <property name="value">
+          <number>42</number>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+         </property>
+         <property name="invertedAppearance">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1">
         <widget class="QLabel" name="channelB_value">
          <property name="palette">
           <palette>
@@ -276,62 +335,18 @@
          </property>
         </widget>
        </item>
-       <item row="5" column="0" colspan="2">
-        <widget class="QProgressBar" name="progressBar">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
+       <item row="0" column="0" colspan="2">
+        <widget class="QLabel" name="message_label">
          <property name="font">
           <font>
-           <family>SF Mono</family>
-          </font>
-         </property>
-         <property name="value">
-          <number>42</number>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-         </property>
-         <property name="invertedAppearance">
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QLabel" name="ra_value">
-         <property name="font">
-          <font>
-           <family>SF Mono</family>
            <pointsize>22</pointsize>
            <weight>75</weight>
-           <italic>false</italic>
            <bold>true</bold>
-           <kerning>false</kerning>
+           <kerning>true</kerning>
           </font>
          </property>
          <property name="text">
-          <string>00:00:00</string>
-         </property>
-         <property name="scaledContents">
-          <bool>false</bool>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="ra_label">
-         <property name="font">
-          <font>
-           <pointsize>22</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>Right Ascension:</string>
+          <string>Never tell me the odds!</string>
          </property>
         </widget>
        </item>

@@ -240,7 +240,8 @@ class Threepio(QtWidgets.QMainWindow):
         dialog.show()
         dialog.exec_()
         
-
+    def update_message(self, message):
+        self.ui.message_label.setText(message)
 
 
 def main():
