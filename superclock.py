@@ -39,5 +39,5 @@ class SuperClock():
         epoch_date = time.localtime(time.time())
         epoch_date = 3600*epoch_date[3] + 60*epoch_date[4] + epoch_date[5]
         epoch_date *= self.SIDEREAL
-        print(epoch_date)
+        # print(epoch_date)
         return epoch_date

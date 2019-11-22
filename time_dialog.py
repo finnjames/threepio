@@ -22,6 +22,6 @@ class TimeDialog(QtWidgets.QDialog):
         
         pattern = "%H:%M:%S"
         
-        print(self.ui.sidereal_value.text())
+        # print(self.ui.sidereal_value.text())
         self.superclock.starting_sidereal_time = time.mktime(time.strptime(self.ui.sidereal_value.text(), pattern))
         self.superclock.starting_time = time.time()

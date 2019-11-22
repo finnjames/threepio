@@ -87,6 +87,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.stripchart_series_b.setPen(pen)
 
         # # DATAQ stuff
+        self.tars = None
         # self.tars = tars.Tars(tars.discovery())
         # self.tars.init()
         # self.tars.start()
@@ -235,7 +236,7 @@ class Threepio(QtWidgets.QMainWindow):
         dialog.exec_()
         
     def dec_calibration(self):
-        dialog = DecDialog()
+        dialog = DecDialog(self.tars)
         dialog.show()
         dialog.exec_()
 
