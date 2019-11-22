@@ -23,6 +23,7 @@ import tars
 from precious import MyPrecious
 from dialog import Dialog
 from time_dialog import TimeDialog
+from dec_dialog import DecDialog
 from superclock import SuperClock
 from observation import Observation, Survey, Scan, Spectrum, DataPoint
         
@@ -67,7 +68,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.ui.chart_clear_button.clicked.connect(self.handle_clear)
         # self.ui.chart_refresh_button.clicked.connect(self.handle_refresh)
         # this is for testing, the above line is the correct one
-        self.ui.chart_refresh_button.clicked.connect(self.handle_scan)
+        self.ui.chart_refresh_button.clicked.connect(self.dec_calibration)
 
         # TODO: maybe just choose one of these?
         self.ui.actionLegacy.triggered.connect(self.legacy_mode)
@@ -230,6 +231,11 @@ class Threepio(QtWidgets.QMainWindow):
     def new_observation(self, obs):
         dialog = Dialog(self, self.clock.get_time(), obs)
         dialog.setWindowTitle("New " + obs.obs_type)
+        dialog.show()
+        dialog.exec_()
+        
+    def dec_calibration(self):
+        dialog = DecDialog()
         dialog.show()
         dialog.exec_()
 
