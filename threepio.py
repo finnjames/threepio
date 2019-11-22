@@ -239,6 +239,8 @@ class Threepio(QtWidgets.QMainWindow):
         dialog = DecDialog(self.tars)
         dialog.show()
         dialog.exec_()
+        
+
 
 
 def main():

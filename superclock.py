@@ -36,8 +36,7 @@ class SuperClock():
         return sidereal
     
     def get_sidereal_seconds(self):
-        epoch_date = time.localtime(time.time())
-        epoch_date = 3600*epoch_date[3] + 60*epoch_date[4] + epoch_date[5]
-        epoch_date *= self.SIDEREAL
-        # print(epoch_date)
-        return epoch_date
+        epoch_date = time.localtime(self.starting_time)
+        sidereal_seconds = 3600*epoch_date[3] + 60*epoch_date[4] + epoch_date[5]
+        sidereal_seconds = self.SIDEREAL * (sidereal_seconds + (self.get_elapsed_time()))
+        return sidereal_seconds
