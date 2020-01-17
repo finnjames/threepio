@@ -45,16 +45,33 @@ class Observation():
         self.precious.write('*')
         self.write_meta()
 
-    def write(self, list_of_data: list):
+    def end_calibration(self):
+        self.precious.write('*')
+        
+    def end_background(self):
+        self.precious.write('*')
+
+    def end_data(self):
+        self.precious.write('*')
+
+    def write_three(self, point):
+        self.precious.write(point.timestamp)
+        self.precious.write(point.dec)
+        self.precious.write(point.a)
+
+    def write_four(self, point):
+        self.precious.write(point.timestamp)
+        self.precious.write(point.dec)
+        self.precious.write(point.a)
+        self.precious.write(point.b)
+
+    def write_list(self, list_of_data: list):
         """
         Take in a list of DataPoints. Each has four values: 
         RA, DEC, and voltages from the two channels.
         """
         for point in list_of_data:
-            self.precious.write(point.timestamp)
-            self.precious.write(point.dec)
-            self.precious.write(point.a)
-            self.precious.write(point.b)
+            self.write_three(point)
 
     def write_meta(self):
         self.precious.write('TELESCOPE: The Mighty Forty')
