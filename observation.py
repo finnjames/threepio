@@ -1,13 +1,14 @@
-from datetime import datetime
 import time
+
 from datapoint import DataPoint
+from precious import MyPrecious
 
 class Observation():
     """Superclass for each of the three types of observation you might encounter on your Pokemon journey"""
     
     def __init__(self, name, start_RA, end_RA, max_dec, min_dec):
         self.name       = name
-        self.composite   = False
+        self.composite  = False
         self.state      = "STOPPED"
         
         self.start_RA   = start_RA
@@ -110,9 +111,9 @@ class Observation():
         self.min_dec = min_dec
         
     def set_files(self, extension):
-        self.file_a = self.name + '_a' + extension
-        self.file_b = self.name + '_b' + extension
-        self.file_comp = self.name + '_comp' + extension
+        self.file_a = MyPrecious(self.name + '_a' + extension)
+        self.file_b = MyPrecious(self.name + '_b' + extension)
+        self.file_comp = MyPrecious(self.name + '_comp' + extension)
 
     def get_last_data(self):
         return self.data[len(self.data) - 1]
