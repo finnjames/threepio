@@ -96,7 +96,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.clock = self.set_time()
         
         # blank obs
-        self.observation = Observation()
+        self.observation = None
         
         # refresh timer
         self.timer = QtCore.QTimer(self)
@@ -105,15 +105,16 @@ class Threepio(QtWidgets.QMainWindow):
 
     def tick(self): # primary controller for each clock tick
 
-        self.update_gui() # update gui
+        if self.observation != None:
+            self.update_gui() # update gui
 
-        self.ticker += random.random()*random.randint(-1,1)       # \ for the test data
-        self.other_ticker += random.random()*random.randint(-1,1) # /
-        self.observation.add_data(DataPoint(self.clock.get_time(), self.ticker, self.other_ticker, 1)) # random meander
+            self.ticker += random.random()*random.randint(-1,1)       # \ for the test data
+            self.other_ticker += random.random()*random.randint(-1,1) # /
+            self.observation.add_data(DataPoint(self.clock.get_time(), self.ticker, self.other_ticker, 1)) # random meander
 
-        # self.observation.add_data(self.tars.read_one(1)) # get data from DAQ
-        
-        self.update_strip_chart() # make the stripchart scroll
+            # self.observation.add_data(self.tars.read_one(1)) # get data from DAQ
+            
+            self.update_strip_chart() # make the stripchart scroll
         
         self.clock.get_sidereal_seconds()
         
