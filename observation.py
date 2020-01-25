@@ -10,16 +10,15 @@ class Observation():
         self.name       = name
         self.composite  = False
         self.state      = "STOPPED"
+        self.obs_type   = None
         
-        self.start_RA   = start_RA
-        self.end_RA     = end_RA
-        self.max_dec    = max_dec     # if only one dec, this is it
-        self.min_dec    = min_dec
+        self.start_RA   = None
+        self.end_RA     = None
+        self.max_dec    = None     # if only one dec, this is it
+        self.min_dec    = None
 
         self.start_time = None
         self.end_time   = None
-        self.data_start = None
-        self.data_end   = None
 
         # Temporary bookkeeping
         self.cal_start  = None
@@ -27,6 +26,11 @@ class Observation():
         
         # The data list, for backup
         self.data       = []
+
+        # File interface
+        self.file_a     = None
+        self.file_b     = None
+        self.file_comp  = None
     
     # This is the communication API
     def communicate(self, data_point):
@@ -81,12 +85,10 @@ class Observation():
     def end_background_1(self):
         self.state = "DATA"
         self.write('*')
-        self.data_start = time.time()
 
     def end_data(self):
         self.state = "CAL ON 2"
         self.write('*')
-        self.data_end = time.time()
         self.cal_start = time.time()
 
     def end_calibration_2(self):
@@ -101,25 +103,28 @@ class Observation():
         self.write('*')
         self.write_meta()
 
-    ############################ Helpers ############################
+    # Set properties
     def set_RA(self, start_RA, end_RA):
         self.start_RA = start_RA
         self.end_RA = end_RA
     
-    def set_dec(self, max_dec, min_dec):
+    def set_dec(self, max_dec, min_dec = None):
         self.max_dec = max_dec
         self.min_dec = min_dec
-        
-    def set_files(self, extension):
-        self.file_a = MyPrecious(self.name + '_a' + extension)
-        self.file_b = MyPrecious(self.name + '_b' + extension)
-        self.file_comp = MyPrecious(self.name + '_comp' + extension)
 
-    def get_last_data(self):
-        return self.data[len(self.data) - 1]
+    def set_name(self, name):
+        self.name = name
+        self.set_files()
+        
+    ############################ Helpers ############################
+    def set_files(self):
+        pass
 
     def data_logic(self, data_point):
         pass
+
+    def get_last_data(self):
+        return self.data[len(self.data) - 1]
 
     def write(self, string: str):
         if self.composite:
@@ -152,9 +157,14 @@ class Observation():
 class Scan(Observation):
     """Set a start and end RA"""
 
-    def __init__(self, name, start_RA, end_RA, max_dec, min_dec):
-        super().__init__(name, start_RA, end_RA, max_dec, min_dec)
-        self.set_files('.md1')
+    def __init__(self):
+        super().__init__()
+        self.obs_type = "Scan"
+
+    def set_files(self):
+        self.file_a = MyPrecious(self.name + '_a.md1')
+        self.file_b = MyPrecious(self.name + '_b.md1')
+        self.file_comp = MyPrecious(self.name + '_comp.md1')
 
     def data_logic(self, data_point):
         self.write_data(data_point)
@@ -163,11 +173,16 @@ class Scan(Observation):
 class Survey(Observation):
     """Set a region in sky using start and end RA/DEC"""
 
-    def __init__(self, name, start_RA, end_RA, max_dec, min_dec):
-        super().__init__(name, start_RA, end_RA, max_dec, min_dec)
-        self.set_files('.md2')
+    def __init__(self):
+        super().__init__()
+        self.obs_type = "Scan"
         self.out_boundary = False
         
+    def set_files(self):
+        self.file_a = MyPrecious(self.name + '_a.md2')
+        self.file_b = MyPrecious(self.name + '_b.md2')
+        self.file_comp = MyPrecious(self.name + '_comp.md2')
+
     def data_logic(self, data_point):
         if data_point.dec < self.min_dec or data_point.dec > self.max_dec:
             if self.out_boundary:
@@ -184,9 +199,14 @@ class Survey(Observation):
 class Spectrum(Observation):
     """for all your spectrum observation needs"""
 
-    def __init__(self, name, start_RA, end_RA, max_dec, min_dec):
-        super().__init__(name, start_RA, end_RA, max_dec, min_dec)
-        self.set_files('.md2')
+    def __init__(self):
+        super().__init__()
+        self.obs_type = "Spectrum"
         
+    def set_files(self):
+        self.file_a = MyPrecious(self.name + '_a.md1')
+        self.file_b = MyPrecious(self.name + '_b.md1')
+        self.file_comp = MyPrecious(self.name + '_comp.md1')
+
     def data_logic(self, data_point):
         pass
