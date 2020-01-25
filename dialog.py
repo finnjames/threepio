@@ -14,7 +14,7 @@ class Dialog(QtWidgets.QDialog):
         self.setWindowTitle("Threepio Dialogue")
         self.observation = observation
         
-        # If a scan, only one Dec needed
+        # If a scan or spectrum, only one Dec needed
         if self.observation.obs_type == "Scan" or self.observation.obs_type == "Spectrum":
             self.ui.ending_dec.hide()
             self.ui.end_dec_label.hide()
