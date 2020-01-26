@@ -44,6 +44,10 @@ class Threepio(QtWidgets.QMainWindow):
     # stripchart
     stripchart_low = -1
     stripchart_high = 1
+    
+    # declination calibration
+    dec_slope = 0
+    dec_int = 0
 
     # palette
     BLUE = 0x2196f3
@@ -66,6 +70,8 @@ class Threepio(QtWidgets.QMainWindow):
         self.ui.actionScan.triggered.connect(self.handle_scan)
         self.ui.actionSurvey.triggered.connect(self.handle_survey)
         self.ui.actionSpectrum.triggered.connect(self.handle_spectrum)
+        
+        self.ui.actionDec.triggered.connect(self.dec_calibration)
 
         self.ui.chart_clear_button.clicked.connect(self.handle_clear)
         # self.ui.chart_refresh_button.clicked.connect(self.handle_refresh)
@@ -97,8 +103,11 @@ class Threepio(QtWidgets.QMainWindow):
         # clock
         self.clock = self.set_time()
         
-        # blank obs
+        # establish observation
         self.observation = None
+        
+        # run initial calibration
+        self.declination_regression()
         
         # refresh timer
         self.timer = QtCore.QTimer(self)
@@ -112,6 +121,7 @@ class Threepio(QtWidgets.QMainWindow):
         if self.foo > 90: self.foo = 0
         self.calculate_declination(int(self.foo))
         
+        # do this only if observation loaded
         if self.observation != None:
             self.update_gui() # update gui
 
@@ -151,17 +161,21 @@ class Threepio(QtWidgets.QMainWindow):
         self.handle_clear()
         
     def calculate_declination(self, input_dec):
-        # TODO: get data from declinometer
-        slope = 0.0 # for testing
+        # calculate the true dec from input data and calibration data
+        true_dec = self.dec_int + (self.dec_slope * input_dec)
+        
+        # self.ui.dec_value.setText(str(true_dec)[:5] + "deg") # for testing
+        
+        return true_dec
+    
+    def declination_regression(self):
         x = []
         c = open("dec_cal.txt", 'r').read().splitlines()
         for i in c:
             x.append(float(i))
-        
         y = [0.0, 5.0, 10.0, 15.0, 20.0, 25.0, 30.0, 35.0, 40.0, 45.0, 50.0, 55.0, 60.0, 65.0, 70.0, 75.0, 80.0, 85.0, 90.0]
-        slope, intercept, r_value, p_value, std_err = stats.linregress(x,y)
-        true_dec = intercept + (slope * input_dec)
-        return true_dec
+        
+        self.dec_slope, self.dec_int, r_value, p_value, std_err = stats.linregress(x,y)
 
     def update_gui(self):
         self.ui.ra_value.setText(self.clock.get_sidereal_time())
@@ -259,6 +273,7 @@ class Threepio(QtWidgets.QMainWindow):
         dialog = DecDialog(self.tars)
         dialog.show()
         dialog.exec_()
+        self.declination_regression() # calculate a new regression
         
     def update_message(self, message):
         self.ui.message_label.setText(message)
