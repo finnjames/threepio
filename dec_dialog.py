@@ -35,7 +35,7 @@ class DecDialog(QtWidgets.QDialog):
                 f.write(str(line) + '\n')
             self.close()
         else:
-            self.data.append(self.current_dec + 5) # this should come from the DAQ
+            self.data.append(self.current_dec) # TODO: read data from declinometer
             self.ui.set_dec_value.setText(str(self.current_dec))
             self.current_dec += self.step
         

@@ -107,6 +107,7 @@ class Threepio(QtWidgets.QMainWindow):
 
     def tick(self): # primary controller for each clock tick
 
+        # for dec cal testing
         self.foo += .1
         if self.foo > 90: self.foo = 0
         self.calculate_declination(int(self.foo))
@@ -151,16 +152,15 @@ class Threepio(QtWidgets.QMainWindow):
         
     def calculate_declination(self, input_dec):
         # TODO: get data from declinometer
-        slope = 0 # for testing
+        slope = 0.0 # for testing
         x = []
         c = open("dec_cal.txt", 'r').read().splitlines()
         for i in c:
-            x.append(int(i))
-            
-        y = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90]
+            x.append(float(i))
+        
+        y = [0.0, 5.0, 10.0, 15.0, 20.0, 25.0, 30.0, 35.0, 40.0, 45.0, 50.0, 55.0, 60.0, 65.0, 70.0, 75.0, 80.0, 85.0, 90.0]
         slope, intercept, r_value, p_value, std_err = stats.linregress(x,y)
         true_dec = intercept + (slope * input_dec)
-        print(input_dec, true_dec)
         return true_dec
 
     def update_gui(self):
