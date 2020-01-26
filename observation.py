@@ -6,8 +6,8 @@ from precious import MyPrecious
 class Observation():
     """Superclass for each of the three types of observation you might encounter on your Pokemon journey"""
     
-    def __init__(self, name, start_RA, end_RA, max_dec, min_dec):
-        self.name       = name
+    def __init__(self):
+        self.name       = None
         self.composite  = False
         self.state      = "STOPPED"
         self.obs_type   = None

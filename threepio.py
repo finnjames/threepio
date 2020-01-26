@@ -15,6 +15,7 @@ from main_ui import Ui_MainWindow   # compiled PyQt main ui
 # from dialog_ui import Ui_Dialog     # compiled PyQt dialogue ui
 from time_ui import Ui_Dialog     # compiled PyQt dialogue ui
 from astropy.time import Time
+from scipy import stats
 # from playsound import playsound # TODO: test on Windows 
 import numpy as np
 import time, math, random
@@ -38,6 +39,7 @@ class Threepio(QtWidgets.QMainWindow):
     # test data
     ticker = 0
     other_ticker = 0
+    foo = 0
 
     # stripchart
     stripchart_low = -1
@@ -105,12 +107,16 @@ class Threepio(QtWidgets.QMainWindow):
 
     def tick(self): # primary controller for each clock tick
 
+        self.foo += .1
+        if self.foo > 90: self.foo = 0
+        self.calculate_declination(int(self.foo))
+        
         if self.observation != None:
             self.update_gui() # update gui
 
             self.ticker += random.random()*random.randint(-1,1)       # \ for the test data
             self.other_ticker += random.random()*random.randint(-1,1) # /
-            self.observation.add_data(DataPoint(self.clock.get_time(), self.ticker, self.other_ticker, 1)) # random meander
+            self.observation.data_logic(DataPoint(self.clock.get_time(), self.ticker, self.other_ticker, 1)) # random meander
 
             # self.observation.add_data(self.tars.read_one(1)) # get data from DAQ
             
@@ -142,12 +148,25 @@ class Threepio(QtWidgets.QMainWindow):
         else:
             self.stripchart_display_ticks = 2048
         self.handle_clear()
+        
+    def calculate_declination(self, input_dec):
+        # TODO: get data from declinometer
+        slope = 0 # for testing
+        x = []
+        c = open("dec_cal.txt", 'r').read().splitlines()
+        for i in c:
+            x.append(int(i))
+            
+        y = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90]
+        slope, intercept, r_value, p_value, std_err = stats.linregress(x,y)
+        true_dec = intercept + (slope * input_dec)
+        print(input_dec, true_dec)
+        return true_dec
 
     def update_gui(self):
         self.ui.ra_value.setText(self.clock.get_sidereal_time())
         
-        # TODO: get data from declinometer
-        self.ui.dec_value.setText(str(self.observation.start_dec) + "deg")
+        self.ui.dec_value.setText(str(self.calculate_declination(4)) + "deg")
         
         if len(self.observation.data) > 0:
             self.ui.channelA_value.setText("%.2f" % (self.observation.data[len(self.observation.data) - 1].a))

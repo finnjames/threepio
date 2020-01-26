@@ -284,7 +284,7 @@ class Ui_MainWindow(object):
         self.channelA_value.setText(_translate("MainWindow", "0.00V"))
         self.ra_value.setText(_translate("MainWindow", "00:00:00"))
         self.channelB_value.setText(_translate("MainWindow", "0.00V"))
-        self.message_label.setText(_translate("MainWindow", "Never tell me the odds!"))
+        self.message_label.setText(_translate("MainWindow", "Never tell me the odds!!!"))
         self.stripchart_control_group.setTitle(_translate("MainWindow", "Strip chart"))
         self.speed_slower_radio.setText(_translate("MainWindow", "Slower (more points)"))
         self.chart_clear_button.setText(_translate("MainWindow", "Clear chart"))
