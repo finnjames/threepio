@@ -8,8 +8,8 @@ class Observation():
     
     def __init__(self, name, start_RA, end_RA, max_dec, min_dec):
         self.name       = name
-        self.composite  = False
         self.state      = "STOPPED"
+        self.composite  = False
         self.obs_type   = None
         
         self.start_RA   = None
@@ -31,22 +31,26 @@ class Observation():
         self.file_a     = None
         self.file_b     = None
         self.file_comp  = None
+
+        # Parameters
+        self.bg_dur     = 60
+        self.cal_dur    = 60
     
     # This is the communication API
     def communicate(self, data_point):
         if self.state == "STOPPED":
-            if time.time() < self.start_RA - 120:
+            if time.time() < self.start_RA - (self.bg_dur + self.cal_dur):
                 return 0
             else:
                 return "Please start calibration"
         elif self.state == "CAL ON 1":
-            if time.time() - self.cal_start < 60:
+            if time.time() - self.cal_start < self.cal_dur:
                 self.write_data(data_point)
                 return 0
             else:
                 return "Please turn off calibration"
         elif self.state == "BG 1":
-            if time.time() - self.bg_start < 60:
+            if time.time() - self.bg_start < self.bg_dur:
                 self.write_data(data_point)
                 return 0
             else:
@@ -57,13 +61,13 @@ class Observation():
             else:
                 return "Please start calibration"
         elif self.state == "CAL ON 2":
-            if time.time() - self.cal_start < 60:
+            if time.time() - self.cal_start < self.cal_dur:
                 self.write_data(data_point)
                 return 0
             else:
                 return "Please turn off calibration"
         elif self.state == "BG 2":
-            if time.time() - self.bg_start < 60:
+            if time.time() - self.bg_start < self.bg_dur:
                 self.write_data(data_point)
                 return 0
             else:
@@ -202,6 +206,9 @@ class Spectrum(Observation):
     def __init__(self):
         super().__init__()
         self.obs_type = "Spectrum"
+
+        self.bg_dur = 20
+        self.cal_dur = 20
         
     def set_files(self):
         self.file_a = MyPrecious(self.name + '_a.md1')
