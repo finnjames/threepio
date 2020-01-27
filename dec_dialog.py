@@ -1,5 +1,6 @@
 from PyQt5 import QtCore, QtWidgets, QtGui, QtChart
 from dec_ui import Ui_Dialog     # compiled PyQt dialogue ui
+import random
 
 class DecDialog(QtWidgets.QDialog):
     """New observation dialogue window"""
@@ -34,7 +35,7 @@ class DecDialog(QtWidgets.QDialog):
                 f.write(str(line) + '\n')
             self.close()
         else:
-            self.data.append(self.current_dec) # this should come from the DAQ
+            self.data.append(self.current_dec + random.randint(-2, 2)) # TODO: read data from declinometer
             self.ui.set_dec_value.setText(str(self.current_dec))
             self.current_dec += self.step
         

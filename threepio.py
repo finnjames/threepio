@@ -15,6 +15,7 @@ from main_ui import Ui_MainWindow   # compiled PyQt main ui
 # from dialog_ui import Ui_Dialog     # compiled PyQt dialogue ui
 from time_ui import Ui_Dialog     # compiled PyQt dialogue ui
 from astropy.time import Time
+from scipy import stats
 # from playsound import playsound # TODO: test on Windows 
 import numpy as np
 import time, math, random
@@ -38,10 +39,15 @@ class Threepio(QtWidgets.QMainWindow):
     # test data
     ticker = 0
     other_ticker = 0
+    foo = 0
 
     # stripchart
     stripchart_low = -1
     stripchart_high = 1
+    
+    # declination calibration
+    dec_slope = 0
+    dec_int = 0
 
     # palette
     BLUE = 0x2196f3
@@ -64,6 +70,8 @@ class Threepio(QtWidgets.QMainWindow):
         self.ui.actionScan.triggered.connect(self.handle_scan)
         self.ui.actionSurvey.triggered.connect(self.handle_survey)
         self.ui.actionSpectrum.triggered.connect(self.handle_spectrum)
+        
+        self.ui.actionDec.triggered.connect(self.dec_calibration)
 
         self.ui.chart_clear_button.clicked.connect(self.handle_clear)
         # self.ui.chart_refresh_button.clicked.connect(self.handle_refresh)
@@ -95,8 +103,11 @@ class Threepio(QtWidgets.QMainWindow):
         # clock
         self.clock = self.set_time()
         
-        # blank obs
+        # establish observation
         self.observation = None
+        
+        # run initial calibration
+        self.declination_regression()
         
         # refresh timer
         self.timer = QtCore.QTimer(self)
@@ -105,12 +116,18 @@ class Threepio(QtWidgets.QMainWindow):
 
     def tick(self): # primary controller for each clock tick
 
+        # for dec cal testing
+        self.foo += .1
+        if self.foo > 90: self.foo = 0
+        self.calculate_declination(int(self.foo))
+        
+        # do this only if observation loaded
         if self.observation != None:
             self.update_gui() # update gui
 
             self.ticker += random.random()*random.randint(-1,1)       # \ for the test data
             self.other_ticker += random.random()*random.randint(-1,1) # /
-            self.observation.add_data(DataPoint(self.clock.get_time(), self.ticker, self.other_ticker, 1)) # random meander
+            self.observation.data_logic(DataPoint(self.clock.get_time(), self.ticker, self.other_ticker, 1)) # random meander
 
             # self.observation.add_data(self.tars.read_one(1)) # get data from DAQ
             
@@ -142,12 +159,28 @@ class Threepio(QtWidgets.QMainWindow):
         else:
             self.stripchart_display_ticks = 2048
         self.handle_clear()
+        
+    def calculate_declination(self, input_dec):
+        # calculate the true dec from input data and calibration data
+        true_dec = self.dec_int + (self.dec_slope * input_dec)
+        
+        # self.ui.dec_value.setText(str(true_dec)[:5] + "deg") # for testing
+        
+        return true_dec
+    
+    def declination_regression(self):
+        x = []
+        c = open("dec_cal.txt", 'r').read().splitlines()
+        for i in c:
+            x.append(float(i))
+        y = [0.0, 5.0, 10.0, 15.0, 20.0, 25.0, 30.0, 35.0, 40.0, 45.0, 50.0, 55.0, 60.0, 65.0, 70.0, 75.0, 80.0, 85.0, 90.0]
+        
+        self.dec_slope, self.dec_int, r_value, p_value, std_err = stats.linregress(x,y)
 
     def update_gui(self):
         self.ui.ra_value.setText(self.clock.get_sidereal_time())
         
-        # TODO: get data from declinometer
-        self.ui.dec_value.setText(str(self.observation.start_dec) + "deg")
+        self.ui.dec_value.setText(str(self.calculate_declination(4)) + "deg")
         
         if len(self.observation.data) > 0:
             self.ui.channelA_value.setText("%.2f" % (self.observation.data[len(self.observation.data) - 1].a))
@@ -240,6 +273,7 @@ class Threepio(QtWidgets.QMainWindow):
         dialog = DecDialog(self.tars)
         dialog.show()
         dialog.exec_()
+        self.declination_regression() # calculate a new regression
         
     def update_message(self, message):
         self.ui.message_label.setText(message)

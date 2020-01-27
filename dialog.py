@@ -18,6 +18,7 @@ class Dialog(QtWidgets.QDialog):
         if self.observation.obs_type == "Scan" or self.observation.obs_type == "Spectrum":
             self.ui.ending_dec.hide()
             self.ui.end_dec_label.hide()
+            self.ui.ending_dec.setText("0")
             self.ui.start_dec_label.setText("Declination")
         
         # set today's date
@@ -48,6 +49,4 @@ class Dialog(QtWidgets.QDialog):
         pattern = "%Y.%m.%d %H:%M:%S"
         
         self.observation.set_RA(int(time.mktime(time.strptime(self.ui.start_time.text(), pattern))), int(time.mktime(time.strptime(self.ui.end_time.text(), pattern))))
-        self.observation.set_dec(self.ui.starting_dec.text(), self.ui.ending_dec.text())
-        
-        self.observation.set_precious(MyPrecious(self.ui.file_name_value))
+        self.observation.set_dec(int(self.ui.starting_dec.text()), int(self.ui.ending_dec.text()))
