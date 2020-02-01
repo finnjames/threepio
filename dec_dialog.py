@@ -32,7 +32,10 @@ class DecDialog(QtWidgets.QDialog):
             open("dec_cal.txt", "w").close() # overwrite file
             f = open("dec_cal.txt", "a")
             for line in self.data: # replace with new calibration data
-                f.write(str(line) + '\n')
+                if line == self.data[len(self.data) - 1]:
+                    f.write(str(line))
+                else: 
+                    f.write(str(line) + '\n')
             self.close()
         else:
             self.data.append(self.current_dec + random.randint(-2, 2)) # TODO: read data from declinometer
