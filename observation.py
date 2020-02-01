@@ -1,17 +1,37 @@
-import time
+# TODO:
+# 1. Figure out a consistent way to deal with time
 
+import time
+from enum import Enum
+
+from comm import Comm
 from datapoint import DataPoint
 from precious import MyPrecious
 
 class Observation():
-    """Superclass for each of the three types of observation you might encounter on your Pokemon journey"""
+    """
+    Superclass for each of the three types of observation you might encounter on your Pokemon journey
     
-    def __init__(self, name, start_RA, end_RA, max_dec, min_dec):
-        self.name       = name
-        self.state      = "STOPPED"
+    To interact with any type of the observation object (e.g an Oberservation object obs), first set
+    its properties using the three 'obs.set_xxx()' API. Then, call the method 'obs.communication()' 
+    every 'obs.freq' seconds. Then when the comm method returns a message other than 'Comm.NO_ACTION',
+    prompt user for the appropriate action and call 'obs.next()' once to proceed into next stage.
+    An observation is finished when the 'communication()' method returns 'Comm.FINISHED'.
+    """
+    
+    def __init__(self):
+        self.name       = None
         self.composite  = False
         self.obs_type   = None
+
+        # Parameters
+        self.bg_dur     = 60
+        self.cal_dur    = 60
+        self.freq       = 1
+
+        self.state      = self.State.OFF
         
+        # Info
         self.start_RA   = None
         self.end_RA     = None
         self.max_dec    = None     # if only one dec, this is it
@@ -20,94 +40,19 @@ class Observation():
         self.start_time = None
         self.end_time   = None
 
-        # Temporary bookkeeping
-        self.cal_start  = None
-        self.bg_start   = None
-        
-        # The data list, for backup
-        self.data       = []
-
         # File interface
         self.file_a     = None
         self.file_b     = None
         self.file_comp  = None
 
-        # Parameters
-        self.bg_dur     = 60
-        self.cal_dur    = 60
-    
-    # This is the communication API
-    def communicate(self, data_point):
-        if self.state == "STOPPED":
-            if time.time() < self.start_RA - (self.bg_dur + self.cal_dur):
-                return 0
-            else:
-                return "Please start calibration"
-        elif self.state == "CAL ON 1":
-            if time.time() - self.cal_start < self.cal_dur:
-                self.write_data(data_point)
-                return 0
-            else:
-                return "Please turn off calibration"
-        elif self.state == "BG 1":
-            if time.time() - self.bg_start < self.bg_dur:
-                self.write_data(data_point)
-                return 0
-            else:
-                return "Starting to collect data"
-        elif self.state == "DATA":
-            if time.time() < self.end_RA:
-                return self.data_logic(data_point)
-            else:
-                return "Please start calibration"
-        elif self.state == "CAL ON 2":
-            if time.time() - self.cal_start < self.cal_dur:
-                self.write_data(data_point)
-                return 0
-            else:
-                return "Please turn off calibration"
-        elif self.state == "BG 2":
-            if time.time() - self.bg_start < self.bg_dur:
-                self.write_data(data_point)
-                return 0
-            else:
-                return "Finished"
-        elif self.state == "FINISHED":
-            return "Observation is already finished"
-
-    # These are the action APIs
-    def start(self):
-        self.state = "CAL ON 1"
-        self.start_time = time.time()
-        self.cal_start = time.time()
-
-    def end_calibration_1(self):
-        self.state = "BG 1"
-        self.write('*')
-        self.bg_start = time.time()
+        # Temporary bookkeeping
+        self.cal_start  = None
+        self.bg_start   = None
         
-    def end_background_1(self):
-        self.state = "DATA"
-        self.write('*')
-
-    def end_data(self):
-        self.state = "CAL ON 2"
-        self.write('*')
-        self.cal_start = time.time()
-
-    def end_calibration_2(self):
-        self.state = "BG 2"
-        self.write('*')
-        self.bg_start = time.time()
-
-    def stop(self):
-        self.state = "Finished"
-        self.end_time = time.time()
-        self.write('*')
-        self.write('*')
-        self.write_meta()
-
-    # Set properties
+        # # The data list, for backup
+        # self.data       = []
+    
+    # Settings API
     def set_RA(self, start_RA, end_RA):
         self.start_RA = start_RA
         self.end_RA = end_RA
@@ -119,16 +64,112 @@ class Observation():
     def set_name(self, name):
         self.name = name
         self.set_files()
+
+    # This is the communication API
+    def communicate(self, data_point):
+        if self.state == self.State.OFF:
+            if time.time() < self.start_RA - (self.bg_dur + self.cal_dur):
+                return Comm.NO_ACTION
+            else:
+                return Comm.START_CAL
+        elif self.state == self.State.CAL_1:
+            if time.time() - self.cal_start < self.cal_dur:
+                self.write_data(data_point)
+                return Comm.NO_ACTION
+            else:
+                return Comm.STOP_CAL
+        elif self.state == self.State.BG_1:
+            if time.time() - self.bg_start < self.bg_dur:
+                self.write_data(data_point)
+                return Comm.NO_ACTION
+            else:
+                return Comm.NEXT
+        elif self.state == self.State.DATA:
+            if time.time() < self.end_RA:
+                return self.data_logic(data_point)
+            else:
+                return Comm.STOP_CAL
+        elif self.state == self.State.CAL_2:
+            if time.time() - self.cal_start < self.cal_dur:
+                self.write_data(data_point)
+                return Comm.NO_ACTION
+            else:
+                return Comm.STOP_CAL
+        elif self.state == self.State.BG_2:
+            if time.time() - self.bg_start < self.bg_dur:
+                self.write_data(data_point)
+                return Comm.NO_ACTION
+            else:
+                return Comm.FINISHED
+        elif self.state == self.State.DONE:
+            return Comm.FINISHED
+
+    # This is the action API
+    def next(self):
+        if self.state == self.State.OFF:
+            self.start_calibration_1()
+        elif self.state == self.State.CAL_1:
+            self.end_calibration_1()
+        elif self.state == self.State.BG_1:
+            self.end_background_1()
+        elif self.state == self.State.DATA:
+            self.start_calibration_2()
+        elif self.state == self.State.CAL_2:
+            self.end_calibration_2()
+        elif self.state == self.State.BG_2():
+            self.stop()
+        else:
+            pass # state == DONE, do nothing
+
+    # State machine
+    class State(Enum):
+        OFF     = 1
+        CAL_1   = 2
+        BG_1    = 3
+        DATA    = 4
+        CAL_2   = 5
+        BG_2    = 6
+        DONE    = 7
+
+    def start_calibration_1(self):
+        self.state = self.State.CAL_1
+        self.start_time = time.time()
+        self.cal_start = time.time()
+
+    def end_calibration_1(self):
+        self.state = self.State.BG_1
+        self.write('*')
+        self.bg_start = time.time()
         
-    ############################ Helpers ############################
+    def end_background_1(self):
+        self.state = self.State.DATA
+        self.write('*')
+
+    def start_calibration_2(self):
+        self.state = self.State.CAL_2
+        self.write('*')
+        self.cal_start = time.time()
+
+    def end_calibration_2(self):
+        self.state = self.State.BG_2
+        self.write('*')
+        self.bg_start = time.time()
+
+    def stop(self):
+        self.state = self.State.DONE
+        self.end_time = time.time()
+        self.write('*')
+        self.write('*')
+        self.write_meta()
+
+    # To be implemented in each subclass
     def set_files(self):
         pass
 
     def data_logic(self, data_point):
         pass
-
-    def get_last_data(self):
-        return self.data[len(self.data) - 1]
+        
+    ############################ Helpers ############################
 
     def write(self, string: str):
         if self.composite:
@@ -138,17 +179,13 @@ class Observation():
             self.file_b.write(string)
 
     def write_data(self, point: DataPoint):
+        self.write(point.timestamp)
+        self.write(point.dec)
         if self.composite:
-            self.file_comp.write(point.timestamp)
-            self.file_comp.write(point.dec)
             self.file_comp.write(point.a)
             self.file_comp.write(point.b)
         else:
-            self.file_a.write(point.timestamp)
-            self.file_a.write(point.dec)
             self.file_a.write(point.a)
-            self.file_b.write(point.timestamp)
-            self.file_b.write(point.dec)
             self.file_b.write(point.b)
 
     def write_meta(self):
@@ -158,12 +195,17 @@ class Observation():
         self.write('LOCAL STOP DATE: '  + str(self.end_time.date()))
         self.write('LOCAL STOP TIME: '  + str(self.end_time.time()))
 
+    # def get_last_data(self):
+    #     return self.data[len(self.data) - 1]
+
 class Scan(Observation):
     """Set a start and end RA"""
 
     def __init__(self):
         super().__init__()
         self.obs_type = "Scan"
+
+        self.freq = 1
 
     def set_files(self):
         self.file_a = MyPrecious(self.name + '_a.md1')
@@ -172,7 +214,7 @@ class Scan(Observation):
 
     def data_logic(self, data_point):
         self.write_data(data_point)
-        return 0
+        return Comm.NO_ACTION
 
 class Survey(Observation):
     """Set a region in sky using start and end RA/DEC"""
@@ -180,6 +222,8 @@ class Survey(Observation):
     def __init__(self):
         super().__init__()
         self.obs_type = "Scan"
+
+        self.freq = 1
         self.out_boundary = False
         
     def set_files(self):
@@ -190,15 +234,15 @@ class Survey(Observation):
     def data_logic(self, data_point):
         if data_point.dec < self.min_dec or data_point.dec > self.max_dec:
             if self.out_boundary:
-                return "Beep!"
+                return Comm.BEEP
             else:
                 self.write('*')
                 self.out_boundary = True
-                return "Beep!"
+                return Comm.BEEP
         else:
             self.out_boundary = False
             self.write_data(data_point)
-            return 0
+            return Comm.NO_ACTION
 
 class Spectrum(Observation):
     """for all your spectrum observation needs"""
@@ -207,8 +251,13 @@ class Spectrum(Observation):
         super().__init__()
         self.obs_type = "Spectrum"
 
+        self.freq = 0.1
+
         self.bg_dur = 20
         self.cal_dur = 20
+
+        self.last_change = None
+        self.interval = 4
         
     def set_files(self):
         self.file_a = MyPrecious(self.name + '_a.md1')
@@ -216,4 +265,14 @@ class Spectrum(Observation):
         self.file_comp = MyPrecious(self.name + '_comp.md1')
 
     def data_logic(self, data_point):
-        pass
+        if self.last_change is None:
+            self.last_change = time.time()
+            self.write_data(data_point)
+            return Comm.NO_ACTION
+        elif time.time() - self.last_change < self.interval:
+            self.write_data(data_point)
+            return Comm.NO_ACTION
+        else:
+            self.last_change = time.time()
+            self.write_data(data_point)
+            return Comm.BEEP
