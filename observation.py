@@ -226,7 +226,7 @@ class Scan(Observation):
 
     def __init__(self):
         super().__init__()
-        self.obs_type = "Scan"
+        self.obs_type   = "Scan"
 
         self.data_freq  = 1
 
@@ -244,10 +244,10 @@ class Survey(Observation):
 
     def __init__(self):
         super().__init__()
-        self.obs_type = "Scan"
+        self.obs_type   = "Survey"
 
         self.data_freq  = 1
-        self.out_boundary = False
+        self.outside    = False
         
     def set_files(self):
         self.file_a = MyPrecious(self.name + '_a.md2')
@@ -256,14 +256,14 @@ class Survey(Observation):
 
     def data_logic(self, data_point):
         if data_point.dec < self.min_dec or data_point.dec > self.max_dec:
-            if self.out_boundary:
+            if self.outside:
                 return Comm.BEEP
             else:
                 self.write('*')
-                self.out_boundary = True
+                self.outside = True
                 return Comm.BEEP
         else:
-            self.out_boundary = False
+            self.outside = False
             self.write_data(data_point)
             return Comm.NO_ACTION
 
@@ -279,6 +279,8 @@ class Spectrum(Observation):
 
         self.cal_freq   = 3
         self.data_freq  = 10
+
+        self.end_RA     = self.start_RA + 180
 
         self.freq_time  = None
         self.interval   = 1
