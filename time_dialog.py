@@ -12,7 +12,7 @@ class TimeDialog(QtWidgets.QDialog):
         self.ui.setupUi(self)
         self.setWindowTitle("Set time")
 
-        # store parent window
+        # store parent window's superclock
         self.superclock = superclock
 
         # connect okay button
@@ -22,6 +22,9 @@ class TimeDialog(QtWidgets.QDialog):
         
         pattern = "%H:%M:%S"
         
-        # print(self.ui.sidereal_value.text())
-        self.superclock.starting_sidereal_time = time.mktime(time.strptime(self.ui.sidereal_value.text(), pattern))
+        # self.superclock.starting_sidereal_time = time.mktime(time.strptime(self.ui.sidereal_value.text(), pattern))
+        
+        u_time = self.ui.sidereal_value.text()
+        self.superclock.starting_sidereal_time = 3600*int(u_time[:2]) + 60*int(u_time[3:5]) + int(u_time[6:])
+        
         self.superclock.starting_time = time.time()
