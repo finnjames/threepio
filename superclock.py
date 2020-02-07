@@ -8,7 +8,7 @@ import time
 class SuperClock():
     """Clock object for encapsulation; keeps track of the time(tm)"""
     
-    SIDEREAL = 1.00273790935
+    SIDEREAL = 1.00273790935 # the number of sidereal seconds per second
     LONGITUDE = 38.437235
     
     def __init__(self):
@@ -28,10 +28,11 @@ class SuperClock():
         return time.localtime(time.time())
     
     def get_sidereal_time(self): 
-        elapsed_sidereal_time = self.starting_sidereal_time + self.SIDEREAL*(self.get_elapsed_time())
-        hours = time.localtime(elapsed_sidereal_time)[3]
-        minutes = time.localtime(elapsed_sidereal_time)[4]
-        seconds = time.localtime(elapsed_sidereal_time)[5]
+        """return a string of formatted local sidereal time"""
+        current_sidereal_time = self.starting_sidereal_time + self.SIDEREAL*(self.get_elapsed_time())
+        hours = time.localtime(current_sidereal_time)[3]
+        minutes = time.localtime(current_sidereal_time)[4]
+        seconds = time.localtime(current_sidereal_time)[5]
         sidereal = "%02d:%02d:%02d" % (hours, minutes, seconds)
         return sidereal
     
