@@ -1,5 +1,7 @@
 # TODO:
 # 1. Figure out a consistent way to deal with time
+#   a) when time is used for starting/ending certain stages of the observation
+#   b) when appending metadata about the observation such as start and end time and date.
 
 import time
 from enum import Enum
@@ -27,7 +29,15 @@ class Observation():
         # Parameters
         self.bg_dur     = 60
         self.cal_dur    = 60
-        self.freq       = 1
+
+        # Calibration and BG share the same sampling frequency, while the data has its own sampling
+        #   frequency. Only the data frequency is user-editable. When running the program, the sampling
+        #   frequency is automatically set by the current state and is stored in 'self.freq'.
+        self.cal_freq   = 1
+        self.data_freq  = 1
+
+        # Will be set accordingly in each state.
+        self.freq       = None
 
         self.state      = self.State.OFF
         
@@ -65,10 +75,14 @@ class Observation():
         self.name = name
         self.set_files()
 
+    def set_data_freq(self, data_freq):
+        self.data_freq = data_freq
+
     # This is the communication API
     def communicate(self, data_point):
         if self.state == self.State.OFF:
-            if time.time() < self.start_RA - (self.bg_dur + self.cal_dur):
+            if time.time() < self.start_RA - (self.bg_dur + self.cal_dur + 30):
+                # A 30 seconds buffer for user actions
                 return Comm.NO_ACTION
             else:
                 return Comm.START_CAL
@@ -88,7 +102,7 @@ class Observation():
             if time.time() < self.end_RA:
                 return self.data_logic(data_point)
             else:
-                return Comm.STOP_CAL
+                return Comm.START_CAL
         elif self.state == self.State.CAL_2:
             if time.time() - self.cal_start < self.cal_dur:
                 self.write_data(data_point)
@@ -135,6 +149,7 @@ class Observation():
         self.state = self.State.CAL_1
         self.start_time = time.time()
         self.cal_start = time.time()
+        self.freq = self.cal_freq
 
     def end_calibration_1(self):
         self.state = self.State.BG_1
@@ -144,11 +159,13 @@ class Observation():
     def end_background_1(self):
         self.state = self.State.DATA
         self.write('*')
+        self.freq = self.data_freq
 
     def start_calibration_2(self):
         self.state = self.State.CAL_2
         self.write('*')
         self.cal_start = time.time()
+        self.freq = self.cal_freq
 
     def end_calibration_2(self):
         self.state = self.State.BG_2
@@ -164,9 +181,15 @@ class Observation():
 
     # To be implemented in each subclass
     def set_files(self):
+        """This function generates appropriate file types (.md1 or .md2) based on observation type"""
         pass
 
     def data_logic(self, data_point):
+        """
+        This function defines the behavior of observation during the main data collection period.
+        For example, in Survey this method is responsible for tracking if the dec is too high or too
+        low. In Spectrum, this method tells the UI to beep to remind the user to change frequency.s
+        """
         pass
         
     ############################ Helpers ############################
@@ -205,7 +228,7 @@ class Scan(Observation):
         super().__init__()
         self.obs_type = "Scan"
 
-        self.freq = 1
+        self.data_freq  = 1
 
     def set_files(self):
         self.file_a = MyPrecious(self.name + '_a.md1')
@@ -223,7 +246,7 @@ class Survey(Observation):
         super().__init__()
         self.obs_type = "Scan"
 
-        self.freq = 1
+        self.data_freq  = 1
         self.out_boundary = False
         
     def set_files(self):
@@ -249,15 +272,16 @@ class Spectrum(Observation):
 
     def __init__(self):
         super().__init__()
-        self.obs_type = "Spectrum"
+        self.obs_type   = "Spectrum"
 
-        self.freq = 0.1
+        self.cal_dur    = 20
+        self.bg_dur     = 20
 
-        self.bg_dur = 20
-        self.cal_dur = 20
+        self.cal_freq   = 3
+        self.data_freq  = 10
 
-        self.last_change = None
-        self.interval = 4
+        self.freq_time  = None
+        self.interval   = 1
         
     def set_files(self):
         self.file_a = MyPrecious(self.name + '_a.md1')
@@ -265,11 +289,11 @@ class Spectrum(Observation):
         self.file_comp = MyPrecious(self.name + '_comp.md1')
 
     def data_logic(self, data_point):
-        if self.last_change is None:
-            self.last_change = time.time()
+        if self.freq_time is None:
+            self.freq_time = time.time()
             self.write_data(data_point)
             return Comm.NO_ACTION
-        elif time.time() - self.last_change < self.interval:
+        elif time.time() - self.freq_time < self.interval:
             self.write_data(data_point)
             return Comm.NO_ACTION
         else:
