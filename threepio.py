@@ -141,10 +141,11 @@ class Threepio(QtWidgets.QMainWindow):
         self.clock.get_sidereal_seconds()
         
     def legacy_mode(self):
+        """lol"""
         f = open("stylesheet.qss", "w")
         f.write("background-color:#00ff00; color: #ff0000")
         self.setStyleSheet("background-color:#00ff00; color: #ff0000")
-        self.setAutoFillBackground( True )
+        self.setAutoFillBackground(True)
 
     def set_time(self):
         new_clock = SuperClock()

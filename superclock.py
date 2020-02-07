@@ -13,7 +13,7 @@ class SuperClock():
     
     def __init__(self):
         self.starting_time = time.time()
-        self.starting_sidereal_time = self.starting_time
+        self.starting_sidereal_time = 0 # number of seconds since last sidereal midnight
         
     def get_time(self):
         return time.time()
@@ -27,17 +27,15 @@ class SuperClock():
     def get_local_time(self):
         return time.localtime(time.time())
     
-    def get_sidereal_time(self): 
+    def get_sidereal_seconds(self):
+        """get time-stamp-able number of sidereal seconds since last sidereal midnight"""
+        sidereal_seconds = self.starting_sidereal_time + self.SIDEREAL*(self.get_elapsed_time())
+        return sidereal_seconds
+    
+    def get_sidereal_time(self):
         """return a string of formatted local sidereal time"""
-        current_sidereal_time = self.starting_sidereal_time + self.SIDEREAL*(self.get_elapsed_time())
-        hours = time.localtime(current_sidereal_time)[3]
-        minutes = time.localtime(current_sidereal_time)[4]
-        seconds = time.localtime(current_sidereal_time)[5]
+        current_sidereal_time = self.get_sidereal_seconds()
+        minutes, seconds = divmod(current_sidereal_time, 60)
+        hours, minutes = divmod(minutes, 60)
         sidereal = "%02d:%02d:%02d" % (hours, minutes, seconds)
         return sidereal
-    
-    def get_sidereal_seconds(self):
-        epoch_date = time.localtime(self.starting_time)
-        sidereal_seconds = 3600*epoch_date[3] + 60*epoch_date[4] + epoch_date[5]
-        sidereal_seconds = self.SIDEREAL * (sidereal_seconds + (self.get_elapsed_time()))
-        return sidereal_seconds
