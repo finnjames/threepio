@@ -1,7 +1,7 @@
 # TODO:
 # 1. Figure out a consistent way to deal with time
 #   a) when time is used for starting/ending certain stages of the observation
-#   b) when appending metadata about the observation such as start and end time and date.
+#   DONE b) when appending metadata about the observation such as start and end time and date.
 
 import time
 from enum import Enum
@@ -213,10 +213,10 @@ class Observation():
 
     def write_meta(self):
         self.write('TELESCOPE: The Mighty Forty')
-        self.write('LOCAL START DATE: ' + str(self.start_time.date()))
-        self.write('LOCAL START TIME: ' + str(self.start_time.time()))
-        self.write('LOCAL STOP DATE: '  + str(self.end_time.date()))
-        self.write('LOCAL STOP TIME: '  + str(self.end_time.time()))
+        self.write('LOCAL START DATE: ' + get_date(self.start_time))
+        self.write('LOCAL START TIME: ' + get_time(self.start_time))
+        self.write('LOCAL STOP DATE: '  + get_date(self.end_time))
+        self.write('LOCAL STOP TIME: '  + get_time(self.end_time))
 
     # def get_last_data(self):
     #     return self.data[len(self.data) - 1]
@@ -300,3 +300,9 @@ class Spectrum(Observation):
             self.last_change = time.time()
             self.write_data(data_point)
             return Comm.BEEP
+
+def get_date(epoch_time) -> str:
+    return time.strftime('%m/%d/%Y', time.localtime(epoch_time))
+
+def get_time(epoch_time) -> str:
+    return time.strftime('%I:%M:%S %p', time.localtime(epoch_time))
