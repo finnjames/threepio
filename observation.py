@@ -282,8 +282,9 @@ class Spectrum(Observation):
 
         self.end_RA     = self.start_RA + 180
 
-        self.freq_time  = None
+        # These are the radio frequency (e.g. 1319.5 Mhz), not the sampling frequency!
         self.interval   = 1
+        self.freq_time  = None
         
     def set_files(self):
         self.file_a = MyPrecious(self.name + '_a.md1')
