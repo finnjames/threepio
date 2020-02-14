@@ -25,6 +25,7 @@ from precious import MyPrecious
 from dialog import Dialog
 from time_dialog import TimeDialog
 from dec_dialog import DecDialog
+from credits_dialog import CreditsDialog
 from superclock import SuperClock
 from observation import Observation, Survey, Scan, Spectrum, DataPoint
         
@@ -67,6 +68,8 @@ class Threepio(QtWidgets.QMainWindow):
         self.ui.speed_faster_radio.clicked.connect(self.update_speed)
         self.ui.speed_slower_radio.clicked.connect(self.update_speed)
         self.ui.speed_default_radio.clicked.connect(self.update_speed)
+
+        self.ui.actionInfo.triggered.connect(self.handle_credits)
 
         self.ui.actionScan.triggered.connect(self.handle_scan)
         self.ui.actionSurvey.triggered.connect(self.handle_survey)
@@ -136,9 +139,7 @@ class Threepio(QtWidgets.QMainWindow):
 
             # self.observation.add_data(self.tars.read_one(1)) # get data from DAQ
             
-            self.update_strip_chart() # make the stripchart scroll
-        
-        self.clock.get_sidereal_seconds()
+            # self.update_strip_chart() # make the stripchart scroll #TODO: make data save/and go to gui simulataneously
         
     def legacy_mode(self):
         """lol"""
@@ -146,6 +147,11 @@ class Threepio(QtWidgets.QMainWindow):
         f.write("background-color:#00ff00; color: #ff0000")
         self.setStyleSheet("background-color:#00ff00; color: #ff0000")
         self.setAutoFillBackground(True)
+        
+    def handle_credits(self):
+        dialog = CreditsDialog()
+        dialog.show()
+        dialog.exec_()
 
     def set_time(self):
         new_clock = SuperClock()
@@ -192,11 +198,12 @@ class Threepio(QtWidgets.QMainWindow):
     def update_gui(self):
         self.ui.ra_value.setText(self.clock.get_sidereal_time())
         
-        self.ui.dec_value.setText(str(self.calculate_declination(4)) + "deg")
+        # NOTE: this method does NOT update declination (because that needs to always be updated!)
         
-        if len(self.observation.data) > 0:
-            self.ui.channelA_value.setText("%.2f" % (self.observation.data[len(self.observation.data) - 1].a))
-            self.ui.channelB_value.setText("%.2f" % (self.observation.data[len(self.observation.data) - 1].b))
+        # TODO: get the input data for the stripchart and labels
+        # if len(self.observation.data) > 0:
+        #     self.ui.channelA_value.setText("%.2f" % (self.observation.data[len(self.observation.data) - 1].a))
+        #     self.ui.channelB_value.setText("%.2f" % (self.observation.data[len(self.observation.data) - 1].b))
         
         # this mess makes the progress bar display "T+/- XX.XX" when
         # assigned, and progress the bar when taking data
