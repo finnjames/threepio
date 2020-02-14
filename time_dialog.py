@@ -19,11 +19,8 @@ class TimeDialog(QtWidgets.QDialog):
         self.ui.dialog_button_box.accepted.connect(self.handle_ok)
 
     def handle_ok(self):
-        
-        pattern = "%H:%M:%S"
-        
-        # self.superclock.starting_sidereal_time = time.mktime(time.strptime(self.ui.sidereal_value.text(), pattern))
-        
+        # pattern = "%H:%M:%S"
+                
         u_time = self.ui.sidereal_value.text()
         self.superclock.starting_sidereal_time = 3600*int(u_time[:2]) + 60*int(u_time[3:5]) + int(u_time[6:])
         

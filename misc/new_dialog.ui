@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>389</width>
+    <width>300</width>
     <height>260</height>
    </rect>
   </property>
@@ -14,6 +14,25 @@
    <string>Dialog</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <item row="8" column="3">
+    <widget class="QLineEdit" name="file_name_value">
+     <property name="font">
+      <font>
+       <family>SF Mono</family>
+      </font>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="1" colspan="3">
+    <widget class="QDialogButtonBox" name="dialog_button_box">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
    <item row="1" column="3">
     <widget class="QDateTimeEdit" name="end_time">
      <property name="font">
@@ -22,76 +41,7 @@
       </font>
      </property>
      <property name="displayFormat">
-      <string>yyyy.MM.dd HH:mm:ss</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="3">
-    <widget class="QDateTimeEdit" name="start_time">
-     <property name="font">
-      <font>
-       <family>SF Mono</family>
-      </font>
-     </property>
-     <property name="displayFormat">
-      <string>yyyy.MM.dd HH:mm:ss</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="1">
-    <widget class="QLabel" name="start_label">
-     <property name="font">
-      <font>
-       <pointsize>16</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>Starting RA</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="1">
-    <widget class="QLabel" name="data_acquisition_rate_label">
-     <property name="font">
-      <font>
-       <pointsize>16</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>Data Acquisition Rate</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-     </property>
-     <property name="buddy">
-      <cstring>data_acquisition_rate_value</cstring>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="3">
-    <widget class="QLineEdit" name="starting_dec">
-     <property name="font">
-      <font>
-       <family>SF Mono</family>
-      </font>
-     </property>
-     <property name="placeholderText">
-      <string>degrees</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="3">
-    <widget class="QLineEdit" name="ending_dec">
-     <property name="font">
-      <font>
-       <family>SF Mono</family>
-      </font>
-     </property>
-     <property name="placeholderText">
-      <string>degrees</string>
+      <string>HH:mm:ss</string>
      </property>
     </widget>
    </item>
@@ -110,6 +60,18 @@
      </property>
     </widget>
    </item>
+   <item row="2" column="3">
+    <widget class="QLineEdit" name="starting_dec">
+     <property name="font">
+      <font>
+       <family>SF Mono</family>
+      </font>
+     </property>
+     <property name="placeholderText">
+      <string>degrees</string>
+     </property>
+    </widget>
+   </item>
    <item row="1" column="1">
     <widget class="QLabel" name="end_label">
      <property name="font">
@@ -119,58 +81,6 @@
      </property>
      <property name="text">
       <string>Ending RA</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-     </property>
-    </widget>
-   </item>
-   <item row="7" column="1" colspan="3">
-    <widget class="Line" name="line">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="8" column="1">
-    <widget class="QLabel" name="file_name_label">
-     <property name="font">
-      <font>
-       <pointsize>16</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>File name</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-     </property>
-    </widget>
-   </item>
-   <item row="8" column="3">
-    <widget class="QLineEdit" name="file_name_value">
-     <property name="font">
-      <font>
-       <family>SF Mono</family>
-      </font>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="1">
-    <widget class="QLabel" name="start_dec_label">
-     <property name="font">
-      <font>
-       <pointsize>16</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>Starting Declination</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -192,13 +102,103 @@
      </property>
     </widget>
    </item>
-   <item row="9" column="1" colspan="3">
-    <widget class="QDialogButtonBox" name="dialog_button_box">
+   <item row="4" column="3">
+    <widget class="QLineEdit" name="ending_dec">
+     <property name="font">
+      <font>
+       <family>SF Mono</family>
+      </font>
+     </property>
+     <property name="placeholderText">
+      <string>degrees</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QLabel" name="start_label">
+     <property name="font">
+      <font>
+       <pointsize>16</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Starting RA</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="1" colspan="3">
+    <widget class="Line" name="line">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+    </widget>
+   </item>
+   <item row="6" column="1">
+    <widget class="QLabel" name="data_acquisition_rate_label">
+     <property name="font">
+      <font>
+       <pointsize>16</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Data Acquisition Rate</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+     <property name="buddy">
+      <cstring>data_acquisition_rate_value</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="3">
+    <widget class="QTimeEdit" name="start_time">
+     <property name="font">
+      <font>
+       <family>SF Mono</family>
+      </font>
+     </property>
+     <property name="displayFormat">
+      <string>HH:mm:ss</string>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="1">
+    <widget class="QLabel" name="file_name_label">
+     <property name="font">
+      <font>
+       <pointsize>16</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>File name</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QLabel" name="start_dec_label">
+     <property name="font">
+      <font>
+       <pointsize>16</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Starting Declination</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
      </property>
     </widget>
    </item>
@@ -207,6 +207,7 @@
  <tabstops>
   <tabstop>start_time</tabstop>
   <tabstop>end_time</tabstop>
+  <tabstop>starting_dec</tabstop>
   <tabstop>ending_dec</tabstop>
   <tabstop>data_acquisition_rate_value</tabstop>
   <tabstop>file_name_value</tabstop>

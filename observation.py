@@ -6,9 +6,9 @@
 import time
 from enum import Enum
 
-from .comm import Comm
-from .datapoint import DataPoint
-from .precious import MyPrecious
+from comm import Comm
+from datapoint import DataPoint
+from precious import MyPrecious
 
 class Observation():
     """

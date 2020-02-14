@@ -40,13 +40,20 @@ class Dialog(QtWidgets.QDialog):
         self.parent_window.observation = None
         self.parent_window.observation = self.observation
         
-        # this should fix the stripchart, #nojudgement
+        # this should fix the stripchart, #nojudgement #TODO: is this still necessary?
         self.parent_window.stripchart_offset = 0
         self.parent_window.stripchart_series_a.clear()
         self.parent_window.stripchart_series_b.clear()
         
     def set_observation(self):
-        pattern = "%Y.%m.%d %H:%M:%S"
+        # pattern = "%H:%M:%S"
         
-        self.observation.set_RA(int(time.mktime(time.strptime(self.ui.start_time.text(), pattern))), int(time.mktime(time.strptime(self.ui.end_time.text(), pattern))))
+        u_start_time = self.ui.start_time.text()
+        starting_sidereal_time = 3600*int(u_start_time[:2]) + 60*int(u_start_time[3:5]) + int(u_start_time[6:])
+        u_end_time = self.ui.end_time.text()
+        ending_sidereal_time = 3600*int(u_end_time[:2]) + 60*int(u_end_time[3:5]) + int(u_end_time[6:])
+        
+        self.observation.set_RA(starting_sidereal_time, ending_sidereal_time)
         self.observation.set_dec(int(self.ui.starting_dec.text()), int(self.ui.ending_dec.text()))
+        self.observation.set_name(self.ui.file_name_value.text())
+        self.observation.set_data_freq(int(self.ui.data_acquisition_rate_value.text()))

@@ -136,9 +136,7 @@ class Threepio(QtWidgets.QMainWindow):
 
             # self.observation.add_data(self.tars.read_one(1)) # get data from DAQ
             
-            self.update_strip_chart() # make the stripchart scroll
-        
-        self.clock.get_sidereal_seconds()
+            # self.update_strip_chart() # make the stripchart scroll #TODO: make data save/and go to gui simulataneously
         
     def legacy_mode(self):
         """lol"""
@@ -192,11 +190,12 @@ class Threepio(QtWidgets.QMainWindow):
     def update_gui(self):
         self.ui.ra_value.setText(self.clock.get_sidereal_time())
         
-        self.ui.dec_value.setText(str(self.calculate_declination(4)) + "deg")
+        # NOTE: this method does NOT update declination (because that needs to always be updated!)
         
-        if len(self.observation.data) > 0:
-            self.ui.channelA_value.setText("%.2f" % (self.observation.data[len(self.observation.data) - 1].a))
-            self.ui.channelB_value.setText("%.2f" % (self.observation.data[len(self.observation.data) - 1].b))
+        # TODO: get the input data for the stripchart and labels
+        # if len(self.observation.data) > 0:
+        #     self.ui.channelA_value.setText("%.2f" % (self.observation.data[len(self.observation.data) - 1].a))
+        #     self.ui.channelB_value.setText("%.2f" % (self.observation.data[len(self.observation.data) - 1].b))
         
         # this mess makes the progress bar display "T+/- XX.XX" when
         # assigned, and progress the bar when taking data
