@@ -2,6 +2,7 @@
 Functionalities needed for working with files.
 """
 
+import os
 from datetime import datetime
 
 class MyPrecious:
@@ -10,6 +11,11 @@ class MyPrecious:
     def __init__(self, filename: str):
         self.filename = filename
         self.__buffer = []
+
+        self.dir = "./data/"
+        if not os.path.isdir(self.dir):
+            os.mkdir(self.dir)
+
         self.__file_clear()
 
     def __del__(self):
@@ -52,7 +58,7 @@ class MyPrecious:
         if mode != 'a' and mode != 'w':
             print("Write mode not recognized. Please use " +
             "'a' for append and 'w' for write (overwrite).")
-        with open(self.filename, mode) as file:
+        with open(self.dir + self.filename, mode) as file:
             print(data, end='\n', file=file)
 
     def __file_overwrite(self, data):
@@ -62,5 +68,5 @@ class MyPrecious:
         self.__file_write(data, mode='a')
 
     def __file_clear(self):
-        with open(self.filename, 'w') as file:
+        with open(self.dir + self.filename, 'w') as file:
             print('', end='', file=file)

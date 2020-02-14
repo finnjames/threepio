@@ -79,38 +79,38 @@ class Observation():
         self.data_freq = data_freq
 
     # This is the communication API
-    def communicate(self, data_point):
+    def communicate(self, data_point, timestamp = time.time()):
         if self.state == self.State.OFF:
-            if time.time() < self.start_RA - (self.bg_dur + self.cal_dur + 30):
+            if timestamp < self.start_RA - (self.bg_dur + self.cal_dur + 30):
                 # A 30 seconds buffer for user actions
                 return Comm.NO_ACTION
             else:
                 return Comm.START_CAL
         elif self.state == self.State.CAL_1:
-            if time.time() - self.cal_start < self.cal_dur:
+            if timestamp - self.cal_start < self.cal_dur:
                 self.write_data(data_point)
                 return Comm.NO_ACTION
             else:
                 return Comm.STOP_CAL
         elif self.state == self.State.BG_1:
-            if time.time() - self.bg_start < self.bg_dur:
+            if timestamp - self.bg_start < self.bg_dur:
                 self.write_data(data_point)
                 return Comm.NO_ACTION
             else:
                 return Comm.NEXT
         elif self.state == self.State.DATA:
-            if time.time() < self.end_RA:
+            if timestamp < self.end_RA:
                 return self.data_logic(data_point)
             else:
                 return Comm.START_CAL
         elif self.state == self.State.CAL_2:
-            if time.time() - self.cal_start < self.cal_dur:
+            if timestamp - self.cal_start < self.cal_dur:
                 self.write_data(data_point)
                 return Comm.NO_ACTION
             else:
                 return Comm.STOP_CAL
         elif self.state == self.State.BG_2:
-            if time.time() - self.bg_start < self.bg_dur:
+            if timestamp - self.bg_start < self.bg_dur:
                 self.write_data(data_point)
                 return Comm.NO_ACTION
             else:
