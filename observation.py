@@ -6,9 +6,9 @@
 import time
 from enum import Enum
 
-from comm import Comm
-from datapoint import DataPoint
-from precious import MyPrecious
+from .comm import Comm
+from .datapoint import DataPoint
+from .precious import MyPrecious
 
 class Observation():
     """
@@ -130,7 +130,7 @@ class Observation():
             self.start_calibration_2()
         elif self.state == self.State.CAL_2:
             self.end_calibration_2()
-        elif self.state == self.State.BG_2():
+        elif self.state == self.State.BG_2:
             self.stop()
         else:
             pass # state == DONE, do nothing
@@ -202,14 +202,14 @@ class Observation():
             self.file_b.write(string)
 
     def write_data(self, point: DataPoint):
-        self.write(point.timestamp)
-        self.write(point.dec)
+        self.write("%.2f" % point.timestamp)
+        self.write("%.2f" % point.dec)
         if self.composite:
-            self.file_comp.write(point.a)
-            self.file_comp.write(point.b)
+            self.file_comp.write("%.4f" % point.a)
+            self.file_comp.write("%.4f" % point.b)
         else:
-            self.file_a.write(point.a)
-            self.file_b.write(point.b)
+            self.file_a.write("%.4f" % point.a)
+            self.file_b.write("%.4f" % point.b)
 
     def write_meta(self):
         self.write('TELESCOPE: The Mighty Forty')
@@ -280,12 +280,14 @@ class Spectrum(Observation):
         self.cal_freq   = 3
         self.data_freq  = 10
 
-        self.end_RA     = self.start_RA + 180
-
         # These are the radio frequency (e.g. 1319.5 Mhz), not the sampling frequency!
         self.interval   = 1
         self.freq_time  = None
         
+    def set_RA(self, start_RA, end_RA):
+        self.start_RA = start_RA
+        self.end_RA = self.start_RA + 180
+
     def set_files(self):
         self.file_a = MyPrecious(self.name + '_a.md1')
         self.file_b = MyPrecious(self.name + '_b.md1')
