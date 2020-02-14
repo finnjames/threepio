@@ -499,7 +499,6 @@
     <addaction name="separator"/>
     <addaction name="actionHelp"/>
     <addaction name="actionInfo"/>
-    <addaction name="actionLegacy"/>
     <addaction name="separator"/>
     <addaction name="actionStop"/>
     <addaction name="actionQuit"/>

@@ -25,6 +25,7 @@ from precious import MyPrecious
 from dialog import Dialog
 from time_dialog import TimeDialog
 from dec_dialog import DecDialog
+from credits_dialog import CreditsDialog
 from superclock import SuperClock
 from observation import Observation, Survey, Scan, Spectrum, DataPoint
         
@@ -67,6 +68,8 @@ class Threepio(QtWidgets.QMainWindow):
         self.ui.speed_faster_radio.clicked.connect(self.update_speed)
         self.ui.speed_slower_radio.clicked.connect(self.update_speed)
         self.ui.speed_default_radio.clicked.connect(self.update_speed)
+
+        self.ui.actionInfo.triggered.connect(self.handle_credits)
 
         self.ui.actionScan.triggered.connect(self.handle_scan)
         self.ui.actionSurvey.triggered.connect(self.handle_survey)
@@ -144,6 +147,11 @@ class Threepio(QtWidgets.QMainWindow):
         f.write("background-color:#00ff00; color: #ff0000")
         self.setStyleSheet("background-color:#00ff00; color: #ff0000")
         self.setAutoFillBackground(True)
+        
+    def handle_credits(self):
+        dialog = CreditsDialog()
+        dialog.show()
+        dialog.exec_()
 
     def set_time(self):
         new_clock = SuperClock()

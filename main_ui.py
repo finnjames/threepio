@@ -256,7 +256,6 @@ class Ui_MainWindow(object):
         self.menuFile.addSeparator()
         self.menuFile.addAction(self.actionHelp)
         self.menuFile.addAction(self.actionInfo)
-        self.menuFile.addAction(self.actionLegacy)
         self.menuFile.addSeparator()
         self.menuFile.addAction(self.actionStop)
         self.menuFile.addAction(self.actionQuit)
