@@ -10,6 +10,7 @@ class MyPrecious:
     def __init__(self, filename: str):
         self.filename = filename
         self.__buffer = []
+        self.__file_clear()
 
     def __del__(self):
         if self.__buffer_size() > 0:
@@ -59,3 +60,7 @@ class MyPrecious:
 
     def __file_append(self, data):
         self.__file_write(data, mode='a')
+
+    def __file_clear(self):
+        with open(self.filename, 'w') as file:
+            print('', end='', file=file)
