@@ -76,9 +76,9 @@ class Threepio(QtWidgets.QMainWindow):
         self.ui.actionDec.triggered.connect(self.dec_calibration)
 
         self.ui.chart_clear_button.clicked.connect(self.handle_clear)
-        # self.ui.chart_refresh_button.clicked.connect(self.handle_refresh)
+        self.ui.chart_refresh_button.clicked.connect(self.handle_refresh)
         # this is for testing, the above line is the correct one
-        self.ui.chart_refresh_button.clicked.connect(self.dec_calibration)
+
 
         # TODO: maybe just choose one of these?
         self.ui.actionLegacy.triggered.connect(self.legacy_mode)
@@ -124,15 +124,14 @@ class Threepio(QtWidgets.QMainWindow):
         # TODO: make this use DAQ data
         self.foo += .1
         if self.foo > 90.0: self.foo = 0.0
-        self.ui.dec_value.setText(str(self.calculate_declination(int(self.foo)))[:5])
-        
+                
         # for speed testing
         #print(time.time() - self.tick_time)
         #self.tick_time = time.time()
         
         self.update_gui() # update gui
         
-        # do this only if observation loaded -> read data
+        # if observation loaded -> read data
         if self.observation != None:
             self.update_progress_bar()
 
@@ -202,7 +201,8 @@ class Threepio(QtWidgets.QMainWindow):
         self.dec_slope, self.dec_int, r_value, p_value, std_err = stats.linregress(x,y)
 
     def update_gui(self):
-        self.ui.ra_value.setText(self.clock.get_sidereal_time())
+        self.ui.ra_value.setText(self.clock.get_sidereal_time()) # show RA
+        self.ui.dec_value.setText("%.2f" % self.calculate_declination(int(self.foo))) # show dec
         
         # NOTE: this method does NOT update declination (because that needs to always be updated!)
         
@@ -293,7 +293,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.new_observation(obs)
 
     def new_observation(self, obs):
-        dialog = Dialog(self, self.clock.get_time(), obs)
+        dialog = Dialog(self, self.clock.get_sidereal_time(), obs)
         dialog.setWindowTitle("New " + obs.obs_type)
         dialog.show()
         dialog.exec_()

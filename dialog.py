@@ -7,7 +7,7 @@ from precious import MyPrecious
 
 class Dialog(QtWidgets.QDialog):
     """New observation dialogue window"""
-    def __init__(self, parent_window, date, observation):
+    def __init__(self, parent_window, current_time, observation):
         QtWidgets.QWidget.__init__(self)
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
@@ -21,14 +21,6 @@ class Dialog(QtWidgets.QDialog):
             self.ui.ending_dec.setText("0")
             self.ui.start_dec_label.setText("Declination")
         
-        # set today's date
-        self.current_date = QtCore.QDate(time.localtime(date)[0], time.localtime(date)[1], time.localtime(date)[2])
-        self.current_time = QtCore.QTime(time.localtime(date)[3], time.localtime(date)[4], 0)
-        self.ui.start_time.setDate(self.current_date)
-        self.ui.start_time.setTime(self.current_time)
-        self.ui.end_time.setDate(self.current_date)
-        self.ui.end_time.setTime(self.current_time)
-
         # store parent window
         self.parent_window = parent_window
 
