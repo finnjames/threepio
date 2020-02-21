@@ -12,9 +12,7 @@ Written with frustration by Shengjie, Isabel, and Finn
 
 from PyQt5 import QtCore, QtWidgets, QtGui, QtChart
 from main_ui import Ui_MainWindow   # compiled PyQt main ui
-# from dialog_ui import Ui_Dialog     # compiled PyQt dialogue ui
 from time_ui import Ui_Dialog     # compiled PyQt dialogue ui
-from astropy.time import Time
 from scipy import stats
 # from playsound import playsound # TODO: test on Windows 
 import numpy as np
@@ -110,6 +108,9 @@ class Threepio(QtWidgets.QMainWindow):
         # establish observation
         self.observation = None
         
+        # establish data array
+        self.data = []
+        
         # run initial calibration
         self.declination_regression()
         
@@ -129,17 +130,22 @@ class Threepio(QtWidgets.QMainWindow):
         #print(time.time() - self.tick_time)
         #self.tick_time = time.time()
         
-        # do this only if observation loaded
+        self.update_gui() # update gui
+        
+        # do this only if observation loaded -> read data
         if self.observation != None:
-            self.update_gui() # update gui
+            self.update_progress_bar()
 
             self.ticker += random.random()*random.randint(-1,1)       # \ for the test data
             self.other_ticker += random.random()*random.randint(-1,1) # /
-            self.observation.data_logic(DataPoint(self.clock.get_time(), self.ticker, self.other_ticker, 1)) # random meander
+            
+            # TODO: add declination lol
+            self.data.append(DataPoint(self.clock.get_sidereal_seconds(), self.ticker, self.other_ticker, self.calculate_declination(1))) # random meander
+            self.observation.data_logic(DataPoint(self.clock.get_sidereal_seconds(), self.ticker, self.other_ticker, self.calculate_declination(1))) # random meander
 
             # self.observation.add_data(self.tars.read_one(1)) # get data from DAQ
             
-            # self.update_strip_chart() # make the stripchart scroll #TODO: make data save/and go to gui simulataneously
+            self.update_strip_chart() # make the stripchart scroll #TODO: make data save/and go to gui simulataneously
         
     def legacy_mode(self):
         """lol"""
@@ -201,10 +207,11 @@ class Threepio(QtWidgets.QMainWindow):
         # NOTE: this method does NOT update declination (because that needs to always be updated!)
         
         # TODO: get the input data for the stripchart and labels
-        # if len(self.observation.data) > 0:
-        #     self.ui.channelA_value.setText("%.2f" % (self.observation.data[len(self.observation.data) - 1].a))
-        #     self.ui.channelB_value.setText("%.2f" % (self.observation.data[len(self.observation.data) - 1].b))
-        
+        if len(self.data) > 0:
+            self.ui.channelA_value.setText("%.2f" % (self.data[len(self.data) - 1].a))
+            self.ui.channelB_value.setText("%.2f" % (self.data[len(self.data) - 1].b))
+    
+    def update_progress_bar(self):
         # this mess makes the progress bar display "T+/- XX.XX" when
         # assigned, and progress the bar when taking data
         if not self.observation.end_RA - self.observation.start_RA <= 1:
@@ -221,12 +228,12 @@ class Threepio(QtWidgets.QMainWindow):
         self.ui.message_label.setText(message)
     
     def update_strip_chart(self):
-        new_a = self.observation.data[len(self.observation.data) - 1].a
-        new_b = self.observation.data[len(self.observation.data) - 1].b
-        self.stripchart_series_a.append(new_a, len(self.observation.data))
-        self.stripchart_series_b.append(new_b, len(self.observation.data))
+        new_a = self.data[len(self.data) - 1].a
+        new_b = self.data[len(self.data) - 1].b
+        self.stripchart_series_a.append(new_a, len(self.data))
+        self.stripchart_series_b.append(new_b, len(self.data))
 
-        while (len(self.observation.data) - self.stripchart_offset > self.stripchart_display_ticks):
+        while (len(self.data) - self.stripchart_offset > self.stripchart_display_ticks):
             self.stripchart_series_a.remove(0)
             self.stripchart_series_b.remove(0)
             self.stripchart_offset += 1
