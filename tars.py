@@ -32,54 +32,104 @@ class Tars:
     RANGE_RATE = (50000, 20000, 10000, 5000, 2000,
                   1000, 500, 200, 100, 50, 20, 10)
 
-    def __init__(self, device: str):
-        self.ser = serial.Serial(device)
-        self.acquiring = False
-        self.channels = [
-            0x0100, # channel 0, ±5 V range
-            0x0101, # channel 1, ±5 V range
-            0x0102, # channel 2, ±5 V range
-        ]
+    def __init__(self, device=None):
+        if device is not None:
+            self.testing = False
 
-    def send(self, command: str):
-        self.ser.write((command + '\r').encode())
-    
-    def init(self):
-        self.send("stop")
-        self.send("encode 0")       # 0 = binary, 1 = ascii
-        self.send("ps 0")           # small pocket size for responsiveness
+            self.ser = serial.Serial(device)
+            self.channels = [
+                0x0100, # channel 0, telescope channel A, ±5 V range
+                0x0101, # channel 1, telescope channel B, ±5 V range
+                0x0102, # channel 2, declinometer, ±5 V range
+            ]
+            self.acquiring = False
 
-        for i in range(0, len(self.channels)):
-            self.send("slist " + str(i) + " " + str(self.channels[i]))
-
-        # Define sample rate = 10 Hz:
-        # 60,000,000/(srate * dec) = 60,000,000/(11718 * 512) = 10 Hz
-        self.send("dec 5120")
-        self.send("srate 11718")
+            self.setup()
+        else:
+            self.testing = True
     
     def start(self):
-        self.send("start")
-        self.acquiring = True
+        if not self.testing:
+            self.send("start")
+            self.acquiring = True
 
     def reset(self):
-        self.send("reset 1")
+        if not self.testing:
+            self.send("reset 1")
     
     def stop(self):
-        self.send("stop")
-        self.ser.reset_input_buffer()
-        self.acquiring = False
+        if not self.testing:
+            self.send("stop")
+            self.ser.reset_input_buffer()
+            self.acquiring = False
+
+    def read_one(self) -> list:
+        """
+        This reads one datapoint from the buffer. Each datapoint has three channels:
+        channel 0: telescope channel A
+        channel 1: telescope channel B
+        channel 2: telescope channel C
+        """
+        if not self.testing:
+            if self.in_waiting() < (2 * len(self.channels)):
+                return None
+            return [(channel & 3, self.buffer_read(channel)) for channel in self.channels]
+        else:
+            return [(0, 2), (1, 3), (2, 1)]
+
+    def read_latest(self) -> list:
+        """
+        This function reads the last datapoint from the buffer and clears the buffer.
+        Use this as a real-time sampling method.
+        """
+        if not self.testing:
+            current = self.read_one()
+            latest = None
+            while current is not None:
+                latest = current
+                current = self.read_one()
+            return latest
+        else:
+            return [(0, 2), (1, 3), (2, 1)]
+
+    ############################ Helpers ############################
+
+    def send(self, command: str):
+        if not self.testing:
+            self.ser.write((command + '\r').encode())
+    
+    def setup(self):
+        if not self.testing:
+            self.send("stop")
+            self.send("encode 0")       # 0 = binary, 1 = ascii
+            self.send("ps 0")           # small pocket size for responsiveness
+
+            for i in range(0, len(self.channels)):
+                self.send("slist " + str(i) + " " + str(self.channels[i]))
+
+            # Define sample rate = 100 Hz:
+            # 60,000,000/(srate * dec) = 60,000,000/(1171 * 512) = 100 Hz
+            self.send("dec 512")
+            self.send("srate 1171")
+
+            # self.send("dec 512")
+            # self.send("srate 11718")
 
     def in_waiting(self) -> int:
-        return self.ser.in_waiting
+        if not self.testing:
+            return self.ser.in_waiting
 
-    def read_one(self, channel: int) -> float:
-        buffer = self.ser.read(2)
-        return Tars.RANGE_VOLT[channel >> 8] * int.from_bytes(buffer, byteorder='little', signed=True) / 32768
-    
-    def read_all(self) -> list:
-        if self.in_waiting() < (2 * len(self.channels)):
-            return None
-        return [(channel, self.read_one(channel)) for channel in self.channels]
+    def buffer_read(self, channel: int) -> float:
+        """
+        This function reads one value from the serial buffer. I.e. it will only read *one channel* at a time.
+        Therefore, do not use this function by itself. If data is not always read in pairs of three there's no
+        way to tell the channels apart.
+        """
+        if not self.testing:
+            if self.in_waiting < 2:
+                return None
+            buffer = self.ser.read(2)
+            return Tars.RANGE_VOLT[channel >> 8] * int.from_bytes(buffer, byteorder='little', signed=True) / 32768
 
 def main():
     device_name = discovery()
@@ -92,12 +142,12 @@ def main():
     print("Found a DATAQ Instruments device on", device_name)
     device = Tars(device_name)
 
-    device.init()
+    device.setup()
     time.sleep(3)
     device.start()
 
     while(True):
-        device.read_all()
+        print(device.read_one())
 
 if __name__ == "__main__":
     main()
