@@ -16,6 +16,11 @@
   <layout class="QGridLayout" name="gridLayout">
    <item row="1" column="0">
     <widget class="QPushButton" name="discard_cal_button">
+     <property name="font">
+      <font>
+       <family>IBM Plex Sans</family>
+      </font>
+     </property>
      <property name="text">
       <string>Discard</string>
      </property>
@@ -23,6 +28,11 @@
    </item>
    <item row="1" column="1">
     <widget class="QPushButton" name="next_cal_button">
+     <property name="font">
+      <font>
+       <family>IBM Plex Sans</family>
+      </font>
+     </property>
      <property name="text">
       <string>Next</string>
      </property>
@@ -36,6 +46,11 @@
    </item>
    <item row="0" column="0">
     <widget class="QLabel" name="set_dec_label">
+     <property name="font">
+      <font>
+       <family>IBM Plex Sans</family>
+      </font>
+     </property>
      <property name="text">
       <string>Set declination to</string>
      </property>
@@ -45,7 +60,7 @@
     <widget class="QLabel" name="set_dec_value">
      <property name="font">
       <font>
-       <family>SF Mono</family>
+       <family>IBM Plex Mono</family>
       </font>
      </property>
      <property name="text">

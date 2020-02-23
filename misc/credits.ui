@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>394</width>
-    <height>361</height>
+    <width>383</width>
+    <height>376</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -31,7 +31,7 @@
     <widget class="QLabel" name="label">
      <property name="font">
       <font>
-       <family>SF Mono</family>
+       <family>IBM Plex Mono</family>
       </font>
      </property>
      <property name="text">
@@ -64,6 +64,7 @@
     <widget class="QLabel" name="label_2">
      <property name="font">
       <font>
+       <family>IBM Plex Sans</family>
        <pointsize>14</pointsize>
       </font>
      </property>
@@ -95,6 +96,11 @@ No frills, all thrills 😎</string>
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="font">
+      <font>
+       <family>IBM Plex Sans</family>
+      </font>
+     </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>

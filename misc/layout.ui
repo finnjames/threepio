@@ -39,6 +39,11 @@
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
+      <property name="font">
+       <font>
+        <family>IBM Plex Sans</family>
+       </font>
+      </property>
       <property name="title">
        <string>Data</string>
       </property>
@@ -47,6 +52,7 @@
         <widget class="QLabel" name="ra_label">
          <property name="font">
           <font>
+           <family>IBM Plex Sans</family>
            <pointsize>22</pointsize>
           </font>
          </property>
@@ -59,6 +65,7 @@
         <widget class="QLabel" name="dec_label">
          <property name="font">
           <font>
+           <family>IBM Plex Sans</family>
            <pointsize>22</pointsize>
           </font>
          </property>
@@ -71,6 +78,7 @@
         <widget class="QLabel" name="channelB_label">
          <property name="font">
           <font>
+           <family>IBM Plex Sans</family>
            <pointsize>22</pointsize>
           </font>
          </property>
@@ -83,6 +91,7 @@
         <widget class="QLabel" name="channelA_label">
          <property name="font">
           <font>
+           <family>IBM Plex Sans</family>
            <pointsize>22</pointsize>
           </font>
          </property>
@@ -95,10 +104,9 @@
         <widget class="QLabel" name="dec_value">
          <property name="font">
           <font>
-           <family>SF Mono</family>
+           <family>IBM Plex Mono</family>
            <pointsize>22</pointsize>
            <weight>75</weight>
-           <italic>false</italic>
            <bold>true</bold>
            <kerning>false</kerning>
           </font>
@@ -182,10 +190,9 @@
          </property>
          <property name="font">
           <font>
-           <family>SF Mono</family>
+           <family>IBM Plex Mono</family>
            <pointsize>22</pointsize>
            <weight>75</weight>
-           <italic>false</italic>
            <bold>true</bold>
            <kerning>false</kerning>
           </font>
@@ -205,10 +212,9 @@
         <widget class="QLabel" name="ra_value">
          <property name="font">
           <font>
-           <family>SF Mono</family>
+           <family>IBM Plex Mono</family>
            <pointsize>22</pointsize>
            <weight>75</weight>
-           <italic>false</italic>
            <bold>true</bold>
            <kerning>false</kerning>
           </font>
@@ -316,10 +322,9 @@
          </property>
          <property name="font">
           <font>
-           <family>SF Mono</family>
+           <family>IBM Plex Mono</family>
            <pointsize>22</pointsize>
            <weight>75</weight>
-           <italic>false</italic>
            <bold>true</bold>
            <kerning>false</kerning>
           </font>
@@ -341,8 +346,8 @@
           <font>
            <pointsize>22</pointsize>
            <weight>75</weight>
+           <italic>false</italic>
            <bold>true</bold>
-           <kerning>true</kerning>
           </font>
          </property>
          <property name="text">
@@ -361,6 +366,11 @@
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
+      <property name="font">
+       <font>
+        <family>IBM Plex Sans</family>
+       </font>
+      </property>
       <property name="title">
        <string>Strip chart</string>
       </property>
@@ -372,6 +382,11 @@
          <width>152</width>
          <height>20</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>IBM Plex Sans</family>
+        </font>
        </property>
        <property name="cursor">
         <cursorShape>PointingHandCursor</cursorShape>
@@ -388,6 +403,11 @@
          <width>109</width>
          <height>32</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>IBM Plex Sans</family>
+        </font>
        </property>
        <property name="cursor">
         <cursorShape>PointingHandCursor</cursorShape>
@@ -408,6 +428,11 @@
          <height>20</height>
         </rect>
        </property>
+       <property name="font">
+        <font>
+         <family>IBM Plex Sans</family>
+        </font>
+       </property>
        <property name="cursor">
         <cursorShape>PointingHandCursor</cursorShape>
        </property>
@@ -427,6 +452,11 @@
          <height>20</height>
         </rect>
        </property>
+       <property name="font">
+        <font>
+         <family>IBM Plex Sans</family>
+        </font>
+       </property>
        <property name="cursor">
         <cursorShape>PointingHandCursor</cursorShape>
        </property>
@@ -443,6 +473,11 @@
          <height>32</height>
         </rect>
        </property>
+       <property name="font">
+        <font>
+         <family>IBM Plex Sans</family>
+        </font>
+       </property>
        <property name="text">
         <string>Legacy Mode</string>
        </property>
@@ -455,6 +490,11 @@
          <width>121</width>
          <height>32</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>IBM Plex Sans</family>
+        </font>
        </property>
        <property name="cursor">
         <cursorShape>PointingHandCursor</cursorShape>
@@ -473,8 +513,13 @@
      <x>0</x>
      <y>0</y>
      <width>683</width>
-     <height>22</height>
+     <height>24</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>IBM Plex Sans</family>
+    </font>
    </property>
    <widget class="QMenu" name="menuCalibration">
     <property name="title">

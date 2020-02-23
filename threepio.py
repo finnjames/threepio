@@ -26,6 +26,7 @@ from dec_dialog import DecDialog
 from credits_dialog import CreditsDialog
 from superclock import SuperClock
 from observation import Observation, Survey, Scan, Spectrum, DataPoint
+from alert import AlertDialog
         
 class Threepio(QtWidgets.QMainWindow):
     """Main class for the app"""
@@ -118,6 +119,10 @@ class Threepio(QtWidgets.QMainWindow):
         self.timer = QtCore.QTimer(self)
         self.timer.timeout.connect(self.tick) # do everything
         self.timer.start(self.timer_rate) # set refresh rate
+        
+        alert = AlertDialog("Set calibration switches to 'on'")
+        alert.show()
+        alert.exec_()
 
     def tick(self): # primary controller for each clock tick
 
@@ -139,8 +144,8 @@ class Threepio(QtWidgets.QMainWindow):
             self.other_ticker += random.random()*random.randint(-1,1) # /
             
             # TODO: add declination lol
-            self.data.append(DataPoint(self.clock.get_sidereal_seconds(), self.ticker, self.other_ticker, self.calculate_declination(1))) # random meander
-            self.observation.data_logic(DataPoint(self.clock.get_sidereal_seconds(), self.ticker, self.other_ticker, self.calculate_declination(1))) # random meander
+            self.data.append(DataPoint(self.clock.get_sidereal_seconds(), self.ticker, self.other_ticker, self.calculate_declination(self.foo))) # random meander
+            self.observation.data_logic(DataPoint(self.clock.get_sidereal_seconds(), self.ticker, self.other_ticker, self.calculate_declination(self.foo))) # random meander
 
             # self.observation.add_data(self.tars.read_one(1)) # get data from DAQ
             
@@ -317,5 +322,5 @@ def main():
     window.show()
     sys.exit(app.exec_())
     
-if __name__ == '__main__':
+if __name__ == '__main__':   
     main()

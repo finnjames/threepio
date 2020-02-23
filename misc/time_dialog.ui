@@ -16,6 +16,11 @@
   <layout class="QGridLayout" name="gridLayout">
    <item row="3" column="1" colspan="2">
     <widget class="QDialogButtonBox" name="dialog_button_box">
+     <property name="font">
+      <font>
+       <family>IBM Plex Sans</family>
+      </font>
+     </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
@@ -31,6 +36,7 @@
     <widget class="QLabel" name="sidereal_label">
      <property name="font">
       <font>
+       <family>IBM Plex Sans</family>
        <pointsize>16</pointsize>
       </font>
      </property>
@@ -46,7 +52,7 @@
     <widget class="QTimeEdit" name="sidereal_value">
      <property name="font">
       <font>
-       <family>SF Mono</family>
+       <family>IBM Plex Mono</family>
       </font>
      </property>
      <property name="displayFormat">
