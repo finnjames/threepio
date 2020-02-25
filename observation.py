@@ -1,6 +1,6 @@
 # TODO:
 # 1. Figure out a consistent way to deal with time
-#   a) when time is used for starting/ending certain stages of the observation
+#   DONE a) when time is used for starting/ending certain stages of the observation
 #   DONE b) when appending metadata about the observation such as start and end time and date.
 
 import time
@@ -99,7 +99,9 @@ class Observation():
             else:
                 return Comm.NEXT
         elif self.state == self.State.DATA:
-            if timestamp < self.end_RA:
+            if timestamp < self.start_RA:
+                return Comm.NO_ACTION
+            elif timestamp < self.end_RA:
                 return self.data_logic(data_point)
             else:
                 return Comm.START_CAL
