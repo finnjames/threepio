@@ -75,7 +75,7 @@ class Tars:
                 return None
             return [(channel & 3, self.buffer_read(channel)) for channel in self.channels]
         else:
-            return [(0, 2), (1, 3), (2, 1)]
+            return [(0, 2.0), (1, 3.0), (2, 1.0)]
 
     def read_latest(self) -> list:
         """
@@ -93,7 +93,7 @@ class Tars:
                 current = self.read_one()
             return latest
         else:
-            return [(0, 2), (1, 3), (2, 1)]
+            return [(0, 2.0), (1, 3.0), (2, 1.0)]
 
     ############################ Helpers ############################
 
