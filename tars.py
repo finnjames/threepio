@@ -80,7 +80,10 @@ class Tars:
     def read_latest(self) -> list:
         """
         This function reads the last datapoint from the buffer and clears the buffer.
-        Use this as a real-time sampling method.
+        Use this as a real-time sampling method. Each datapoint has three channels:
+        channel 0: telescope channel A
+        channel 1: telescope channel B
+        channel 2: telescope channel C
         """
         if not self.testing:
             current = self.read_one()
