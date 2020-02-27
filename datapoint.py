@@ -1,11 +1,11 @@
 
 class DataPoint():
-    """each data point taken, has a timestamp, a dec value, and two voltage channels"""
-    def __init__(self, timestamp, a, b, dec):
+    """each data point taken (timestamp, dec, a, b)"""
+    def __init__(self, timestamp, dec, a, b):
         self.timestamp = timestamp
+        self.dec = dec
         self.a = a
         self.b = b
-        self.dec = dec
         
     def to_tuple(self):
-        return (self.timestamp, self.a, self.b, self.dec)
+        return (self.timestamp, self.dec, self.a, self.b)

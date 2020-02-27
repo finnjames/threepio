@@ -37,7 +37,7 @@ class Observation():
         self.data_freq  = 1
 
         # Will be set accordingly in each state.
-        self.freq       = None
+        self.freq       = self.cal_freq
 
         self.state      = self.State.OFF
         
@@ -59,6 +59,9 @@ class Observation():
         self.cal_start  = None
         self.bg_start   = None
         
+        self.data_start = None
+        self.data_end   = None
+        
         # # The data list, for backup
         # self.data       = []
     
@@ -70,6 +73,10 @@ class Observation():
     def set_dec(self, max_dec, min_dec = None):
         self.max_dec = max_dec
         self.min_dec = min_dec
+        
+    def set_data_time(self, data_start, data_end):
+        self.data_start = data_start
+        self.data_end = data_end
 
     def set_name(self, name):
         self.name = name
@@ -79,7 +86,8 @@ class Observation():
         self.data_freq = data_freq
 
     # This is the communication API
-    def communicate(self, data_point, timestamp = time.time()):
+    def communicate(self, data_point, timestamp):
+            
         if self.state == self.State.OFF:
             if timestamp < self.start_RA - (self.bg_dur + self.cal_dur + 30):
                 # A 30 seconds buffer for user actions
@@ -287,8 +295,10 @@ class Spectrum(Observation):
         self.freq_time  = None
         
     def set_RA(self, start_RA, end_RA):
-        self.start_RA = start_RA
-        self.end_RA = self.start_RA + 180
+        return super().set_RA(start_RA, start_RA + 180)
+        
+    def set_data_time(self, data_start, data_end):
+        return super().set_data_time(data_start, data_start + 180)
 
     def set_files(self):
         self.file_a = MyPrecious(self.name + '_a.md1')

@@ -7,12 +7,13 @@ from precious import MyPrecious
 
 class Dialog(QtWidgets.QDialog):
     """New observation dialogue window"""
-    def __init__(self, parent_window, current_time, observation):
+    def __init__(self, parent_window, current_time, observation, clock):
         QtWidgets.QWidget.__init__(self)
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
         self.setWindowTitle("Threepio Dialogue")
         self.observation = observation
+        self.clock = clock
         
         # If a scan or spectrum, only one Dec needed
         if self.observation.obs_type == "Scan" or self.observation.obs_type == "Spectrum":
@@ -45,7 +46,10 @@ class Dialog(QtWidgets.QDialog):
         u_end_time = self.ui.end_time.text()
         ending_sidereal_time = 3600*int(u_end_time[:2]) + 60*int(u_end_time[3:5]) + int(u_end_time[6:])
         
-        self.observation.set_RA(starting_sidereal_time, ending_sidereal_time)
+        start_time = starting_sidereal_time - self.clock.get_sidereal_seconds() + time.time()
+        end_time = ending_sidereal_time - self.clock.get_sidereal_seconds() + time.time()
+        
+        self.observation.set_RA(start_time, end_time)
         self.observation.set_dec(int(self.ui.starting_dec.text()), int(self.ui.ending_dec.text()))
         self.observation.set_name(self.ui.file_name_value.text())
         self.observation.set_data_freq(int(self.ui.data_acquisition_rate_value.text()))

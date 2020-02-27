@@ -27,6 +27,7 @@ from credits_dialog import CreditsDialog
 from superclock import SuperClock
 from observation import Observation, Survey, Scan, Spectrum, DataPoint
 from alert import AlertDialog
+from comm import Comm
         
 class Threepio(QtWidgets.QMainWindow):
     """Main class for the app"""
@@ -40,7 +41,10 @@ class Threepio(QtWidgets.QMainWindow):
     ticker = 0
     other_ticker = 0
     foo = 0.0
+    
+    # speed measurement
     tick_time = 0.0
+    timing_margin = 0.995
 
     # stripchart
     stripchart_low = -1
@@ -48,11 +52,15 @@ class Threepio(QtWidgets.QMainWindow):
     
     # declination calibration
     dec_slope = 0
-    dec_int = 0
+    dec_intercept = 0
 
     # palette
     BLUE = 0x2196f3
     RED = 0xff5252
+    
+    # tars communication interpretation
+    transmission = None
+    old_transmission = None
 
     def __init__(self):
         QtWidgets.QWidget.__init__(self)
@@ -97,11 +105,10 @@ class Threepio(QtWidgets.QMainWindow):
         pen.setColor(QtGui.QColor(self.RED))
         self.stripchart_series_b.setPen(pen)
 
-        # # DATAQ stuff
-        self.tars = None
-        # self.tars = tars.Tars(tars.discovery())
-        # self.tars.init()
-        # self.tars.start()
+        # DATAQ stuff
+        self.tars = tars.Tars()
+        self.tars.setup()
+        self.tars.start()
         
         # clock
         self.clock = self.set_time()
@@ -109,8 +116,9 @@ class Threepio(QtWidgets.QMainWindow):
         # establish observation
         self.observation = None
         
-        # establish data array
+        # establish data array & most recent dec
         self.data = []
+        self.current_dec = 0.0
         
         # run initial calibration
         self.declination_regression()
@@ -119,10 +127,6 @@ class Threepio(QtWidgets.QMainWindow):
         self.timer = QtCore.QTimer(self)
         self.timer.timeout.connect(self.tick) # do everything
         self.timer.start(self.timer_rate) # set refresh rate
-        
-        alert = AlertDialog("Set calibration switches to 'on'")
-        alert.show()
-        alert.exec_()
 
     def tick(self): # primary controller for each clock tick
 
@@ -138,18 +142,48 @@ class Threepio(QtWidgets.QMainWindow):
         
         # if observation loaded -> read data
         if self.observation != None:
-            self.update_progress_bar()
-
-            self.ticker += random.random()*random.randint(-1,1)       # \ for the test data
-            self.other_ticker += random.random()*random.randint(-1,1) # /
+            period = 1/self.observation.freq
             
-            # TODO: add declination lol
-            self.data.append(DataPoint(self.clock.get_sidereal_seconds(), self.ticker, self.other_ticker, self.calculate_declination(self.foo))) # random meander
-            self.observation.data_logic(DataPoint(self.clock.get_sidereal_seconds(), self.ticker, self.other_ticker, self.calculate_declination(self.foo))) # random meander
-
-            # self.observation.add_data(self.tars.read_one(1)) # get data from DAQ
+            if (time.time() - self.tick_time) > (period * self.timing_margin):
+                self.update_progress_bar()
+                
+                self.tick_time = time.time()
             
-            self.update_strip_chart() # make the stripchart scroll #TODO: make data save/and go to gui simulataneously
+                tars_data = self.tars.read_latest() # get data from DAQ
+                
+                self.current_dec = self.calculate_declination(tars_data[2][1])
+                data_point = DataPoint(self.clock.get_sidereal_seconds(), self.current_dec, tars_data[0][1], tars_data[1][1])
+                
+                self.data.append(data_point)
+                self.old_transmission = self.transmission
+                self.transmission = self.observation.communicate(data_point, time.time())
+                # print(self.transmission, time.time(), self.observation.state)
+                
+                if self.transmission != self.old_transmission:
+                    if self.transmission == Comm.START_CAL:
+                        self.alert("Set calibration switches to ON")
+                        self.alert("Are the calibration switches on?")
+                    elif self.transmission == Comm.STOP_CAL:
+                        self.alert("Set calibration switches to OFF")
+                        self.alert("Are the calibration switches off?")
+                    elif self.transmission == Comm.NEXT:
+                        pass # do nothing
+                    elif self.transmission == Comm.BEEP:
+                        self.beep()
+                    elif self.transmission == Comm.FINISHED:
+                        pass # do nothing
+                        
+                    if self.transmission != Comm.NO_ACTION:
+                        self.observation.next()
+                    
+                
+                # for test data
+                #self.ticker += random.random()*random.randint(-1,1)
+                #self.other_ticker += random.random()*random.randint(-1,1)
+                #self.data.append(DataPoint(self.clock.get_sidereal_seconds(), self.ticker, self.other_ticker, self.calculate_declination(self.foo)))
+                #self.observation.data_logic(DataPoint(self.clock.get_sidereal_seconds(), self.ticker, self.other_ticker, self.calculate_declination(self.foo)))
+            
+                self.update_strip_chart() # make the stripchart scroll #TODO: make data save/and go to gui simulataneously
         
     def legacy_mode(self):
         """lol"""
@@ -184,7 +218,7 @@ class Threepio(QtWidgets.QMainWindow):
         
     def calculate_declination(self, input_dec):
         # calculate the true dec from input data and calibration data
-        true_dec = self.dec_int + (self.dec_slope * input_dec)
+        true_dec = self.dec_intercept + (self.dec_slope * input_dec)
         
         # self.ui.dec_value.setText(str(true_dec)[:5] + "deg") # for testing
         
@@ -207,7 +241,7 @@ class Threepio(QtWidgets.QMainWindow):
 
     def update_gui(self):
         self.ui.ra_value.setText(self.clock.get_sidereal_time()) # show RA
-        self.ui.dec_value.setText("%.2f" % self.calculate_declination(int(self.foo))) # show dec
+        self.ui.dec_value.setText("%.2f" % self.calculate_declination(self.current_dec)) # show dec
         
         # NOTE: this method does NOT update declination (because that needs to always be updated!)
         
@@ -298,7 +332,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.new_observation(obs)
 
     def new_observation(self, obs):
-        dialog = Dialog(self, self.clock.get_sidereal_time(), obs)
+        dialog = Dialog(self, self.clock.get_sidereal_time(), obs, self.clock)
         dialog.setWindowTitle("New " + obs.obs_type)
         dialog.show()
         dialog.exec_()
@@ -311,7 +345,14 @@ class Threepio(QtWidgets.QMainWindow):
         
     def update_message(self, message):
         self.ui.message_label.setText(message)
-
+        
+    def alert(self, message):
+        alert = AlertDialog(message)
+        alert.show()
+        alert.exec_()
+        
+    def beep(self):
+        print("beep", time.time())
 
 def main():
     import sys
