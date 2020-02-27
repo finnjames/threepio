@@ -68,19 +68,22 @@ class Tars:
         This reads one datapoint from the buffer. Each datapoint has three channels:
         channel 0: telescope channel A
         channel 1: telescope channel B
-        channel 2: telescope channel C
+        channel 2, declinometer
         """
         if not self.testing:
             if self.in_waiting() < (2 * len(self.channels)):
                 return None
             return [(channel & 3, self.buffer_read(channel)) for channel in self.channels]
         else:
-            return [(0, 2), (1, 3), (2, 1)]
+            return [(0, 2.0), (1, 3.0), (2, 1.0)]
 
     def read_latest(self) -> list:
         """
         This function reads the last datapoint from the buffer and clears the buffer.
-        Use this as a real-time sampling method.
+        Use this as a real-time sampling method. Each datapoint has three channels:
+        channel 0: telescope channel A
+        channel 1: telescope channel B
+        channel 2, declinometer
         """
         if not self.testing:
             current = self.read_one()
@@ -90,7 +93,7 @@ class Tars:
                 current = self.read_one()
             return latest
         else:
-            return [(0, 2), (1, 3), (2, 1)]
+            return [(0, 2.0), (1, 3.0), (2, 1.0)]
 
     ############################ Helpers ############################
 

@@ -6,7 +6,7 @@ import os
 from datetime import datetime
 
 class MyPrecious:
-    MAX_BUFFER_SIZE = 100
+    MAX_BUFFER_SIZE = 1
 
     def __init__(self, filename: str):
         self.filename = filename
