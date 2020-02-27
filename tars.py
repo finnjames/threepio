@@ -68,7 +68,7 @@ class Tars:
         This reads one datapoint from the buffer. Each datapoint has three channels:
         channel 0: telescope channel A
         channel 1: telescope channel B
-        channel 2: telescope channel C
+        channel 2, declinometer
         """
         if not self.testing:
             if self.in_waiting() < (2 * len(self.channels)):
@@ -83,7 +83,7 @@ class Tars:
         Use this as a real-time sampling method. Each datapoint has three channels:
         channel 0: telescope channel A
         channel 1: telescope channel B
-        channel 2: telescope channel C
+        channel 2, declinometer
         """
         if not self.testing:
             current = self.read_one()
