@@ -352,7 +352,7 @@ class Threepio(QtWidgets.QMainWindow):
         alert.exec_()
         
     def beep(self):
-        print("beep", time.time())
+        print("beep! ", time.time())
 
 def main():
     import sys
