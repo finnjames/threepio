@@ -86,7 +86,9 @@ class Observation():
         self.data_freq = data_freq
 
     # This is the communication API
-    def communicate(self, data_point, timestamp):
+    def communicate(self, data_point, timestamp = None):
+        if timestamp == None:
+            timestamp = time.time()
             
         if self.state == self.State.OFF:
             if timestamp < self.start_RA - (self.bg_dur + self.cal_dur + 30):
