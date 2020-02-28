@@ -170,10 +170,12 @@ class Threepio(QtWidgets.QMainWindow):
                         self.observation.next()
                     elif self.transmission == Comm.NEXT:
                         self.observation.next()
+                    elif self.transmission == Comm.FINISHED:
+                        self.observation.next()
                     elif self.transmission == Comm.BEEP:
                         self.beep()
-                    elif self.transmission == Comm.FINISHED:
-                        pass # do nothing
+                    elif self.transmission == Comm.NO_ACTION:
+                        pass
                 
                 # for test data
                 #self.ticker += random.random()*random.randint(-1,1)
