@@ -295,7 +295,7 @@ class Spectrum(Observation):
         # These are the radio frequency (e.g. 1319.5 Mhz), not the sampling frequency!
         self.interval   = 1
         self.freq_time  = None
-        self.timing_margin = 0.98
+        self.timing_margin = 0.97
         
     def set_RA(self, start_RA, end_RA):
         super().set_RA(start_RA, start_RA + 180)
