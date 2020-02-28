@@ -163,19 +163,17 @@ class Threepio(QtWidgets.QMainWindow):
                     if self.transmission == Comm.START_CAL:
                         self.alert("Set calibration switches to ON")
                         self.alert("Are the calibration switches on?")
+                        self.observation.next()
                     elif self.transmission == Comm.STOP_CAL:
                         self.alert("Set calibration switches to OFF")
                         self.alert("Are the calibration switches off?")
+                        self.observation.next()
                     elif self.transmission == Comm.NEXT:
-                        pass # do nothing
+                        self.observation.next()
                     elif self.transmission == Comm.BEEP:
                         self.beep()
                     elif self.transmission == Comm.FINISHED:
                         pass # do nothing
-                        
-                    if self.transmission != Comm.NO_ACTION:
-                        self.observation.next()
-                    
                 
                 # for test data
                 #self.ticker += random.random()*random.randint(-1,1)

@@ -295,12 +295,13 @@ class Spectrum(Observation):
         # These are the radio frequency (e.g. 1319.5 Mhz), not the sampling frequency!
         self.interval   = 1
         self.freq_time  = None
+        self.timing_margin = 0.98
         
     def set_RA(self, start_RA, end_RA):
-        return super().set_RA(start_RA, start_RA + 180)
+        super().set_RA(start_RA, start_RA + 180)
         
     def set_data_time(self, data_start, data_end):
-        return super().set_data_time(data_start, data_start + 180)
+        super().set_data_time(data_start, data_start + 180)
 
     def set_files(self):
         self.file_a = MyPrecious(self.name + '_a.md1')
@@ -312,11 +313,11 @@ class Spectrum(Observation):
             self.freq_time = time.time()
             self.write_data(data_point)
             return Comm.NO_ACTION
-        elif time.time() - self.freq_time < self.interval:
+        elif time.time() - self.freq_time < self.timing_margin * self.interval:
             self.write_data(data_point)
             return Comm.NO_ACTION
         else:
-            self.last_change = time.time()
+            self.freq_time = time.time()
             self.write_data(data_point)
             return Comm.BEEP
 
