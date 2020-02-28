@@ -190,6 +190,7 @@ class Observation():
         self.write('*')
         self.write('*')
         self.write_meta()
+        self.close_file()
 
     # To be implemented in each subclass
     def set_files(self):
@@ -229,6 +230,13 @@ class Observation():
         self.write('LOCAL START TIME: ' + get_time(self.start_time))
         self.write('LOCAL STOP DATE: '  + get_date(self.end_time))
         self.write('LOCAL STOP TIME: '  + get_time(self.end_time))
+
+    def close_file(self):
+        if self.composite:
+            self.file_comp.close()
+        else:
+            self.file_a.close()
+            self.file_b.close()
 
     # def get_last_data(self):
     #     return self.data[len(self.data) - 1]
