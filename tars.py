@@ -9,6 +9,8 @@ import serial
 import serial.tools.list_ports
 import time
 
+import random as r # for testing
+
 def discovery() -> str:
     # Get a list of active com ports to scan for possible DATAQ Instruments devices
     available_ports = serial.tools.list_ports.comports()
@@ -75,7 +77,11 @@ class Tars:
                 return None
             return [(channel & 3, self.buffer_read(channel)) for channel in self.channels]
         else:
-            return [(0, 2.0), (1, 3.0), (2, 1.0)]
+            rand_a = r.random(-20, 30)
+            rand_b = r.random(-30, 20)
+            print(rand_a, rand_b)
+            # a, b, dec
+            return [(0, rand_a), (1, rand_b), (2, 1.0)]
 
     def read_latest(self) -> list:
         """
@@ -93,7 +99,12 @@ class Tars:
                 current = self.read_one()
             return latest
         else:
-            return [(0, 2.0), (1, 3.0), (2, 1.0)]
+            rand_float = r.random()
+            rand_a = -8 + 16*rand_float
+            rand_b = 8 + 8*rand_float
+            # a, b, dec
+            return [(0, rand_a), (1, rand_b), (2, 1.0)]
+            # return [(0, 2.0), (1, 3.0), (2, 1.0)]
 
     ############################ Helpers ############################
 

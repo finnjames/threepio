@@ -34,7 +34,7 @@ class Threepio(QtWidgets.QMainWindow):
 
     # basic time
     timer_rate = 10 # ms
-    stripchart_display_ticks = 2048 # how many data points to draw to stripchart
+    stripchart_display_ticks = 64 # how many data points to draw to stripchart
     stripchart_offset = 0
 
     # test data
@@ -142,10 +142,12 @@ class Threepio(QtWidgets.QMainWindow):
         
         # if observation loaded -> read data
         if self.observation != None:
+            
+            self.update_progress_bar()
+            
             period = 1/self.observation.freq
             
             if (time.time() - self.tick_time) > (period * self.timing_margin):
-                self.update_progress_bar()
                 
                 self.tick_time = time.time()
             
@@ -164,18 +166,25 @@ class Threepio(QtWidgets.QMainWindow):
                         self.alert("Set calibration switches to ON")
                         self.alert("Are the calibration switches on?")
                         self.observation.next()
+                        self.message("Taking calibration data...")
                     elif self.transmission == Comm.STOP_CAL:
                         self.alert("Set calibration switches to OFF")
                         self.alert("Are the calibration switches off?")
                         self.observation.next()
+                        self.message("Taking background data...")
                     elif self.transmission == Comm.NEXT:
                         self.observation.next()
                     elif self.transmission == Comm.FINISHED:
                         self.observation.next()
+                        self.message("Finished.")
                     elif self.transmission == Comm.BEEP:
                         self.beep()
                     elif self.transmission == Comm.NO_ACTION:
                         pass
+                    
+                time_until_start = self.observation.start_RA - time.time()
+                if time_until_start <= 0 and (self.observation.end_RA - time.time()) > 0:
+                    self.message("Taking observation data...")
                 
                 # for test data
                 #self.ticker += random.random()*random.randint(-1,1)
@@ -209,11 +218,11 @@ class Threepio(QtWidgets.QMainWindow):
 
     def update_speed(self):
         if (self.ui.speed_faster_radio.isChecked()):
-            self.stripchart_display_ticks = 512
+            self.stripchart_display_ticks = 32
         elif (self.ui.speed_slower_radio.isChecked()):
-            self.stripchart_display_ticks = 3072
+            self.stripchart_display_ticks = 128
         else:
-            self.stripchart_display_ticks = 2048
+            self.stripchart_display_ticks = 64
         self.handle_clear()
         
     def calculate_declination(self, input_dec):
@@ -343,7 +352,7 @@ class Threepio(QtWidgets.QMainWindow):
         dialog.exec_()
         self.declination_regression() # calculate a new regression
         
-    def update_message(self, message):
+    def message(self, message):
         self.ui.message_label.setText(message)
         
     def alert(self, message):

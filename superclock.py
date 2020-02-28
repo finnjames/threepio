@@ -22,7 +22,7 @@ class SuperClock():
         return time.time() - self.starting_time
     
     def get_time_until(self, destination_time):
-        return self.get_sidereal_seconds() - destination_time
+        return time.time() - destination_time
     
     def get_local_time(self):
         return time.localtime(time.time())
