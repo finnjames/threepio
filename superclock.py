@@ -37,5 +37,6 @@ class SuperClock():
         current_sidereal_time = self.get_sidereal_seconds()
         minutes, seconds = divmod(current_sidereal_time, 60)
         hours, minutes = divmod(minutes, 60)
+        hours = hours % 24
         sidereal = "%02d:%02d:%02d" % (hours, minutes, seconds)
         return sidereal
