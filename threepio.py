@@ -83,11 +83,10 @@ class Threepio(QtWidgets.QMainWindow):
         self.ui.actionSpectrum.triggered.connect(self.handle_spectrum)
         
         self.ui.actionDec.triggered.connect(self.dec_calibration)
+        self.ui.actionRA.triggered.connect(self.ra_calibration)
 
         self.ui.chart_clear_button.clicked.connect(self.handle_clear)
         self.ui.chart_refresh_button.clicked.connect(self.handle_refresh)
-        # this is for testing, the above line is the correct one
-
 
         # TODO: maybe just choose one of these?
         self.ui.actionLegacy.triggered.connect(self.legacy_mode)
@@ -97,8 +96,6 @@ class Threepio(QtWidgets.QMainWindow):
         self.stripchart_series_a = QtChart.QLineSeries()
         self.stripchart_series_b = QtChart.QLineSeries()
         self.ui.stripchart.setRenderHint(QtGui.QPainter.Antialiasing)
-
-        # make the charts m a t e r i a l (blue and red)
         pen = QtGui.QPen(QtGui.QColor(self.BLUE))
         pen.setWidth(3)
         self.stripchart_series_a.setPen(pen)
@@ -351,6 +348,9 @@ class Threepio(QtWidgets.QMainWindow):
         dialog.show()
         dialog.exec_()
         self.declination_regression() # calculate a new regression
+        
+    def ra_calibration(self):
+        self.clock = self.set_time()
         
     def message(self, message):
         self.ui.message_label.setText(message)
