@@ -5,9 +5,9 @@ import random
 class DecDialog(QtWidgets.QDialog):
     """New observation dialogue window"""
     
-    start_dec  = 0
-    end_dec    = 90
-    step       = 5
+    start_dec  = -25
+    end_dec    = 95
+    step       = 10
     
     def __init__(self, tars):
         QtWidgets.QWidget.__init__(self)
@@ -38,8 +38,10 @@ class DecDialog(QtWidgets.QDialog):
                     f.write(str(line) + '\n')
             self.close()
         else:
-            self.data.append(self.current_dec + random.randint(-2, 2)) # TODO: read data from declinometer
+            self.data.append(self.current_dec**2 / 100 + random.randint(-2, 2)) # TODO: read data from declinometer
             self.ui.set_dec_value.setText(str(self.current_dec))
+            if self.current_dec == self.end_dec:
+                self.ui.next_cal_button.setText("Save")
             self.current_dec += self.step
         
     def handle_discard(self):

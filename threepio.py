@@ -118,7 +118,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.current_dec = 0.0
         
         # run initial calibration
-        self.declination_regression()
+        self.dec_calibration()
         
         # refresh timer
         self.timer = QtCore.QTimer(self)
@@ -221,29 +221,6 @@ class Threepio(QtWidgets.QMainWindow):
         else:
             self.stripchart_display_ticks = 64
         self.handle_clear()
-        
-    def calculate_declination(self, input_dec):
-        # calculate the true dec from input data and calibration data
-        true_dec = self.dec_intercept + (self.dec_slope * input_dec)
-        
-        # self.ui.dec_value.setText(str(true_dec)[:5] + "deg") # for testing
-        
-        return true_dec
-    
-    def declination_regression(self):
-        x = []
-        y = [0.0, 5.0, 10.0, 15.0, 20.0, 25.0, 30.0, 35.0, 40.0, 45.0, 50.0, 55.0, 60.0, 65.0, 70.0, 75.0, 80.0, 85.0, 90.0]
-        
-        c = open("dec_cal.txt", 'r').read().splitlines() # get data from file
-        for i in c:
-            x.append(float(i)) # create x array
-        
-        if len(y) != len(x):
-            # TODO: output notification
-            print("Declination calibration data error, please calibrate declination")
-            return 1
-        
-        self.dec_slope, self.dec_int, r_value, p_value, std_err = stats.linregress(x,y)
 
     def update_gui(self):
         self.ui.ra_value.setText(self.clock.get_sidereal_time()) # show RA
@@ -283,7 +260,7 @@ class Threepio(QtWidgets.QMainWindow):
             self.stripchart_series_b.remove(0)
             self.stripchart_offset += 1
 
-        # TODO: make the stripchart fill in old data when slowed down
+        # TODO: make the stripchart fill in old data when speed changes
 
         chart = QtChart.QChart()
         chart.addSeries(self.stripchart_series_a)
@@ -292,6 +269,7 @@ class Threepio(QtWidgets.QMainWindow):
         
         axisX = QtChart.QValueAxis()
 
+        # hacky min/max, TODO: pls make this better lol
         if (new_a < new_b):
             if (new_a < self.stripchart_low):
                 self.stripchart_low = new_a
@@ -347,7 +325,49 @@ class Threepio(QtWidgets.QMainWindow):
         dialog = DecDialog(self.tars)
         dialog.show()
         dialog.exec_()
-        self.declination_regression() # calculate a new regression
+        
+        # build new x and y plots for lookup
+        self.x = []
+        self.y = []
+        
+        # create y array
+        i = DecDialog.start_dec
+        while i <= DecDialog.end_dec:
+            self.y.append(float(i))
+            i += DecDialog.step
+        
+        # create x array
+        c = open("dec_cal.txt", 'r').read().splitlines() # get data from file
+        for i in c:
+            self.x.append(float(i))
+        
+        if len(self.y) != len(self.x):
+            # TODO: output notification
+            print("Declination calibration data error, please calibrate declination")
+            return 1
+    
+    def calculate_declination(self, input_dec):
+        # calculate the true dec from input data and calibration data
+        true_dec = 0.0
+        
+        # input is below data
+        if input_dec < self.x[0]: #TODO: use minimum, not first
+            return ((self.y[1] - self.y[0])/(self.x[1] - self.x[0]) * (input_dec - self.x[0])) + self.x[0]
+            
+        # input is above data
+        if input_dec < self.x[-1]: #TODO: use maximum, not last
+            return ((self.y[-1] - self.y[-2])/(self.x[-1] - self.x[-2]) * (input_dec - self.x[-1])) + self.x[-1]
+
+        # input is within data
+        for i in range(len(self.x)):
+            if input_dec < self.x[i + 1]:
+                if input_dec > self.x[i]:
+                    # (Δy/Δx * x) + x_0
+                    return ((self.y[i + 1] - self.y[i])/(self.x[i + 1] - self.x[i]) * (input_dec - self.x[i])) + self.x[i]
+        
+        true_dec = self.dec_intercept + (self.dec_slope * input_dec)
+        
+        return true_dec
         
     def ra_calibration(self):
         self.clock = self.set_time()
