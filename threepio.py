@@ -119,11 +119,6 @@ class Threepio(QtWidgets.QMainWindow):
         
         # run initial calibration
         self.load_dec_cal()
-        print(self.calculate_declination(7.0))
-        print(self.calculate_declination(7.25))
-        print(self.calculate_declination(27.1))
-        print(self.calculate_declination(-3.0))
-        print(self.calculate_declination(90.0))
         
         # refresh timer
         self.timer = QtCore.QTimer(self)
