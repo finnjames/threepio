@@ -51,8 +51,8 @@ class Threepio(QtWidgets.QMainWindow):
     stripchart_high = 1
     
     # declination calibration
-    dec_slope = 0
-    dec_intercept = 0
+    x = []
+    y = []
 
     # palette
     BLUE = 0x2196f3
@@ -118,7 +118,12 @@ class Threepio(QtWidgets.QMainWindow):
         self.current_dec = 0.0
         
         # run initial calibration
-        self.dec_calibration()
+        self.load_dec_cal()
+        print(self.calculate_declination(7.0))
+        print(self.calculate_declination(7.25))
+        print(self.calculate_declination(27.1))
+        print(self.calculate_declination(-3.0))
+        print(self.calculate_declination(90.0))
         
         # refresh timer
         self.timer = QtCore.QTimer(self)
@@ -326,10 +331,9 @@ class Threepio(QtWidgets.QMainWindow):
         dialog.show()
         dialog.exec_()
         
-        # build new x and y plots for lookup
-        self.x = []
-        self.y = []
-        
+        self.load_dec_cal()
+    
+    def load_dec_cal(self):
         # create y array
         i = DecDialog.start_dec
         while i <= DecDialog.end_dec:
@@ -341,10 +345,6 @@ class Threepio(QtWidgets.QMainWindow):
         for i in c:
             self.x.append(float(i))
         
-        if len(self.y) != len(self.x):
-            # TODO: output notification
-            print("Declination calibration data error, please calibrate declination")
-            return 1
     
     def calculate_declination(self, input_dec):
         # calculate the true dec from input data and calibration data
@@ -352,22 +352,19 @@ class Threepio(QtWidgets.QMainWindow):
         
         # input is below data
         if input_dec < self.x[0]: #TODO: use minimum, not first
-            return ((self.y[1] - self.y[0])/(self.x[1] - self.x[0]) * (input_dec - self.x[0])) + self.x[0]
+            return ((self.y[1] - self.y[0])/(self.x[1] - self.x[0]) * (input_dec - self.x[0])) + self.y[0]
             
         # input is above data
-        if input_dec < self.x[-1]: #TODO: use maximum, not last
-            return ((self.y[-1] - self.y[-2])/(self.x[-1] - self.x[-2]) * (input_dec - self.x[-1])) + self.x[-1]
+        if input_dec > self.x[-1]: #TODO: use maximum, not last
+            return ((self.y[-1] - self.y[-2])/(self.x[-1] - self.x[-2]) * (input_dec - self.x[-1])) + self.y[-1]
 
         # input is within data
         for i in range(len(self.x)):
-            if input_dec < self.x[i + 1]:
-                if input_dec > self.x[i]:
-                    # (Δy/Δx * x) + x_0
-                    return ((self.y[i + 1] - self.y[i])/(self.x[i + 1] - self.x[i]) * (input_dec - self.x[i])) + self.x[i]
+            if input_dec <= self.x[i + 1]:
+                if input_dec >= self.x[i]:
+                    # (Δy/Δx)x + y_0
+                    return ((self.y[i + 1] - self.y[i])/(self.x[i + 1] - self.x[i]) * (input_dec - self.x[i])) + self.y[i]
         
-        true_dec = self.dec_intercept + (self.dec_slope * input_dec)
-        
-        return true_dec
         
     def ra_calibration(self):
         self.clock = self.set_time()
