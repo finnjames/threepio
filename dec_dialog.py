@@ -29,8 +29,14 @@ class DecDialog(QtWidgets.QDialog):
 
     def handle_next(self):
         if self.current_dec > self.end_dec: # base case, calibration complete
-            open("dec_cal.txt", "w").close() # overwrite file
-            f = open("dec_cal.txt", "a")
+            
+            with open("dec_cal.txt") as f:
+                with open("dec_cal_backup.txt", 'w') as b:
+                    for line in f:
+                        b.write(line)
+            
+            open("dec_cal.txt", 'w').close() # overwrite file
+            f = open("dec_cal.txt", 'a')
             for line in self.data: # replace with new calibration data
                 if line == self.data[len(self.data) - 1]:
                     f.write(str(line))

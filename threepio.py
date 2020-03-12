@@ -340,10 +340,8 @@ class Threepio(QtWidgets.QMainWindow):
         for i in c:
             self.x.append(float(i))
         
-    
     def calculate_declination(self, input_dec):
-        # calculate the true dec from input data and calibration data
-        true_dec = 0.0
+        """calculate the true dec from declinometer input data and calibration data"""
         
         # input is below data
         if input_dec < self.x[0]: #TODO: use minimum, not first
@@ -359,7 +357,6 @@ class Threepio(QtWidgets.QMainWindow):
                 if input_dec >= self.x[i]:
                     # (Δy/Δx)x + y_0
                     return ((self.y[i + 1] - self.y[i])/(self.x[i + 1] - self.x[i]) * (input_dec - self.x[i])) + self.y[i]
-        
         
     def ra_calibration(self):
         self.clock = self.set_time()
