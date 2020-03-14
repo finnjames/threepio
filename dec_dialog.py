@@ -25,6 +25,9 @@ class DecDialog(QtWidgets.QDialog):
         self.ui.discard_cal_button.clicked.connect(self.handle_discard)
         self.ui.next_cal_button.clicked.connect(self.handle_next)
         
+        self.ui.north_or_south_combo_box.addItem("N → S")
+        self.ui.north_or_south_combo_box.addItem("S → N")
+        
         self.handle_next()
 
     def handle_next(self):
