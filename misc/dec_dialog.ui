@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>302</width>
+    <width>323</width>
     <height>110</height>
    </rect>
   </property>
@@ -14,7 +14,7 @@
    <string>Dialog</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="1" column="0">
+   <item row="3" column="1">
     <widget class="QPushButton" name="discard_cal_button">
      <property name="font">
       <font>
@@ -26,7 +26,7 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="1">
+   <item row="3" column="2">
     <widget class="QPushButton" name="next_cal_button">
      <property name="font">
       <font>
@@ -44,19 +44,7 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="set_dec_label">
-     <property name="font">
-      <font>
-       <family>IBM Plex Sans</family>
-      </font>
-     </property>
-     <property name="text">
-      <string>Set declination to</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="1">
+   <item row="1" column="2">
     <widget class="QLabel" name="set_dec_value">
      <property name="font">
       <font>
@@ -68,6 +56,21 @@
      </property>
      <property name="alignment">
       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QComboBox" name="north_or_south_combo_box"/>
+   </item>
+   <item row="1" column="0" colspan="2">
+    <widget class="QLabel" name="set_dec_label">
+     <property name="font">
+      <font>
+       <family>IBM Plex Sans</family>
+      </font>
+     </property>
+     <property name="text">
+      <string>Set declination to</string>
      </property>
     </widget>
    </item>
