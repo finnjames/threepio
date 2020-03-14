@@ -10,21 +10,17 @@ Written with frustration by Shengjie, Isabel, and Finn
 
 """
 
-from PyQt5 import QtCore, QtWidgets, QtGui, QtChart
-from main_ui import Ui_MainWindow  # compiled PyQt main ui
-# from playsound import playsound # TODO: test on Windows
 import time
 
-import tars
-from dialog import Dialog
-from time_dialog import TimeDialog
-from dec_dialog import DecDialog
-from credits_dialog import CreditsDialog
-from superclock import SuperClock
-from observation import Survey, Scan, Spectrum, DataPoint
-from alert import AlertDialog
-from comm import Comm
+from PyQt5 import QtChart, QtCore, QtGui, QtWidgets
 
+import tars
+from comm import Comm
+from dialogs import AlertDialog, CreditsDialog, DecDialog, ObsDialog, RADialog
+from layouts import threepio_ui
+from observation import DataPoint, Scan, Spectrum, Survey
+from superclock import SuperClock
+# from playsound import playsound # TODO: test on Windows
 
 class Threepio(QtWidgets.QMainWindow):
     """Main class for the app"""
@@ -32,7 +28,8 @@ class Threepio(QtWidgets.QMainWindow):
     # basic time
     timer_rate = 10  # ms
     STRIPCHART_DEFAULT_POINTS = 64
-    stripchart_display_ticks = STRIPCHART_DEFAULT_POINTS  # how many data points to draw to stripchart
+    # how many data points to draw to stripchart
+    stripchart_display_ticks = STRIPCHART_DEFAULT_POINTS
     stripchart_offset = 0
 
     # test data
@@ -64,13 +61,14 @@ class Threepio(QtWidgets.QMainWindow):
         QtWidgets.QWidget.__init__(self)
 
         # use main_ui for window setup
-        self.ui = Ui_MainWindow()
+        self.ui = threepio_ui.Ui_MainWindow()
         self.setStyleSheet(open('stylesheet.qss').read())
         self.ui.setupUi(self)
         self.setWindowTitle("Threepio")
-        
+
         # hide the close/minimize/fullscreen buttons
-        self.setWindowFlags(QtCore.Qt.Window | QtCore.Qt.WindowTitleHint | QtCore.Qt.CustomizeWindowHint)
+        self.setWindowFlags(
+            QtCore.Qt.Window | QtCore.Qt.WindowTitleHint | QtCore.Qt.CustomizeWindowHint)
 
         # connect buttons
         self.ui.speed_faster_radio.clicked.connect(self.update_speed)
@@ -128,14 +126,15 @@ class Threepio(QtWidgets.QMainWindow):
 
         # TODO: make this use DAQ data
         self.foo += .1
-        if self.foo > 90.0: self.foo = 0.0
+        if self.foo > 90.0:
+            self.foo = 0.0
 
         # for speed testing
         # print(time.time() - self.tick_time)
         # self.tick_time = time.time()
 
         self.update_gui()  # update gui
-        
+
         # TODO: make this a little less redundant
 
         if self.observation is None:
@@ -171,7 +170,8 @@ class Threepio(QtWidgets.QMainWindow):
 
                 self.data.append(data_point)
                 self.old_transmission = self.transmission
-                self.transmission = self.observation.communicate(data_point, time.time())
+                self.transmission = self.observation.communicate(
+                    data_point, time.time())
                 # print(self.transmission, time.time(), self.observation.state)
 
                 self.update_strip_chart()  # make the stripchart scroll
@@ -217,7 +217,7 @@ class Threepio(QtWidgets.QMainWindow):
         new_clock = SuperClock()
 
         # TODO: abstract this better
-        dialog = TimeDialog(new_clock)
+        dialog = RADialog(new_clock)
         dialog.show()
         dialog.exec_()
 
@@ -234,13 +234,15 @@ class Threepio(QtWidgets.QMainWindow):
 
     def update_gui(self):
         self.ui.ra_value.setText(self.clock.get_sidereal_time())  # show RA
-        self.ui.dec_value.setText("%.2f" % self.calculate_declination(self.current_dec))  # show dec
+        self.ui.dec_value.setText(
+            "%.2f" % self.calculate_declination(self.current_dec))  # show dec
         self.update_progress_bar()
 
-        # TODO: get the input data for the stripchart and labels
         if len(self.data) > 0:
-            self.ui.channelA_value.setText("%.2f" % self.data[len(self.data) - 1].a)
-            self.ui.channelB_value.setText("%.2f" % self.data[len(self.data) - 1].b)
+            self.ui.channelA_value.setText(
+                "%.2f" % self.data[len(self.data) - 1].a)
+            self.ui.channelB_value.setText(
+                "%.2f" % self.data[len(self.data) - 1].b)
 
     def update_progress_bar(self):
         # this mess makes the progress bar display "T+/- XX.XX" when
@@ -250,10 +252,11 @@ class Threepio(QtWidgets.QMainWindow):
                 if self.clock.get_time_until(self.observation.start_RA) > 0 and self.clock.get_time_until(
                         self.observation.end_RA) < 0:
                     self.ui.progressBar.setValue(int((self.clock.get_time_until(self.observation.end_RA) / (
-                                self.observation.end_RA - self.observation.start_RA)) * 100 % 100))
+                        self.observation.end_RA - self.observation.start_RA)) * 100 % 100))
                 else:
                     self.ui.progressBar.setValue(0)
-                self.ui.progressBar.setFormat("T%+.1fs" % (self.clock.get_time_until(self.observation.start_RA)))
+                self.ui.progressBar.setFormat(
+                    "T%+.1fs" % (self.clock.get_time_until(self.observation.start_RA)))
                 return
         self.ui.progressBar.setFormat("n/a")
         self.ui.progressBar.setValue(0)
@@ -305,7 +308,8 @@ class Threepio(QtWidgets.QMainWindow):
         self.new_observation(obs)
 
     def new_observation(self, obs):
-        dialog = Dialog(self, self.clock.get_sidereal_time(), obs, self.clock)
+        dialog = ObsDialog(
+            self, self.clock.get_sidereal_time(), obs, self.clock)
         dialog.setWindowTitle("New " + obs.obs_type)
         dialog.show()
         dialog.exec_()
@@ -346,7 +350,7 @@ class Threepio(QtWidgets.QMainWindow):
                 if input_dec >= self.x[i]:
                     # (Δy/Δx)x + y_0
                     return ((self.y[i + 1] - self.y[i]) / (self.x[i + 1] - self.x[i]) * (input_dec - self.x[i])) + \
-                           self.y[i]
+                        self.y[i]
 
     def ra_calibration(self):
         self.clock = self.set_time()
