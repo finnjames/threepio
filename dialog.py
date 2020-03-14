@@ -34,6 +34,7 @@ class Dialog(QtWidgets.QDialog):
         self.parent_window.observation = self.observation
         
         # this should fix the stripchart, #nojudgement #TODO: is this still necessary?
+        self.parent_window.data = []
         self.parent_window.stripchart_offset = 0
         self.parent_window.stripchart_series_a.clear()
         self.parent_window.stripchart_series_b.clear()

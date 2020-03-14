@@ -243,9 +243,6 @@
            <family>SF Mono</family>
           </font>
          </property>
-         <property name="value">
-          <number>42</number>
-         </property>
          <property name="alignment">
           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
          </property>
@@ -351,7 +348,7 @@
           </font>
          </property>
          <property name="text">
-          <string>Never tell me the odds!!!</string>
+          <string>...</string>
          </property>
         </widget>
        </item>
@@ -545,7 +542,6 @@
     <addaction name="actionHelp"/>
     <addaction name="actionInfo"/>
     <addaction name="separator"/>
-    <addaction name="actionStop"/>
     <addaction name="actionQuit"/>
    </widget>
    <addaction name="menuFile"/>
@@ -579,7 +575,7 @@
   </action>
   <action name="actionInfo">
    <property name="text">
-    <string>Info...</string>
+    <string>Credits...</string>
    </property>
   </action>
   <action name="actionQuit">
