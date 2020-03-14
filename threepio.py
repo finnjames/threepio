@@ -31,7 +31,8 @@ class Threepio(QtWidgets.QMainWindow):
 
     # basic time
     timer_rate = 10  # ms
-    stripchart_display_ticks = 64  # how many data points to draw to stripchart
+    STRIPCHART_DEFAULT_POINTS = 64
+    stripchart_display_ticks = STRIPCHART_DEFAULT_POINTS  # how many data points to draw to stripchart
     stripchart_offset = 0
 
     # test data
@@ -47,7 +48,7 @@ class Threepio(QtWidgets.QMainWindow):
     stripchart_low = -1
     stripchart_high = 1
 
-    # declination calibration
+    # declination calibration arrays
     x = []
     y = []
 
@@ -224,11 +225,11 @@ class Threepio(QtWidgets.QMainWindow):
 
     def update_speed(self):
         if self.ui.speed_faster_radio.isChecked():
-            self.stripchart_display_ticks = 32
+            self.stripchart_display_ticks = self.STRIPCHART_DEFAULT_POINTS/2
         elif self.ui.speed_slower_radio.isChecked():
-            self.stripchart_display_ticks = 128
+            self.stripchart_display_ticks = self.STRIPCHART_DEFAULT_POINTS*2
         else:
-            self.stripchart_display_ticks = 64
+            self.stripchart_display_ticks = self.STRIPCHART_DEFAULT_POINTS
         self.handle_clear()
 
     def update_gui(self):
