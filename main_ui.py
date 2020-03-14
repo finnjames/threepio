@@ -288,6 +288,7 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuCalibration.menuAction())
 
         self.retranslateUi(MainWindow)
+        self.actionQuit.triggered.connect(MainWindow.close)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         MainWindow.setTabOrder(self.speed_slower_radio, self.speed_default_radio)
         MainWindow.setTabOrder(self.speed_default_radio, self.speed_faster_radio)
