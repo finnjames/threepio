@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Dialog</class>
+ <widget class="QDialog" name="Dialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>300</width>
+    <height>260</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="8" column="3">
+    <widget class="QLineEdit" name="file_name_value">
+     <property name="font">
+      <font>
+       <family>IBM Plex Mono</family>
+      </font>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="1" colspan="3">
+    <widget class="QDialogButtonBox" name="dialog_button_box">
+     <property name="font">
+      <font>
+       <family>IBM Plex Sans</family>
+      </font>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="3">
+    <widget class="QDateTimeEdit" name="end_time">
+     <property name="font">
+      <font>
+       <family>IBM Plex Mono</family>
+      </font>
+     </property>
+     <property name="displayFormat">
+      <string>HH:mm:ss</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="3">
+    <widget class="QSpinBox" name="data_acquisition_rate_value">
+     <property name="font">
+      <font>
+       <family>IBM Plex Mono</family>
+      </font>
+     </property>
+     <property name="maximum">
+      <number>999</number>
+     </property>
+     <property name="value">
+      <number>10</number>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="3">
+    <widget class="QLineEdit" name="starting_dec">
+     <property name="font">
+      <font>
+       <family>IBM Plex Mono</family>
+      </font>
+     </property>
+     <property name="placeholderText">
+      <string>degrees</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QLabel" name="end_label">
+     <property name="font">
+      <font>
+       <family>IBM Plex Sans</family>
+       <pointsize>16</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Ending RA</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="QLabel" name="end_dec_label">
+     <property name="font">
+      <font>
+       <family>IBM Plex Sans</family>
+       <pointsize>16</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Ending Declination</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="3">
+    <widget class="QLineEdit" name="ending_dec">
+     <property name="font">
+      <font>
+       <family>IBM Plex Mono</family>
+      </font>
+     </property>
+     <property name="placeholderText">
+      <string>degrees</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QLabel" name="start_label">
+     <property name="font">
+      <font>
+       <family>IBM Plex Sans</family>
+       <pointsize>16</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Starting RA</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="1" colspan="3">
+    <widget class="Line" name="line">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="1">
+    <widget class="QLabel" name="data_acquisition_rate_label">
+     <property name="font">
+      <font>
+       <family>IBM Plex Sans</family>
+       <pointsize>16</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Data Acquisition Rate</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+     <property name="buddy">
+      <cstring>data_acquisition_rate_value</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="3">
+    <widget class="QTimeEdit" name="start_time">
+     <property name="font">
+      <font>
+       <family>IBM Plex Mono</family>
+      </font>
+     </property>
+     <property name="displayFormat">
+      <string>HH:mm:ss</string>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="1">
+    <widget class="QLabel" name="file_name_label">
+     <property name="font">
+      <font>
+       <family>IBM Plex Sans</family>
+       <pointsize>16</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>File name</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QLabel" name="start_dec_label">
+     <property name="font">
+      <font>
+       <family>IBM Plex Sans</family>
+       <pointsize>16</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Starting Declination</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>start_time</tabstop>
+  <tabstop>end_time</tabstop>
+  <tabstop>starting_dec</tabstop>
+  <tabstop>ending_dec</tabstop>
+  <tabstop>data_acquisition_rate_value</tabstop>
+  <tabstop>file_name_value</tabstop>
+ </tabstops>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>dialog_button_box</sender>
+   <signal>rejected()</signal>
+   <receiver>Dialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>173</x>
+     <y>245</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>257</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>dialog_button_box</sender>
+   <signal>accepted()</signal>
+   <receiver>Dialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>173</x>
+     <y>245</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>257</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
