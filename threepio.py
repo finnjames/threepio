@@ -27,7 +27,7 @@ class Threepio(QtWidgets.QMainWindow):
 
     # basic time
     timer_rate = 10  # ms
-    STRIPCHART_DEFAULT_POINTS = 64
+    STRIPCHART_DEFAULT_POINTS = 600
     # how many data points to draw to stripchart
     stripchart_display_ticks = STRIPCHART_DEFAULT_POINTS
     stripchart_offset = 0
@@ -94,7 +94,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.stripchart_series_b = QtChart.QLineSeries()
         self.ui.stripchart.setRenderHint(QtGui.QPainter.Antialiasing)
         pen = QtGui.QPen(QtGui.QColor(self.BLUE))
-        pen.setWidth(3)
+        pen.setWidth(1)
         self.stripchart_series_a.setPen(pen)
         pen.setColor(QtGui.QColor(self.RED))
         self.stripchart_series_b.setPen(pen)
