@@ -101,7 +101,7 @@ class Tars:
         else:
             rand_float = r.random()
             rand_a = -8 + 16*rand_float
-            rand_b = 8 + 8*rand_float
+            rand_b = 8 + 2*rand_float**2
             # a, b, dec
             return [(0, rand_a), (1, rand_b), (2, 1.0)]
             # return [(0, 2.0), (1, 3.0), (2, 1.0)]

@@ -274,36 +274,9 @@ class Threepio(QtWidgets.QMainWindow):
         # TODO: make the stripchart fill in old data when speed changes
 
         chart = QtChart.QChart()
-        chart.addSeries(self.stripchart_series_a)
         chart.addSeries(self.stripchart_series_b)
+        chart.addSeries(self.stripchart_series_a)
 
-        axisX = QtChart.QValueAxis()
-
-        # hacky min/max, TODO: pls make this better lol
-        if new_a < new_b:
-            if new_a < self.stripchart_low:
-                self.stripchart_low = new_a
-            if new_b > self.stripchart_high:
-                self.stripchart_high = new_b
-        else:
-            if new_b < self.stripchart_low:
-                self.stripchart_low = new_b
-            if new_a > self.stripchart_high:
-                self.stripchart_high = new_a
-
-        axisX.setRange(self.stripchart_low, self.stripchart_high)
-
-        # axisY = QtChart.QValueAxis()
-        # axisY.setRange(self.clock.get_sidereal_seconds() - 100, self.clock.get_sidereal_seconds() + 100)
-
-        # axisX.setLabelFormat("%g")
-        chart.setAxisX(axisX)
-        # chart.setAxisY(axisY)  # for testing
-
-        self.stripchart_series_a.attachAxis(axisX)
-        self.stripchart_series_b.attachAxis(axisX)
-
-        # chart.createDefaultAxes()
         chart.legend().hide()
 
         self.ui.stripchart.setChart(chart)
