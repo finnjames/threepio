@@ -88,8 +88,6 @@ class Threepio(QtWidgets.QMainWindow):
         self.ui.chart_clear_button.clicked.connect(self.handle_clear)
         self.ui.chart_refresh_button.clicked.connect(self.handle_refresh)
 
-        # TODO: maybe just choose one of these?
-        self.ui.actionLegacy.triggered.connect(self.legacy_mode)
         self.ui.chart_legacy_button.clicked.connect(self.legacy_mode)
 
         # initialize stripchart
