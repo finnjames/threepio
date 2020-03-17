@@ -27,9 +27,8 @@ class Threepio(QtWidgets.QMainWindow):
 
     # basic time
     timer_rate = 10  # ms
-    STRIPCHART_DEFAULT_POINTS = 600
     # how many data points to draw to stripchart
-    stripchart_display_ticks = STRIPCHART_DEFAULT_POINTS
+    stripchart_display_seconds = 8
     stripchart_offset = 0
 
     # test data
@@ -71,9 +70,9 @@ class Threepio(QtWidgets.QMainWindow):
             QtCore.Qt.Window | QtCore.Qt.WindowTitleHint | QtCore.Qt.CustomizeWindowHint)
 
         # connect buttons
-        self.ui.speed_faster_radio.clicked.connect(self.update_speed)
-        self.ui.speed_slower_radio.clicked.connect(self.update_speed)
-        self.ui.speed_default_radio.clicked.connect(self.update_speed)
+        self.ui.stripchart_speed_slider.valueChanged.connect(self.update_speed)
+        # self.ui.speed_slower_radio.clicked.connect(self.update_speed)
+        # self.ui.speed_default_radio.clicked.connect(self.update_speed)
 
         self.ui.actionInfo.triggered.connect(self.handle_credits)
 
@@ -85,7 +84,6 @@ class Threepio(QtWidgets.QMainWindow):
         self.ui.actionRA.triggered.connect(self.ra_calibration)
 
         self.ui.chart_clear_button.clicked.connect(self.handle_clear)
-        self.ui.chart_refresh_button.clicked.connect(self.handle_refresh)
 
         self.ui.chart_legacy_button.clicked.connect(self.legacy_mode)
 
@@ -98,6 +96,8 @@ class Threepio(QtWidgets.QMainWindow):
         self.stripchart_series_a.setPen(pen)
         pen.setColor(QtGui.QColor(self.RED))
         self.stripchart_series_b.setPen(pen)
+        
+        self.update_speed()
 
         # DATAQ stuff
         self.tars = tars.Tars()
@@ -130,11 +130,11 @@ class Threepio(QtWidgets.QMainWindow):
             self.foo = 0.0
 
         # for speed testing
-        # print(time.time() - self.tick_time)
-        # self.tick_time = time.time()
 
         self.update_gui()  # update gui
 
+        # print(time.time() - self.tick_time)
+        
         # TODO: make this a little less redundant
 
         if self.observation is None:
@@ -224,13 +224,7 @@ class Threepio(QtWidgets.QMainWindow):
         return new_clock
 
     def update_speed(self):
-        if self.ui.speed_faster_radio.isChecked():
-            self.stripchart_display_ticks = self.STRIPCHART_DEFAULT_POINTS/2
-        elif self.ui.speed_slower_radio.isChecked():
-            self.stripchart_display_ticks = self.STRIPCHART_DEFAULT_POINTS*2
-        else:
-            self.stripchart_display_ticks = self.STRIPCHART_DEFAULT_POINTS
-        self.handle_clear()
+        self.stripchart_display_seconds = (120/6)*(6 - ((6.5 / 6) * self.ui.stripchart_speed_slider.value()))
 
     def update_gui(self):
         self.ui.ra_value.setText(self.clock.get_sidereal_time())  # show RA
@@ -271,16 +265,24 @@ class Threepio(QtWidgets.QMainWindow):
         self.stripchart_series_a.append(new_a, new_ra)
         self.stripchart_series_b.append(new_b, new_ra)
 
-        while self.stripchart_display_ticks < len(self.data) - self.stripchart_offset:
-            self.stripchart_series_a.remove(0)
-            self.stripchart_series_b.remove(0)
-            self.stripchart_offset += 1
+        # while self.stripchart_display_ticks < len(self.data) - self.stripchart_offset:
+        #     self.stripchart_series_a.remove(0)
+        #     self.stripchart_series_b.remove(0)
+        #     self.stripchart_offset += 1
 
-        # TODO: make the stripchart fill in old data when speed changes
-
+        # add channels to chart
         chart = QtChart.QChart()
         chart.addSeries(self.stripchart_series_b)
         chart.addSeries(self.stripchart_series_a)
+        
+        # create and scale y axis
+        axisY = QtChart.QValueAxis()
+        axisY.setRange(self.clock.get_sidereal_seconds() - self.stripchart_display_seconds, self.clock.get_sidereal_seconds())
+        axisY.setVisible(False)
+        chart.setAxisY(axisY)
+        
+        self.stripchart_series_a.attachAxis(axisY)
+        self.stripchart_series_b.attachAxis(axisY)
 
         chart.legend().hide()
 

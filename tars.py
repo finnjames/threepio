@@ -79,7 +79,6 @@ class Tars:
         else:
             rand_a = r.random(-20, 30)
             rand_b = r.random(-30, 20)
-            print(rand_a, rand_b)
             # a, b, dec
             return [(0, rand_a), (1, rand_b), (2, 1.0)]
 
