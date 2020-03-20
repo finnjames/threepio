@@ -1,9 +1,9 @@
 r"""
-  __  __                    _                 
+  __  __                    _
  / /_/ /  _______ ___ ___  (_)__    ___  __ __
 / __/ _ \/ __/ -_) -_) _ \/ / _ \_ / _ \/ // /
-\__/_//_/_/  \__/\__/ .__/_/\___(_) .__/\_, / 
-                   /_/           /_/   /___/   
+\__/_//_/_/  \__/\__/ .__/_/\___(_) .__/\_, /
+                   /_/           /_/   /___/
 
 The helpful companion to the 40' telescope
 Written with frustration by Shengjie, Isabel, and Finn
@@ -20,6 +20,8 @@ from dialogs import AlertDialog, CreditsDialog, DecDialog, ObsDialog, RADialog
 from layouts import threepio_ui
 from observation import DataPoint, Scan, Spectrum, Survey
 from superclock import SuperClock
+
+
 # from playsound import playsound # TODO: test on Windows
 
 class Threepio(QtWidgets.QMainWindow):
@@ -96,7 +98,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.stripchart_series_a.setPen(pen)
         pen.setColor(QtGui.QColor(self.RED))
         self.stripchart_series_b.setPen(pen)
-        
+
         self.update_speed()
 
         # DATAQ stuff
@@ -134,7 +136,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.update_gui()  # update gui
 
         # print(time.time() - self.tick_time)
-        
+
         # TODO: make this a little less redundant
 
         if self.observation is None:
@@ -224,7 +226,7 @@ class Threepio(QtWidgets.QMainWindow):
         return new_clock
 
     def update_speed(self):
-        self.stripchart_display_seconds = (120/6)*(6 - ((6.5 / 6) * self.ui.stripchart_speed_slider.value()))
+        self.stripchart_display_seconds = (120 / 6) * (6 - ((6.5 / 6) * self.ui.stripchart_speed_slider.value()))
 
     def update_gui(self):
         self.ui.ra_value.setText(self.clock.get_sidereal_time())  # show RA
@@ -246,7 +248,7 @@ class Threepio(QtWidgets.QMainWindow):
                 if self.clock.get_time_until(self.observation.start_RA) > 0 and self.clock.get_time_until(
                         self.observation.end_RA) < 0:
                     self.ui.progressBar.setValue(int((self.clock.get_time_until(self.observation.end_RA) / (
-                        self.observation.end_RA - self.observation.start_RA)) * 100 % 100))
+                            self.observation.end_RA - self.observation.start_RA)) * 100 % 100))
                 else:
                     self.ui.progressBar.setValue(0)
                 self.ui.progressBar.setFormat(
@@ -274,15 +276,16 @@ class Threepio(QtWidgets.QMainWindow):
         chart = QtChart.QChart()
         chart.addSeries(self.stripchart_series_b)
         chart.addSeries(self.stripchart_series_a)
-        
+
         # create and scale y axis
-        axisY = QtChart.QValueAxis()
-        axisY.setRange(self.clock.get_sidereal_seconds() - self.stripchart_display_seconds, self.clock.get_sidereal_seconds())
-        axisY.setVisible(False)
-        chart.setAxisY(axisY)
-        
-        self.stripchart_series_a.attachAxis(axisY)
-        self.stripchart_series_b.attachAxis(axisY)
+        axis_y = QtChart.QValueAxis()
+        axis_y.setRange(
+            self.clock.get_sidereal_seconds() - self.stripchart_display_seconds, self.clock.get_sidereal_seconds())
+        axis_y.setVisible(False)
+        chart.setAxisY(axis_y)
+
+        self.stripchart_series_a.attachAxis(axis_y)
+        self.stripchart_series_b.attachAxis(axis_y)
 
         chart.legend().hide()
 
@@ -311,7 +314,7 @@ class Threepio(QtWidgets.QMainWindow):
 
     def new_observation(self, obs):
         dialog = ObsDialog(
-            self, self.clock.get_sidereal_time(), obs, self.clock)
+            self, obs, self.clock)
         dialog.setWindowTitle("New " + obs.obs_type)
         dialog.show()
         dialog.exec_()
@@ -352,7 +355,7 @@ class Threepio(QtWidgets.QMainWindow):
                 if input_dec >= self.x[i]:
                     # (Δy/Δx)x + y_0
                     return ((self.y[i + 1] - self.y[i]) / (self.x[i + 1] - self.x[i]) * (input_dec - self.x[i])) + \
-                        self.y[i]
+                           self.y[i]
 
     def ra_calibration(self):
         self.clock = self.set_time()
