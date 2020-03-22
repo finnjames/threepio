@@ -50,7 +50,7 @@ class ObsDialog(QtWidgets.QDialog):
         start_time = starting_sidereal_time - self.clock.get_sidereal_seconds() + time.time()
         end_time = ending_sidereal_time - self.clock.get_sidereal_seconds() + time.time()
 
-        self.observation.set_RA(start_time, end_time)
+        self.observation.set_ra(start_time, end_time)
         self.observation.set_dec(int(self.ui.starting_dec.text()), int(self.ui.ending_dec.text()))
         self.observation.set_name(self.ui.file_name_value.text())
         self.observation.set_data_freq(int(self.ui.data_acquisition_rate_value.text()))

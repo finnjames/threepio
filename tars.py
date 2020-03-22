@@ -9,7 +9,8 @@ import serial
 import serial.tools.list_ports
 import time
 
-import random as r # for testing
+import random as r  # for testing
+
 
 def discovery() -> str:
     # Get a list of active com ports to scan for possible DATAQ Instruments devices
@@ -18,11 +19,13 @@ def discovery() -> str:
     for p in available_ports:
         if "VID:PID=0683:4109" in p.hwid:
             return p.device
-    
+
     return None
 
-def convert(buffer: list, volt: int, channel: int) -> float:
+
+def convert(buffer: list, volt: int) -> float:
     return volt * int.from_bytes(buffer, byteorder='little', signed=True) / 32768
+
 
 class Tars:
     """
@@ -40,16 +43,16 @@ class Tars:
 
             self.ser = serial.Serial(device)
             self.channels = [
-                0x0100, # channel 0, telescope channel A, ±5 V range
-                0x0101, # channel 1, telescope channel B, ±5 V range
-                0x0102, # channel 2, declinometer, ±5 V range
+                0x0100,  # channel 0, telescope channel A, ±5 V range
+                0x0101,  # channel 1, telescope channel B, ±5 V range
+                0x0102,  # channel 2, declinometer, ±5 V range
             ]
             self.acquiring = False
 
             self.setup()
         else:
             self.testing = True
-    
+
     def start(self):
         if not self.testing:
             self.send("start")
@@ -58,7 +61,7 @@ class Tars:
     def reset(self):
         if not self.testing:
             self.send("reset 1")
-    
+
     def stop(self):
         if not self.testing:
             self.send("stop")
@@ -99,23 +102,23 @@ class Tars:
             return latest
         else:
             rand_float = r.random()
-            rand_a = -8 + 16*rand_float
-            rand_b = 8 + 2*rand_float**2
+            rand_a = -8 + 16 * rand_float
+            rand_b = 8 + 2 * rand_float ** 2
             # a, b, dec
             return [(0, rand_a), (1, rand_b), (2, 1.0)]
             # return [(0, 2.0), (1, 3.0), (2, 1.0)]
 
-    ############################ Helpers ############################
+    # Helpers
 
     def send(self, command: str):
         if not self.testing:
             self.ser.write((command + '\r').encode())
-    
+
     def setup(self):
         if not self.testing:
             self.send("stop")
-            self.send("encode 0")       # 0 = binary, 1 = ascii
-            self.send("ps 0")           # small pocket size for responsiveness
+            self.send("encode 0")  # 0 = binary, 1 = ascii
+            self.send("ps 0")  # small pocket size for responsiveness
 
             for i in range(0, len(self.channels)):
                 self.send("slist " + str(i) + " " + str(self.channels[i]))
@@ -144,6 +147,7 @@ class Tars:
             buffer = self.ser.read(2)
             return Tars.RANGE_VOLT[channel >> 8] * int.from_bytes(buffer, byteorder='little', signed=True) / 32768
 
+
 def main():
     device_name = discovery()
 
@@ -159,10 +163,11 @@ def main():
     time.sleep(3)
     device.start()
 
-    while(True):
+    while True:
         data = device.read_latest()
         if data is not None:
             print(data)
+
 
 if __name__ == "__main__":
     main()
