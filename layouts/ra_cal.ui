@@ -6,49 +6,32 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>363</width>
-    <height>99</height>
+    <width>323</width>
+    <height>110</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="3" column="1" colspan="2">
-    <widget class="QDialogButtonBox" name="dialog_button_box">
-     <property name="font">
-      <font>
-       <family>IBM Plex Sans</family>
-      </font>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-     </property>
-     <property name="centerButtons">
-      <bool>false</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="1">
-    <widget class="QLabel" name="sidereal_label">
-     <property name="font">
-      <font>
-       <family>IBM Plex Sans</family>
-       <pointsize>16</pointsize>
-      </font>
-     </property>
+   <item row="2" column="2">
+    <widget class="QPushButton" name="cancel_button">
      <property name="text">
-      <string>Current Sidereal Time</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+      <string>Cancel</string>
      </property>
     </widget>
    </item>
-   <item row="0" column="2">
+   <item row="2" column="3">
+    <widget class="QPushButton" name="ok_button">
+     <property name="text">
+      <string>Set RA</string>
+     </property>
+     <property name="default">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="3">
     <widget class="QTimeEdit" name="sidereal_value">
      <property name="font">
       <font>
@@ -60,42 +43,44 @@
      </property>
     </widget>
    </item>
+   <item row="1" column="2">
+    <widget class="QLabel" name="sidereal_label">
+     <property name="font">
+      <font>
+       <family>IBM Plex Sans</family>
+       <pointsize>13</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Current Sidereal Time</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <tabstops>
   <tabstop>sidereal_value</tabstop>
+  <tabstop>ok_button</tabstop>
+  <tabstop>cancel_button</tabstop>
  </tabstops>
  <resources/>
  <connections>
   <connection>
-   <sender>dialog_button_box</sender>
-   <signal>rejected()</signal>
+   <sender>cancel_button</sender>
+   <signal>clicked()</signal>
    <receiver>Dialog</receiver>
-   <slot>reject()</slot>
+   <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>173</x>
-     <y>245</y>
+     <x>83</x>
+     <y>79</y>
     </hint>
     <hint type="destinationlabel">
-     <x>286</x>
-     <y>257</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>dialog_button_box</sender>
-   <signal>accepted()</signal>
-   <receiver>Dialog</receiver>
-   <slot>accept()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>173</x>
-     <y>245</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>157</x>
-     <y>257</y>
+     <x>161</x>
+     <y>54</y>
     </hint>
    </hints>
   </connection>

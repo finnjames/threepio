@@ -79,6 +79,7 @@
  <tabstops>
   <tabstop>next_cal_button</tabstop>
   <tabstop>discard_cal_button</tabstop>
+  <tabstop>north_or_south_combo_box</tabstop>
  </tabstops>
  <resources/>
  <connections/>

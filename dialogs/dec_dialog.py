@@ -1,7 +1,7 @@
 import math
 import random
 
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtCore
 
 from layouts import dec_cal_ui  # compiled PyQt dialogue ui
 
@@ -18,6 +18,10 @@ class DecDialog(QtWidgets.QDialog):
         self.ui = dec_cal_ui.Ui_Dialog()
         self.ui.setupUi(self)
         self.setWindowTitle("Calibrate declination")
+
+        # hide the close/minimize/fullscreen buttons
+        self.setWindowFlags(
+            QtCore.Qt.Window | QtCore.Qt.WindowTitleHint | QtCore.Qt.CustomizeWindowHint)
 
         self.data = []
         self.current_dec = self.start_dec

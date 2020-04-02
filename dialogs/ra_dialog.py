@@ -1,4 +1,4 @@
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtCore
 from layouts import ra_cal_ui  # compiled PyQt dialogue ui
 import time
 
@@ -15,15 +15,21 @@ class RADialog(QtWidgets.QDialog):
         # store parent window's superclock
         self.superclock = superclock
 
-        # connect okay button
-        self.ui.dialog_button_box.accepted.connect(self.handle_ok)
+        # hide the close/minimize/fullscreen buttons
+        self.setWindowFlags(
+            QtCore.Qt.Window | QtCore.Qt.WindowTitleHint | QtCore.Qt.CustomizeWindowHint)
+
+        # connect button
+        self.ui.ok_button.clicked.connect(self.handle_ok)
+        self.ui.cancel_button.clicked.connect(self.close)
 
     def handle_ok(self):
         # pattern = "%H:%M:%S"
 
         u_time = self.ui.sidereal_value.text()
         self.superclock.starting_sidereal_time = 3600 * int(u_time[:2]) + 60 * int(u_time[3:5]) + int(u_time[6:])
+        self.superclock.starting_time = time.time()
 
         # TODO: clear old stripchart data
 
-        self.superclock.starting_time = time.time()
+        self.close()

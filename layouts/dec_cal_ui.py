@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'dec_cal.ui'
 #
-# Created by: PyQt5 UI code generator 5.13.1
+# Created by: PyQt5 UI code generator 5.14.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -50,6 +50,7 @@ class Ui_Dialog(object):
         self.retranslateUi(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
         Dialog.setTabOrder(self.next_cal_button, self.discard_cal_button)
+        Dialog.setTabOrder(self.discard_cal_button, self.north_or_south_combo_box)
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
