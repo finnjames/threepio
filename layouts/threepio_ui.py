@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'threepio.ui'
 #
-# Created by: PyQt5 UI code generator 5.13.1
+# Created by: PyQt5 UI code generator 5.14.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -74,8 +74,8 @@ class Ui_MainWindow(object):
         self.stripchart_faster_label.setObjectName("stripchart_faster_label")
         self.gridLayout_4.addWidget(self.stripchart_faster_label, 0, 1, 1, 1)
         self.stripchart_speed_slider = QtWidgets.QSlider(self.stripchart_control_group)
-        self.stripchart_speed_slider.setMinimum(1)
-        self.stripchart_speed_slider.setMaximum(5)
+        self.stripchart_speed_slider.setMinimum(0)
+        self.stripchart_speed_slider.setMaximum(6)
         self.stripchart_speed_slider.setProperty("value", 3)
         self.stripchart_speed_slider.setInvertedControls(True)
         self.stripchart_speed_slider.setObjectName("stripchart_speed_slider")
@@ -269,6 +269,7 @@ class Ui_MainWindow(object):
         self.actionQuit = QtWidgets.QAction(MainWindow)
         self.actionQuit.setObjectName("actionQuit")
         self.actionHelp = QtWidgets.QAction(MainWindow)
+        self.actionHelp.setEnabled(False)
         self.actionHelp.setObjectName("actionHelp")
         self.actionStop = QtWidgets.QAction(MainWindow)
         self.actionStop.setObjectName("actionStop")

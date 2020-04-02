@@ -104,7 +104,8 @@ class Threepio(QtWidgets.QMainWindow):
         self.tars.start()
 
         # clock
-        self.clock = self.set_time()
+        self.clock = None
+        self.set_time()
 
         # establish observation
         self.observation = None
@@ -154,6 +155,10 @@ class Threepio(QtWidgets.QMainWindow):
                 self.update_strip_chart()  # make the stripchart scroll
 
         else:
+
+            # can't reset RA/Dec after loading obs
+            self.ui.actionRA.setEnabled(False)
+            self.ui.actionDec.setEnabled(False)
 
             period = 1 / self.observation.freq
 
@@ -213,14 +218,17 @@ class Threepio(QtWidgets.QMainWindow):
         dialog.exec_()
 
     def set_time(self):
-        new_clock = SuperClock()
+        if self.clock is None:
+            new_clock = SuperClock()
+        else:
+            new_clock = self.clock
 
         # TODO: abstract this better
         dialog = RADialog(new_clock)
         dialog.show()
         dialog.exec_()
 
-        return new_clock
+        self.clock = new_clock
 
     def update_speed(self):
         self.stripchart_display_seconds = (120 / 6) * (6 - ((6.5 / 6) * self.ui.stripchart_speed_slider.value()))
@@ -355,7 +363,7 @@ class Threepio(QtWidgets.QMainWindow):
                            self.y[i]
 
     def ra_calibration(self):
-        self.clock = self.set_time()
+        self.set_time()
 
     def message(self, message):
         self.ui.message_label.setText(message)
