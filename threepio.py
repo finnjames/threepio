@@ -14,12 +14,9 @@ import time
 
 from PyQt5 import QtChart, QtCore, QtGui, QtWidgets
 
-import tars
-from comm import Comm
 from dialogs import AlertDialog, CreditsDialog, DecDialog, ObsDialog, RADialog
 from layouts import threepio_ui
-from observation import DataPoint, Scan, Spectrum, Survey
-from superclock import SuperClock
+from tools import Comm, DataPoint, Survey, Scan, Spectrum, SuperClock, Tars
 
 
 # from playsound import playsound # TODO: test on Windows
@@ -102,7 +99,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.update_speed()
 
         # DATAQ stuff
-        self.tars = tars.Tars()
+        self.tars = Tars()
         self.tars.setup()
         self.tars.start()
 

@@ -1,8 +1,8 @@
 import time
 
-from ..observation import Observation, Scan, Survey, Spectrum
-from ..datapoint import DataPoint
-from ..comm import Comm
+from tools.observation import Scan, Survey, Spectrum
+from tools.datapoint import DataPoint
+
 
 def test1():
     scan = Scan()

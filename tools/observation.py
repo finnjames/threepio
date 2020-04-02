@@ -6,9 +6,9 @@
 import time
 from enum import Enum
 
-from comm import Comm
-from datapoint import DataPoint
-from precious import MyPrecious
+from tools.comm import Comm
+from tools.datapoint import DataPoint
+from tools.precious import MyPrecious
 
 
 class Observation:
