@@ -65,8 +65,9 @@ class Threepio(QtWidgets.QMainWindow):
         self.setWindowTitle("Threepio")
 
         # hide the close/minimize/fullscreen buttons
-        self.setWindowFlags(
-            QtCore.Qt.Window | QtCore.Qt.WindowTitleHint | QtCore.Qt.CustomizeWindowHint)
+        self.setWindowFlags(QtCore.Qt.Window | 
+                            QtCore.Qt.WindowTitleHint | 
+                            QtCore.Qt.CustomizeWindowHint)
 
         # connect buttons
         self.ui.stripchart_speed_slider.valueChanged.connect(self.update_speed)
