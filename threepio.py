@@ -170,7 +170,8 @@ class Threepio(QtWidgets.QMainWindow):
                 tars_data = self.tars.read_latest()  # get data from DAQ
 
                 self.current_dec = self.calculate_declination(tars_data[2][1])
-                data_point = DataPoint(self.clock.get_sidereal_seconds(), self.current_dec, tars_data[0][1],
+                data_point = DataPoint(self.clock.get_sidereal_seconds(),
+                                       self.current_dec, tars_data[0][1],
                                        tars_data[1][1])
 
                 self.data.append(data_point)
