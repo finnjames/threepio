@@ -231,7 +231,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.clock = new_clock
 
     def update_speed(self):
-        self.stripchart_display_seconds = (120 / 6) * (6 - ((6.5 / 6) * self.ui.stripchart_speed_slider.value()))
+        self.stripchart_display_seconds = (120 - ((110 / 6) * self.ui.stripchart_speed_slider.value()))
 
     def update_gui(self):
         self.ui.ra_value.setText(self.clock.get_sidereal_time())  # show RA
