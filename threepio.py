@@ -22,7 +22,7 @@ from tools import Comm, DataPoint, Survey, Scan, Spectrum, SuperClock, Tars
 # from playsound import playsound # TODO: test on Windows
 
 class Threepio(QtWidgets.QMainWindow):
-    """Main class for the app"""
+    """main class for the app"""
 
     # basic time
     timer_rate = 10  # ms
