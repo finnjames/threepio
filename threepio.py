@@ -272,11 +272,6 @@ class Threepio(QtWidgets.QMainWindow):
         self.stripchart_series_a.append(new_a, new_ra)
         self.stripchart_series_b.append(new_b, new_ra)
 
-        # while self.stripchart_display_ticks < len(self.data) - self.stripchart_offset:
-        #     self.stripchart_series_a.remove(0)
-        #     self.stripchart_series_b.remove(0)
-        #     self.stripchart_offset += 1
-
         # add channels to chart
         chart = QtChart.QChart()
         chart.addSeries(self.stripchart_series_b)
