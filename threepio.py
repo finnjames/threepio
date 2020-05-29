@@ -339,7 +339,7 @@ class Threepio(QtWidgets.QMainWindow):
             self.x.append(float(i))
 
     def calculate_declination(self, input_dec):
-        """calculate the true dec from declinometer input data and calibration data"""
+        """calculate the true dec from declinometer input and calibration data"""
 
         # input is below data
         if input_dec < self.x[0]:  # TODO: use minimum, not first
