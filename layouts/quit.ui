@@ -17,33 +17,21 @@
    <item row="2" column="2">
     <widget class="QPushButton" name="cancel_button">
      <property name="text">
-      <string>Cancel</string>
+      <string>No, go back</string>
      </property>
     </widget>
    </item>
    <item row="2" column="3">
     <widget class="QPushButton" name="ok_button">
      <property name="text">
-      <string>Set RA</string>
+      <string>Yes, Quit</string>
      </property>
      <property name="default">
       <bool>true</bool>
      </property>
     </widget>
    </item>
-   <item row="1" column="3">
-    <widget class="QTimeEdit" name="sidereal_value">
-     <property name="font">
-      <font>
-       <family>IBM Plex Mono</family>
-      </font>
-     </property>
-     <property name="displayFormat">
-      <string>HH:mm:ss</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="2">
+   <item row="1" column="2" colspan="2">
     <widget class="QLabel" name="sidereal_label">
      <property name="font">
       <font>
@@ -52,17 +40,19 @@
       </font>
      </property>
      <property name="text">
-      <string>Current Sidereal Time</string>
+      <string>Are you sure you want to quit? Incomplete observations may not be usable.</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
   </layout>
  </widget>
  <tabstops>
-  <tabstop>sidereal_value</tabstop>
   <tabstop>ok_button</tabstop>
   <tabstop>cancel_button</tabstop>
  </tabstops>
@@ -80,6 +70,22 @@
     </hint>
     <hint type="destinationlabel">
      <x>161</x>
+     <y>54</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ok_button</sender>
+   <signal>clicked()</signal>
+   <receiver>Dialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>237</x>
+     <y>89</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>159</x>
      <y>54</y>
     </hint>
    </hints>

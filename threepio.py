@@ -15,7 +15,7 @@ import time
 from PyQt5 import QtChart, QtCore, QtGui, QtWidgets
 
 from dialogs import AlertDialog, CreditsDialog, DecDialog, ObsDialog, RADialog
-from layouts import threepio_ui
+from layouts import threepio_ui, quit_ui
 from tools import Comm, DataPoint, Survey, Scan, Spectrum, SuperClock, Tars
 
 
@@ -370,6 +370,23 @@ class Threepio(QtWidgets.QMainWindow):
 
     def beep(self):
         print("beep! ", time.time())
+
+    def closeEvent(self, event):
+        """override quit action to confirm before closing"""
+        m = QtWidgets.QDialog()
+        m.ui = quit_ui.Ui_Dialog()
+        m.ui.setupUi(m)
+        m.setWindowTitle("Quit?")
+
+        m.setWindowFlags(
+            QtCore.Qt.Window | QtCore.Qt.WindowTitleHint | QtCore.Qt.CustomizeWindowHint)
+
+        close = m.exec()
+        print(close)
+        if close:
+            event.accept()
+        else:
+            event.ignore()
 
 
 def main():
