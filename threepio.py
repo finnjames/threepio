@@ -182,13 +182,13 @@ class Threepio(QtWidgets.QMainWindow):
 
                 if self.transmission != self.old_transmission:
                     if self.transmission == Comm.START_CAL:
-                        self.alert("Set calibration switches to ON")
-                        self.alert("Are the calibration switches on?")
+                        self.alert("Set calibration switches to ON", "Okay")
+                        self.alert("Are the calibration switches on?", "Yes")
                         self.observation.next()
                         self.message("Taking calibration data...")
                     elif self.transmission == Comm.STOP_CAL:
-                        self.alert("Set calibration switches to OFF")
-                        self.alert("Are the calibration switches off?")
+                        self.alert("Set calibration switches to OFF", "Okay")
+                        self.alert("Are the calibration switches off?", "Yes")
                         self.observation.next()
                         self.message("Taking background data...")
                     elif self.transmission == Comm.NEXT:
@@ -363,8 +363,8 @@ class Threepio(QtWidgets.QMainWindow):
     def message(self, message):
         self.ui.message_label.setText(message)
 
-    def alert(self, message):
-        alert = AlertDialog(message)
+    def alert(self, message, button_message="Close"):
+        alert = AlertDialog(message, button_message)
         alert.show()
         alert.exec_()
 
@@ -378,8 +378,7 @@ class Threepio(QtWidgets.QMainWindow):
         m.ui.setupUi(m)
         m.setWindowTitle("Quit?")
 
-        m.setWindowFlags(
-            QtCore.Qt.Window | QtCore.Qt.WindowTitleHint | QtCore.Qt.CustomizeWindowHint)
+        m.setWindowFlags(QtCore.Qt.Window | QtCore.Qt.WindowTitleHint | QtCore.Qt.CustomizeWindowHint)
 
         close = m.exec()
         print(close)
