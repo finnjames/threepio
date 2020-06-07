@@ -10,20 +10,14 @@ class RADialog(QtWidgets.QDialog):
         QtWidgets.QWidget.__init__(self)
         self.ui = ra_cal_ui.Ui_Dialog()
         self.ui.setupUi(self)
-        self.setWindowTitle("Set time")
 
         # store parent window's superclock
         self.superclock = superclock
 
         # hide the close/minimize/fullscreen buttons
-        self.setWindowFlags(
-            QtCore.Qt.Window | QtCore.Qt.WindowTitleHint | QtCore.Qt.CustomizeWindowHint)
+        self.setWindowFlags(QtCore.Qt.Window | QtCore.Qt.WindowTitleHint | QtCore.Qt.CustomizeWindowHint)
 
-        # connect button
-        self.ui.ok_button.clicked.connect(self.handle_ok)
-        self.ui.cancel_button.clicked.connect(self.close)
-
-    def handle_ok(self):
+    def accept(self):
         # pattern = "%H:%M:%S"
 
         self.superclock.starting_time = time.time()

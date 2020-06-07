@@ -7,15 +7,20 @@
     <x>0</x>
     <y>0</y>
     <width>320</width>
-    <height>110</height>
+    <height>100</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Quit?</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="2" column="2">
     <widget class="QPushButton" name="cancel_button">
+     <property name="font">
+      <font>
+       <family>IBM Plex Sans</family>
+      </font>
+     </property>
      <property name="text">
       <string>No, go back</string>
      </property>
@@ -23,6 +28,11 @@
    </item>
    <item row="2" column="3">
     <widget class="QPushButton" name="ok_button">
+     <property name="font">
+      <font>
+       <family>IBM Plex Sans</family>
+      </font>
+     </property>
      <property name="text">
       <string>Yes, Quit</string>
      </property>
@@ -31,12 +41,24 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="2" colspan="2">
+   <item row="2" column="0">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="0" column="0" colspan="4">
     <widget class="QLabel" name="sidereal_label">
      <property name="font">
       <font>
        <family>IBM Plex Sans</family>
-       <pointsize>13</pointsize>
       </font>
      </property>
      <property name="text">

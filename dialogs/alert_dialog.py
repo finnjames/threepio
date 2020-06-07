@@ -11,7 +11,6 @@ class AlertDialog(QtWidgets.QDialog):
         QtWidgets.QWidget.__init__(self)
         self.ui = alert_ui.Ui_Dialog()
         self.ui.setupUi(self)
-        self.setWindowTitle("Alert")
 
         # hide the close/minimize/fullscreen buttons
         self.setWindowFlags(

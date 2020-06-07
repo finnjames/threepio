@@ -7,43 +7,72 @@
     <x>0</x>
     <y>0</y>
     <width>320</width>
-    <height>110</height>
+    <height>100</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>RA Calibration</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <item row="3" column="2" colspan="2">
+    <widget class="QWidget" name="widget" native="true">
+     <layout class="QGridLayout" name="gridLayout_2">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item row="1" column="1">
+       <widget class="QPushButton" name="cancel_button">
+        <property name="font">
+         <font>
+          <family>IBM Plex Sans</family>
+         </font>
+        </property>
+        <property name="text">
+         <string>Cancel</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QPushButton" name="ok_button">
+        <property name="font">
+         <font>
+          <family>IBM Plex Sans</family>
+         </font>
+        </property>
+        <property name="text">
+         <string>Set RA</string>
+        </property>
+        <property name="default">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
+   </item>
    <item row="2" column="2">
-    <widget class="QPushButton" name="cancel_button">
-     <property name="text">
-      <string>Cancel</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="3">
-    <widget class="QPushButton" name="ok_button">
-     <property name="text">
-      <string>Set RA</string>
-     </property>
-     <property name="default">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="3">
-    <widget class="QTimeEdit" name="sidereal_value">
-     <property name="font">
-      <font>
-       <family>IBM Plex Mono</family>
-      </font>
-     </property>
-     <property name="displayFormat">
-      <string>HH:mm:ss</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="2">
     <widget class="QLabel" name="sidereal_label">
      <property name="font">
       <font>
@@ -59,13 +88,20 @@
      </property>
     </widget>
    </item>
+   <item row="2" column="3">
+    <widget class="QTimeEdit" name="sidereal_value">
+     <property name="font">
+      <font>
+       <family>IBM Plex Mono</family>
+      </font>
+     </property>
+     <property name="displayFormat">
+      <string>HH:mm:ss</string>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
- <tabstops>
-  <tabstop>sidereal_value</tabstop>
-  <tabstop>ok_button</tabstop>
-  <tabstop>cancel_button</tabstop>
- </tabstops>
  <resources/>
  <connections>
   <connection>
@@ -81,6 +117,22 @@
     <hint type="destinationlabel">
      <x>161</x>
      <y>54</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ok_button</sender>
+   <signal>clicked()</signal>
+   <receiver>Dialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>266</x>
+     <y>66</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>159</x>
+     <y>49</y>
     </hint>
    </hints>
   </connection>

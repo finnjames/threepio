@@ -9,10 +9,3 @@ class CreditsDialog(QtWidgets.QDialog):
         QtWidgets.QWidget.__init__(self)
         self.ui = credits_ui.Ui_Dialog()
         self.ui.setupUi(self)
-        self.setWindowTitle("Credits")
-
-        # connect okay button
-        # self.ui.clo.accepted.connect(self.handle_close)
-
-    def handle_ok(self):
-        pass

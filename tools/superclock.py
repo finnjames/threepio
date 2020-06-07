@@ -1,6 +1,6 @@
 """clock for keeping track of the time ;)"""
 
-import time
+import time, datetime
 
 
 class SuperClock:
@@ -15,6 +15,11 @@ class SuperClock:
 
     def get_time(self):
         return time.time()
+
+    def get_time_slug(self):
+        """get timestamp suitable for file naming"""
+        gmtime = (self.get_local_time())
+        return "{:%Y.%m.%d-%H.%M}".format(datetime.datetime(*gmtime[:5]))
 
     def get_elapsed_time(self):
         return time.time() - self.starting_time
