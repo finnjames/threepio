@@ -6,12 +6,13 @@ import time
 class RADialog(QtWidgets.QDialog):
     """New observation dialogue window"""
 
-    def __init__(self, superclock):
+    def __init__(self, parent_window, superclock):
         QtWidgets.QWidget.__init__(self)
         self.ui = ra_cal_ui.Ui_Dialog()
         self.ui.setupUi(self)
 
-        # store parent window's superclock
+        # store parent window and superclock
+        self.parent_window = parent_window
         self.superclock = superclock
 
         # hide the close/minimize/fullscreen buttons
@@ -26,4 +27,5 @@ class RADialog(QtWidgets.QDialog):
 
         # TODO: clear old stripchart data
 
+        self.parent_window.clear_stripchart()
         self.close()

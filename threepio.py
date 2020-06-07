@@ -65,8 +65,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.setWindowTitle("Threepio")
 
         # hide the close/minimize/fullscreen buttons
-        self.setWindowFlags(
-            QtCore.Qt.Window | QtCore.Qt.WindowTitleHint | QtCore.Qt.CustomizeWindowHint)
+        self.setWindowFlags(QtCore.Qt.Window | QtCore.Qt.WindowTitleHint | QtCore.Qt.CustomizeWindowHint)
 
         # connect buttons
         self.ui.stripchart_speed_slider.valueChanged.connect(self.update_speed)
@@ -82,7 +81,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.ui.actionDec.triggered.connect(self.dec_calibration)
         self.ui.actionRA.triggered.connect(self.ra_calibration)
 
-        self.ui.chart_clear_button.clicked.connect(self.handle_clear)
+        self.ui.chart_clear_button.clicked.connect(self.clear_stripchart)
 
         self.ui.chart_legacy_button.clicked.connect(self.legacy_mode)
 
@@ -224,7 +223,7 @@ class Threepio(QtWidgets.QMainWindow):
             new_clock = self.clock
 
         # TODO: abstract this better
-        dialog = RADialog(new_clock)
+        dialog = RADialog(self, new_clock)
         dialog.show()
         dialog.exec_()
 
@@ -291,12 +290,12 @@ class Threepio(QtWidgets.QMainWindow):
 
         self.ui.stripchart.setChart(chart)
 
-    def handle_clear(self):
+    def clear_stripchart(self):
         self.stripchart_offset += self.stripchart_series_a.count()
         self.stripchart_series_a.clear()
         self.stripchart_series_b.clear()
 
-    def handle_refresh(self):
+    def refresh_stripchart(self):
         self.stripchart_low = 32767
         self.stripchart_high = -32768
 
