@@ -10,6 +10,7 @@ import serial.tools.list_ports
 import time
 
 import random as r  # for testing
+import math
 
 
 def discovery() -> str:
@@ -80,10 +81,16 @@ class Tars:
                 return None
             return [(channel & 3, self.buffer_read(channel)) for channel in self.channels]
         else:
-            rand_a = r.random(-20, 30)
-            rand_b = r.random(-30, 20)
-            # a, b, dec
-            return [(0, rand_a), (1, rand_b), (2, 1.0)]
+            return self.random_data()
+
+    def random_data(self):
+        x = (time.time()/32)
+        y = r.choice([-.2,1])/(64 *(r.random()+0.02))
+        f = 2.6/(math.sin(2*x) + 1.4) + 0.4*math.sin(8 * x) - 0.8*math.sin(4 * x) +(1/(math.sin(8*x)+1.4))
+        a = abs(f) + y
+        b = f**2 + 4*y
+        # a, b, dec
+        return [(0, a), (1, b), (2, 1.0)]
 
     def read_latest(self) -> list:
         """
@@ -101,12 +108,7 @@ class Tars:
                 current = self.read_one()
             return latest
         else:
-            rand_float = r.random()
-            rand_a = -8 + 16 * rand_float
-            rand_b = 8 + 2 * rand_float ** 2
-            # a, b, dec
-            return [(0, rand_a), (1, rand_b), (2, 1.0)]
-            # return [(0, 2.0), (1, 3.0), (2, 1.0)]
+            return self.random_data()
 
     # Helpers
 

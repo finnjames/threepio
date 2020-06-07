@@ -33,7 +33,7 @@ class ObsDialog(QtWidgets.QDialog):
 
     def accept(self):
         exit_code = self.set_observation()
-        if exit_code == 0: # set_observation() executed successfully
+        if exit_code == 0:  # set_observation() executed successfully
             self.parent_window.observation = None
             self.parent_window.observation = self.observation
             self.close()
@@ -41,7 +41,7 @@ class ObsDialog(QtWidgets.QDialog):
             print("error creating observation")
 
     def set_observation(self):
-        """add all necessary info to the encapsulated observation; 1: error,"""
+        """add all necessary info to the encapsulated observation; 1: error"""
 
         # pattern = "%H:%M:%S"
         u_start_time = self.ui.start_time.text()

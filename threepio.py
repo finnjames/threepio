@@ -132,8 +132,6 @@ class Threepio(QtWidgets.QMainWindow):
 
         self.update_gui()  # update gui
 
-        # print(time.time() - self.tick_time)
-
         # TODO: make this a little less redundant
 
         if self.observation is None:
@@ -156,8 +154,9 @@ class Threepio(QtWidgets.QMainWindow):
         else:
 
             # can't reset RA/Dec after loading obs
-            self.ui.actionRA.setEnabled(False)
-            self.ui.actionDec.setEnabled(False)
+            self.ui.actionRA.setDisabled(True)
+            self.ui.actionDec.setDisabled(True)
+            self.ui.menuNew.setDisabled(True)
 
             period = 1 / self.observation.freq
 
