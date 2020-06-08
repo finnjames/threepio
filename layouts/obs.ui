@@ -18,7 +18,7 @@
     <widget class="QLabel" name="start_label">
      <property name="font">
       <font>
-       <family>IBM Plex Sans</family>
+       <family>Iosevka Aile</family>
       </font>
      </property>
      <property name="text">
@@ -33,7 +33,7 @@
     <widget class="QTimeEdit" name="start_time">
      <property name="font">
       <font>
-       <family>IBM Plex Mono</family>
+       <family>Iosevka Aile</family>
       </font>
      </property>
      <property name="displayFormat">
@@ -45,7 +45,7 @@
     <widget class="QLineEdit" name="ending_dec">
      <property name="font">
       <font>
-       <family>IBM Plex Mono</family>
+       <family>Iosevka Aile</family>
       </font>
      </property>
     </widget>
@@ -54,7 +54,7 @@
     <widget class="QDateTimeEdit" name="end_time">
      <property name="font">
       <font>
-       <family>IBM Plex Mono</family>
+       <family>Iosevka Aile</family>
       </font>
      </property>
      <property name="displayFormat">
@@ -66,7 +66,7 @@
     <widget class="QLabel" name="start_dec_label">
      <property name="font">
       <font>
-       <family>IBM Plex Sans</family>
+       <family>Iosevka Aile</family>
       </font>
      </property>
      <property name="text">
@@ -81,7 +81,7 @@
     <widget class="QLabel" name="end_dec_label">
      <property name="font">
       <font>
-       <family>IBM Plex Sans</family>
+       <family>Iosevka Aile</family>
       </font>
      </property>
      <property name="text">
@@ -96,7 +96,7 @@
     <widget class="QLineEdit" name="file_name_value">
      <property name="font">
       <font>
-       <family>IBM Plex Mono</family>
+       <family>Iosevka Aile</family>
       </font>
      </property>
     </widget>
@@ -105,7 +105,7 @@
     <widget class="QSpinBox" name="data_acquisition_rate_value">
      <property name="font">
       <font>
-       <family>IBM Plex Mono</family>
+       <family>Iosevka Aile</family>
       </font>
      </property>
      <property name="maximum">
@@ -120,7 +120,7 @@
     <widget class="QLabel" name="end_label">
      <property name="font">
       <font>
-       <family>IBM Plex Sans</family>
+       <family>Iosevka Aile</family>
       </font>
      </property>
      <property name="text">
@@ -135,7 +135,7 @@
     <widget class="QLineEdit" name="starting_dec">
      <property name="font">
       <font>
-       <family>IBM Plex Mono</family>
+       <family>Iosevka Aile</family>
       </font>
      </property>
     </widget>
@@ -157,7 +157,7 @@
     <widget class="QLabel" name="data_acquisition_rate_label">
      <property name="font">
       <font>
-       <family>IBM Plex Sans</family>
+       <family>Iosevka Aile</family>
       </font>
      </property>
      <property name="text">
@@ -175,7 +175,7 @@
     <widget class="QLabel" name="file_name_label">
      <property name="font">
       <font>
-       <family>IBM Plex Sans</family>
+       <family>Iosevka Aile</family>
       </font>
      </property>
      <property name="text">
@@ -205,7 +205,7 @@
        <widget class="QPushButton" name="accept_button">
         <property name="font">
          <font>
-          <family>IBM Plex Sans</family>
+          <family>Iosevka Aile</family>
          </font>
         </property>
         <property name="text">
@@ -217,7 +217,7 @@
        <widget class="QPushButton" name="cancel_button">
         <property name="font">
          <font>
-          <family>IBM Plex Sans</family>
+          <family>Iosevka Aile</family>
          </font>
         </property>
         <property name="text">

@@ -2,14 +2,6 @@
 <ui version="4.0">
  <class>Dialog</class>
  <widget class="QDialog" name="Dialog">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>383</width>
-    <height>383</height>
-   </rect>
-  </property>
   <property name="windowTitle">
    <string>Credits</string>
   </property>
@@ -31,7 +23,7 @@
     <widget class="QLabel" name="label">
      <property name="font">
       <font>
-       <family>IBM Plex Mono</family>
+       <family>Courier New</family>
       </font>
      </property>
      <property name="text">
@@ -64,14 +56,13 @@
     <widget class="QLabel" name="label_2">
      <property name="font">
       <font>
-       <family>IBM Plex Sans</family>
+       <family>Iosevka Aile</family>
       </font>
      </property>
      <property name="text">
       <string>The helpful companion to the 40' telescope
 
 Written with frustration by Shengjie, Isabel, and Finn
-
 
 No frills, all thrills 😎</string>
      </property>
@@ -123,6 +114,11 @@ No frills, all thrills 😎</string>
       </item>
       <item row="0" column="1">
        <widget class="QPushButton" name="close_button">
+        <property name="font">
+         <font>
+          <family>Iosevka Aile</family>
+         </font>
+        </property>
         <property name="text">
          <string>Close</string>
         </property>

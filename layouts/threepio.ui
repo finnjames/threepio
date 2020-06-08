@@ -35,7 +35,7 @@
      <widget class="QGroupBox" name="groupBox">
       <property name="font">
        <font>
-        <family>IBM Plex Sans</family>
+        <family>Iosevka Aile</family>
        </font>
       </property>
       <property name="title">
@@ -67,7 +67,7 @@
          </property>
          <property name="font">
           <font>
-           <family>SF Mono</family>
+           <family>Iosevka Aile</family>
           </font>
          </property>
          <property name="alignment">
@@ -91,7 +91,7 @@
       </property>
       <property name="font">
        <font>
-        <family>IBM Plex Sans</family>
+        <family>Iosevka Aile</family>
        </font>
       </property>
       <property name="title">
@@ -102,7 +102,7 @@
         <widget class="QLabel" name="dec_label">
          <property name="font">
           <font>
-           <family>IBM Plex Sans</family>
+           <family>Iosevka Aile</family>
            <pointsize>22</pointsize>
           </font>
          </property>
@@ -115,7 +115,7 @@
         <widget class="QLabel" name="channelB_label">
          <property name="font">
           <font>
-           <family>IBM Plex Sans</family>
+           <family>Iosevka Aile</family>
            <pointsize>22</pointsize>
           </font>
          </property>
@@ -128,7 +128,7 @@
         <widget class="QLabel" name="dec_value">
          <property name="font">
           <font>
-           <family>IBM Plex Mono</family>
+           <family>Iosevka Aile</family>
            <pointsize>22</pointsize>
            <weight>75</weight>
            <bold>true</bold>
@@ -214,7 +214,7 @@
          </property>
          <property name="font">
           <font>
-           <family>IBM Plex Mono</family>
+           <family>Iosevka Aile</family>
            <pointsize>22</pointsize>
            <weight>75</weight>
            <bold>true</bold>
@@ -236,7 +236,7 @@
         <widget class="QLabel" name="channelA_label">
          <property name="font">
           <font>
-           <family>IBM Plex Sans</family>
+           <family>Iosevka Aile</family>
            <pointsize>22</pointsize>
           </font>
          </property>
@@ -249,7 +249,7 @@
         <widget class="QLabel" name="ra_value">
          <property name="font">
           <font>
-           <family>IBM Plex Mono</family>
+           <family>Iosevka Aile</family>
            <pointsize>22</pointsize>
            <weight>75</weight>
            <bold>true</bold>
@@ -335,7 +335,7 @@
          </property>
          <property name="font">
           <font>
-           <family>IBM Plex Mono</family>
+           <family>Iosevka Aile</family>
            <pointsize>22</pointsize>
            <weight>75</weight>
            <bold>true</bold>
@@ -357,7 +357,7 @@
         <widget class="QLabel" name="ra_label">
          <property name="font">
           <font>
-           <family>IBM Plex Sans</family>
+           <family>Iosevka Aile</family>
            <pointsize>22</pointsize>
           </font>
          </property>
@@ -379,7 +379,7 @@
       </property>
       <property name="font">
        <font>
-        <family>IBM Plex Sans</family>
+        <family>Iosevka Aile</family>
        </font>
       </property>
       <property name="title">
@@ -399,7 +399,7 @@
            <widget class="QLabel" name="stripchart_slower_label">
             <property name="font">
              <font>
-              <family>IBM Plex Sans</family>
+              <family>Iosevka Aile</family>
              </font>
             </property>
             <property name="text">
@@ -427,7 +427,7 @@
            <widget class="QLabel" name="stripchart_faster_label">
             <property name="font">
              <font>
-              <family>IBM Plex Sans</family>
+              <family>Iosevka Aile</family>
              </font>
             </property>
             <property name="text">
@@ -460,11 +460,8 @@
            <widget class="QPushButton" name="chart_clear_button">
             <property name="font">
              <font>
-              <family>IBM Plex Sans</family>
+              <family>Iosevka Aile</family>
              </font>
-            </property>
-            <property name="cursor">
-             <cursorShape>PointingHandCursor</cursorShape>
             </property>
             <property name="text">
              <string>Clear chart</string>
@@ -475,7 +472,7 @@
            <widget class="QPushButton" name="chart_legacy_button">
             <property name="font">
              <font>
-              <family>IBM Plex Sans</family>
+              <family>Iosevka Aile</family>
              </font>
             </property>
             <property name="text">
@@ -497,12 +494,12 @@
      <x>0</x>
      <y>0</y>
      <width>716</width>
-     <height>24</height>
+     <height>22</height>
     </rect>
    </property>
    <property name="font">
     <font>
-     <family>IBM Plex Sans</family>
+     <family>Iosevka Aile</family>
     </font>
    </property>
    <widget class="QMenu" name="menuCalibration">

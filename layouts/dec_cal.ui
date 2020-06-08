@@ -33,7 +33,7 @@
        <widget class="QComboBox" name="north_or_south_combo_box">
         <property name="font">
          <font>
-          <family>IBM Plex Sans</family>
+          <family>Iosevka Aile</family>
          </font>
         </property>
        </widget>
@@ -42,7 +42,7 @@
        <widget class="QPushButton" name="discard_cal_button">
         <property name="font">
          <font>
-          <family>IBM Plex Sans</family>
+          <family>Iosevka Aile</family>
          </font>
         </property>
         <property name="text">
@@ -54,7 +54,7 @@
        <widget class="QPushButton" name="next_cal_button">
         <property name="font">
          <font>
-          <family>IBM Plex Sans</family>
+          <family>Iosevka Aile</family>
          </font>
         </property>
         <property name="text">
@@ -88,7 +88,7 @@
     <widget class="QLabel" name="set_dec_label">
      <property name="font">
       <font>
-       <family>IBM Plex Sans</family>
+       <family>Iosevka Aile</family>
       </font>
      </property>
      <property name="text">
@@ -100,7 +100,7 @@
     <widget class="QLabel" name="set_dec_value">
      <property name="font">
       <font>
-       <family>IBM Plex Mono</family>
+       <family>Iosevka Aile</family>
       </font>
      </property>
      <property name="text">

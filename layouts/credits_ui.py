@@ -13,14 +13,13 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(383, 383)
         self.verticalLayout = QtWidgets.QVBoxLayout(Dialog)
         self.verticalLayout.setObjectName("verticalLayout")
         spacerItem = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout.addItem(spacerItem)
         self.label = QtWidgets.QLabel(Dialog)
         font = QtGui.QFont()
-        font.setFamily("IBM Plex Mono")
+        font.setFamily("Courier New")
         self.label.setFont(font)
         self.label.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
         self.label.setObjectName("label")
@@ -29,7 +28,7 @@ class Ui_Dialog(object):
         self.verticalLayout.addItem(spacerItem1)
         self.label_2 = QtWidgets.QLabel(Dialog)
         font = QtGui.QFont()
-        font.setFamily("IBM Plex Sans")
+        font.setFamily("Iosevka Aile")
         self.label_2.setFont(font)
         self.label_2.setAlignment(QtCore.Qt.AlignCenter)
         self.label_2.setObjectName("label_2")
@@ -44,6 +43,9 @@ class Ui_Dialog(object):
         spacerItem3 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.gridLayout.addItem(spacerItem3, 0, 0, 1, 1)
         self.close_button = QtWidgets.QPushButton(self.button_box)
+        font = QtGui.QFont()
+        font.setFamily("Iosevka Aile")
+        self.close_button.setFont(font)
         self.close_button.setObjectName("close_button")
         self.gridLayout.addWidget(self.close_button, 0, 1, 1, 1)
         spacerItem4 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
@@ -66,7 +68,6 @@ class Ui_Dialog(object):
         self.label_2.setText(_translate("Dialog", "The helpful companion to the 40\' telescope\n"
 "\n"
 "Written with frustration by Shengjie, Isabel, and Finn\n"
-"\n"
 "\n"
 "No frills, all thrills 😎"))
         self.close_button.setText(_translate("Dialog", "Close"))

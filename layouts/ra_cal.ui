@@ -33,7 +33,7 @@
        <widget class="QPushButton" name="cancel_button">
         <property name="font">
          <font>
-          <family>IBM Plex Sans</family>
+          <family>Iosevka Aile</family>
          </font>
         </property>
         <property name="text">
@@ -45,7 +45,7 @@
        <widget class="QPushButton" name="ok_button">
         <property name="font">
          <font>
-          <family>IBM Plex Sans</family>
+          <family>Iosevka Aile</family>
          </font>
         </property>
         <property name="text">
@@ -76,7 +76,7 @@
     <widget class="QLabel" name="sidereal_label">
      <property name="font">
       <font>
-       <family>IBM Plex Sans</family>
+       <family>Iosevka Aile</family>
        <pointsize>13</pointsize>
       </font>
      </property>
@@ -92,7 +92,7 @@
     <widget class="QTimeEdit" name="sidereal_value">
      <property name="font">
       <font>
-       <family>IBM Plex Mono</family>
+       <family>Iosevka Aile</family>
       </font>
      </property>
      <property name="displayFormat">

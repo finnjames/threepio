@@ -136,7 +136,7 @@ class Threepio(QtWidgets.QMainWindow):
 
         if self.observation is None:
 
-            period = self.timer_rate * 0.001
+            period = self.timer_rate * 0.001  # s -> ms
 
             if (time.time() - self.tick_time) > (period * self.timing_margin):
                 self.tick_time = time.time()
@@ -257,6 +257,7 @@ class Threepio(QtWidgets.QMainWindow):
                 self.ui.progressBar.setFormat(
                     "T%+.1fs" % (self.clock.get_time_until(self.observation.start_RA)))
                 return
+
         self.ui.progressBar.setFormat("n/a")
         self.ui.progressBar.setValue(0)
 

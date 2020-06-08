@@ -83,15 +83,6 @@ class Tars:
         else:
             return self.random_data()
 
-    def random_data(self):
-        x = (time.time()/32)
-        y = r.choice([-.2,1])/(64 *(r.random()+0.02))
-        f = 2.6/(math.sin(2*x) + 1.4) + 0.4*math.sin(8 * x) - 0.8*math.sin(4 * x) +(1/(math.sin(8*x)+1.4))
-        a = abs(f) + y
-        b = f**2 + 4*y
-        # a, b, dec
-        return [(0, a), (1, b), (2, 1.0)]
-
     def read_latest(self) -> list:
         """
         This function reads the last datapoint from the buffer and clears the buffer.
@@ -109,6 +100,15 @@ class Tars:
             return latest
         else:
             return self.random_data()
+
+    def random_data(self):
+        x = (time.time()/32)
+        y = r.choice([-.2,1])/(64 *(r.random()+0.02))
+        f = 2.6/(math.sin(2*x) + 1.4) + 0.4*math.sin(8 * x) - 0.8*math.sin(4 * x) +(1/(math.sin(8*x)+1.4))
+        a = abs(f) + y
+        b = f**2 + 4*y
+        # a, b, dec
+        return [(0, a), (1, b), (2, 1.0)]
 
     # Helpers
 
