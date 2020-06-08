@@ -46,10 +46,8 @@
         <widget class="QLabel" name="message_label">
          <property name="font">
           <font>
-           <pointsize>22</pointsize>
-           <weight>75</weight>
-           <italic>false</italic>
-           <bold>true</bold>
+           <family>Iosevka Aile</family>
+           <pointsize>20</pointsize>
           </font>
          </property>
          <property name="text">
@@ -132,7 +130,6 @@
            <pointsize>22</pointsize>
            <weight>75</weight>
            <bold>true</bold>
-           <kerning>false</kerning>
           </font>
          </property>
          <property name="text">
@@ -218,7 +215,6 @@
            <pointsize>22</pointsize>
            <weight>75</weight>
            <bold>true</bold>
-           <kerning>false</kerning>
           </font>
          </property>
          <property name="text">
@@ -253,7 +249,6 @@
            <pointsize>22</pointsize>
            <weight>75</weight>
            <bold>true</bold>
-           <kerning>false</kerning>
           </font>
          </property>
          <property name="text">
@@ -339,7 +334,6 @@
            <pointsize>22</pointsize>
            <weight>75</weight>
            <bold>true</bold>
-           <kerning>false</kerning>
           </font>
          </property>
          <property name="text">
@@ -531,7 +525,6 @@
    <addaction name="menuFile"/>
    <addaction name="menuCalibration"/>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
   <action name="actionRA">
    <property name="text">
     <string>RA...</string>
@@ -602,6 +595,11 @@
   <action name="actionLegacy">
    <property name="text">
     <string>Legacy...</string>
+   </property>
+  </action>
+  <action name="actionClear_Observation">
+   <property name="text">
+    <string>Clear Observation</string>
    </property>
   </action>
  </widget>

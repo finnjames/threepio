@@ -12,6 +12,7 @@ class ObsDialog(QtWidgets.QDialog):
         QtWidgets.QWidget.__init__(self)
         self.ui = obs_ui.Ui_Dialog()
         self.ui.setupUi(self)
+        self.setModal(True)  # keep focus until dealt with
         self.setWindowFlags(QtCore.Qt.Window | QtCore.Qt.WindowTitleHint | QtCore.Qt.CustomizeWindowHint)
 
         self.observation = observation

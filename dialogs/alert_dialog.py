@@ -11,6 +11,7 @@ class AlertDialog(QtWidgets.QDialog):
         QtWidgets.QWidget.__init__(self)
         self.ui = alert_ui.Ui_Dialog()
         self.ui.setupUi(self)
+        self.setModal(True)  # keep focus until dealt with
 
         # hide the close/minimize/fullscreen buttons
         self.setWindowFlags(

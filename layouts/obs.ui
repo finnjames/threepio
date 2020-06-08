@@ -187,7 +187,7 @@
     </widget>
    </item>
    <item row="9" column="1" colspan="2">
-    <widget class="QWidget" name="button_box" native="true">
+    <widget class="QFrame" name="button_frame">
      <layout class="QGridLayout" name="gridLayout_2">
       <property name="leftMargin">
        <number>0</number>
@@ -252,38 +252,5 @@
   <tabstop>file_name_value</tabstop>
  </tabstops>
  <resources/>
- <connections>
-  <connection>
-   <sender>accept_button</sender>
-   <signal>clicked()</signal>
-   <receiver>Dialog</receiver>
-   <slot>accept()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>259</x>
-     <y>239</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>163</x>
-     <y>156</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>cancel_button</sender>
-   <signal>clicked()</signal>
-   <receiver>Dialog</receiver>
-   <slot>reject()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>144</x>
-     <y>239</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>159</x>
-     <y>159</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>320</width>
-    <height>106</height>
+    <height>100</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -31,7 +31,7 @@
     </widget>
    </item>
    <item row="2" column="0" colspan="2">
-    <widget class="QWidget" name="button_box" native="true">
+    <widget class="QFrame" name="button_frame">
      <layout class="QGridLayout" name="gridLayout_2">
       <property name="leftMargin">
        <number>0</number>
@@ -76,22 +76,5 @@
   </layout>
  </widget>
  <resources/>
- <connections>
-  <connection>
-   <sender>close_button</sender>
-   <signal>clicked()</signal>
-   <receiver>Dialog</receiver>
-   <slot>close()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>275</x>
-     <y>89</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>159</x>
-     <y>54</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>
