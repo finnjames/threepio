@@ -13,6 +13,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
+        Dialog.resize(383, 362)
         self.verticalLayout = QtWidgets.QVBoxLayout(Dialog)
         self.verticalLayout.setObjectName("verticalLayout")
         spacerItem = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
@@ -35,14 +36,14 @@ class Ui_Dialog(object):
         self.verticalLayout.addWidget(self.label_2)
         spacerItem2 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout.addItem(spacerItem2)
-        self.button_box = QtWidgets.QWidget(Dialog)
-        self.button_box.setObjectName("button_box")
-        self.gridLayout = QtWidgets.QGridLayout(self.button_box)
+        self.button_frame = QtWidgets.QFrame(Dialog)
+        self.button_frame.setObjectName("button_frame")
+        self.gridLayout = QtWidgets.QGridLayout(self.button_frame)
         self.gridLayout.setContentsMargins(0, 0, 0, 0)
         self.gridLayout.setObjectName("gridLayout")
         spacerItem3 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.gridLayout.addItem(spacerItem3, 0, 0, 1, 1)
-        self.close_button = QtWidgets.QPushButton(self.button_box)
+        self.close_button = QtWidgets.QPushButton(self.button_frame)
         font = QtGui.QFont()
         font.setFamily("Iosevka Aile")
         self.close_button.setFont(font)
@@ -50,10 +51,9 @@ class Ui_Dialog(object):
         self.gridLayout.addWidget(self.close_button, 0, 1, 1, 1)
         spacerItem4 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.gridLayout.addItem(spacerItem4, 0, 2, 1, 1)
-        self.verticalLayout.addWidget(self.button_box)
+        self.verticalLayout.addWidget(self.button_frame)
 
         self.retranslateUi(Dialog)
-        self.close_button.clicked.connect(Dialog.close)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
     def retranslateUi(self, Dialog):

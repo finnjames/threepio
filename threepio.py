@@ -98,7 +98,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.update_speed()
 
         # DATAQ stuff
-        self.tars = Tars()
+        self.tars = Tars(parent=self)
         self.tars.setup()
         self.tars.start()
 
@@ -392,7 +392,8 @@ def main():
     app = QtWidgets.QApplication(sys.argv)
     app.setStyle("Fusion")
     window = Threepio()
-    window.setMinimumSize(800, 600)
+    # TODO: implement hiding/showing testing better
+    # window.ui.testing_frame.hide()
     window.show()
     sys.exit(app.exec_())
 
