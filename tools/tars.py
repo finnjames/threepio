@@ -106,18 +106,21 @@ class Tars:
             return self.random_data()
 
     def random_data(self):
-        x = (time.time() / 2)
+        """sometimes it's not worth asking"""
+        # TODO: make this function not a complete disaster
+        x = (time.time() / 8)
 
         n = r.choice([-.2, 1]) / (64 * (r.random() + 0.02))
-        n *= self.parent.ui.noise_dial.value()
+        n *= 0.08*self.parent.ui.noise_dial.value()**2
 
         v = self.parent.ui.variance_dial.value()
 
         f = math.sin(4*x)
-        g = (2.6) / (math.sin(2 * x) + 1.4) + (0.4) * math.sin(8 * x) - (0.8) * math.sin(4 * x) + ((1) / (math.sin(8 * x) + 1.4))
+        g = 2.6 / (math.sin(2 * x) + 1.4) + 0.4 * math.sin(8 * x) - 0.8 * math.sin(4 * x) +\
+            (1 / (math.sin(8 * x) + 1.4))
 
         a = f + g * v + n
-        b = a - self.parent.ui.polarization_dial.value() * g
+        b = a - 0.1 * self.parent.ui.polarization_dial.value() * g * (v/2 +1)
 
         # a, b, dec
         return [(0, a), (1, b), (2, float(self.parent.ui.declination_slider.value()))]

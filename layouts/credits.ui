@@ -151,5 +151,22 @@ No frills, all thrills 😎</string>
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>close_button</sender>
+   <signal>clicked()</signal>
+   <receiver>Dialog</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>191</x>
+     <y>333</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>191</x>
+     <y>180</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

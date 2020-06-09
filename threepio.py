@@ -81,6 +81,10 @@ class Threepio(QtWidgets.QMainWindow):
         self.ui.actionDec.triggered.connect(self.dec_calibration)
         self.ui.actionRA.triggered.connect(self.ra_calibration)
 
+        self.ui.actionNormal.triggered.connect(self.set_state_normal)
+        self.ui.actionTesting.triggered.connect(self.set_state_testing)
+        self.ui.actionLegacy.triggered.connect(self.legacy_mode)
+
         self.ui.chart_clear_button.clicked.connect(self.clear_stripchart)
 
         self.ui.chart_legacy_button.clicked.connect(self.legacy_mode)
@@ -203,6 +207,16 @@ class Threepio(QtWidgets.QMainWindow):
                 time_until_start = self.observation.start_RA - time.time()
                 if time_until_start <= 0 and (self.observation.end_RA - time.time()) > 0:
                     self.message("Taking observation data...")
+
+    def set_state_normal(self):
+        self.ui.actionNormal.setChecked(True)
+        self.ui.actionTesting.setChecked(False)
+        self.ui.testing_frame.hide()
+
+    def set_state_testing(self):
+        self.ui.actionNormal.setChecked(False)
+        self.ui.actionTesting.setChecked(True)
+        self.ui.testing_frame.show()
 
     def legacy_mode(self):
         """lol"""
@@ -393,8 +407,7 @@ def main():
     app = QtWidgets.QApplication(sys.argv)
     app.setStyle("Fusion")
     window = Threepio()
-    # TODO: implement hiding/showing testing better
-    # window.ui.testing_frame.hide()
+    window.set_state_normal()
     window.show()
     sys.exit(app.exec_())
 

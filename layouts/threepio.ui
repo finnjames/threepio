@@ -512,6 +512,12 @@
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>180</height>
+       </size>
+      </property>
       <layout class="QGridLayout" name="gridLayout_8">
        <property name="topMargin">
         <number>0</number>
@@ -548,12 +554,6 @@
             </property>
             <property name="singleStep">
              <number>5</number>
-            </property>
-            <property name="tickPosition">
-             <enum>QSlider::TicksBothSides</enum>
-            </property>
-            <property name="tickInterval">
-             <number>25</number>
             </property>
            </widget>
           </item>
@@ -624,7 +624,7 @@
              <number>4</number>
             </property>
             <property name="value">
-             <number>0</number>
+             <number>4</number>
             </property>
             <property name="wrapping">
              <bool>false</bool>
@@ -698,6 +698,9 @@
             <property name="pageStep">
              <number>4</number>
             </property>
+            <property name="value">
+             <number>8</number>
+            </property>
             <property name="wrapping">
              <bool>false</bool>
             </property>
@@ -723,6 +726,9 @@
              <number>16</number>
             </property>
             <property name="pageStep">
+             <number>4</number>
+            </property>
+            <property name="value">
              <number>4</number>
             </property>
             <property name="wrapping">
@@ -784,8 +790,17 @@
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
+   <widget class="QMenu" name="menuMode">
+    <property name="title">
+     <string>Mode</string>
+    </property>
+    <addaction name="actionNormal"/>
+    <addaction name="actionLegacy"/>
+    <addaction name="actionTesting"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuCalibration"/>
+   <addaction name="menuMode"/>
   </widget>
   <action name="actionRA">
    <property name="text">
@@ -795,16 +810,6 @@
   <action name="actionDec">
    <property name="text">
     <string>Dec...</string>
-   </property>
-  </action>
-  <action name="actionAbout">
-   <property name="text">
-    <string>About</string>
-   </property>
-  </action>
-  <action name="actionworld">
-   <property name="text">
-    <string>world</string>
    </property>
   </action>
   <action name="actionSurvey">
@@ -833,11 +838,6 @@
     <string>Help...</string>
    </property>
   </action>
-  <action name="actionStop">
-   <property name="text">
-    <string>Stop</string>
-   </property>
-  </action>
   <action name="actionScan">
    <property name="text">
     <string>Scan</string>
@@ -854,14 +854,37 @@
     <string>Ctrl+3</string>
    </property>
   </action>
-  <action name="actionLegacy">
+  <action name="actionNormal">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
-    <string>Legacy...</string>
+    <string>Normal</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
    </property>
   </action>
-  <action name="actionClear_Observation">
+  <action name="actionTesting">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
-    <string>Clear Observation</string>
+    <string>Testing</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+T</string>
+   </property>
+  </action>
+  <action name="actionLegacy">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Legacy</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Z</string>
    </property>
   </action>
  </widget>
