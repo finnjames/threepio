@@ -15,14 +15,14 @@ import time
 from PyQt5 import QtChart, QtCore, QtGui, QtWidgets
 
 from dialogs import AlertDialog, CreditsDialog, DecDialog, ObsDialog, RADialog
-from layouts import threepio_ui
+from layouts import threepio_ui, quit_ui
 from tools import Comm, DataPoint, Survey, Scan, Spectrum, SuperClock, Tars
 
 
 # from playsound import playsound # TODO: test on Windows
 
 class Threepio(QtWidgets.QMainWindow):
-    """Main class for the app"""
+    """main class for the app"""
 
     # basic time
     timer_rate = 10  # ms
@@ -65,9 +65,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.setWindowTitle("Threepio")
 
         # hide the close/minimize/fullscreen buttons
-        self.setWindowFlags(QtCore.Qt.Window |
-                            QtCore.Qt.WindowTitleHint |
-                            QtCore.Qt.CustomizeWindowHint)
+        self.setWindowFlags(QtCore.Qt.Window | QtCore.Qt.WindowTitleHint | QtCore.Qt.CustomizeWindowHint)
 
         # connect buttons
         self.ui.stripchart_speed_slider.valueChanged.connect(self.update_speed)
@@ -83,7 +81,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.ui.actionDec.triggered.connect(self.dec_calibration)
         self.ui.actionRA.triggered.connect(self.ra_calibration)
 
-        self.ui.chart_clear_button.clicked.connect(self.handle_clear)
+        self.ui.chart_clear_button.clicked.connect(self.clear_stripchart)
 
         self.ui.chart_legacy_button.clicked.connect(self.legacy_mode)
 
@@ -100,7 +98,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.update_speed()
 
         # DATAQ stuff
-        self.tars = Tars()
+        self.tars = Tars(parent=self)
         self.tars.setup()
         self.tars.start()
 
@@ -134,13 +132,11 @@ class Threepio(QtWidgets.QMainWindow):
 
         self.update_gui()  # update gui
 
-        # print(time.time() - self.tick_time)
-
         # TODO: make this a little less redundant
 
         if self.observation is None:
 
-            period = self.timer_rate * 0.001
+            period = self.timer_rate * 0.001  # s -> ms
 
             if (time.time() - self.tick_time) > (period * self.timing_margin):
                 self.tick_time = time.time()
@@ -158,8 +154,9 @@ class Threepio(QtWidgets.QMainWindow):
         else:
 
             # can't reset RA/Dec after loading obs
-            self.ui.actionRA.setEnabled(False)
-            self.ui.actionDec.setEnabled(False)
+            self.ui.actionRA.setDisabled(True)
+            self.ui.actionDec.setDisabled(True)
+            self.ui.menuNew.setDisabled(True)
 
             period = 1 / self.observation.freq
 
@@ -184,13 +181,13 @@ class Threepio(QtWidgets.QMainWindow):
 
                 if self.transmission != self.old_transmission:
                     if self.transmission == Comm.START_CAL:
-                        self.alert("Set calibration switches to ON")
-                        self.alert("Are the calibration switches on?")
+                        self.alert("Set calibration switches to ON", "Okay")
+                        self.alert("Are the calibration switches on?", "Yes")
                         self.observation.next()
                         self.message("Taking calibration data...")
                     elif self.transmission == Comm.STOP_CAL:
-                        self.alert("Set calibration switches to OFF")
-                        self.alert("Are the calibration switches off?")
+                        self.alert("Set calibration switches to OFF", "Okay")
+                        self.alert("Are the calibration switches off?", "Yes")
                         self.observation.next()
                         self.message("Taking background data...")
                     elif self.transmission == Comm.NEXT:
@@ -226,14 +223,14 @@ class Threepio(QtWidgets.QMainWindow):
             new_clock = self.clock
 
         # TODO: abstract this better
-        dialog = RADialog(new_clock)
+        dialog = RADialog(self, new_clock)
         dialog.show()
         dialog.exec_()
 
         self.clock = new_clock
 
     def update_speed(self):
-        self.stripchart_display_seconds = (120 / 6) * (6 - ((6.5 / 6) * self.ui.stripchart_speed_slider.value()))
+        self.stripchart_display_seconds = (120 - ((110 / 6) * self.ui.stripchart_speed_slider.value()))
 
     def update_gui(self):
         self.ui.ra_value.setText(self.clock.get_sidereal_time())  # show RA
@@ -261,6 +258,7 @@ class Threepio(QtWidgets.QMainWindow):
                 self.ui.progressBar.setFormat(
                     "T%+.1fs" % (self.clock.get_time_until(self.observation.start_RA)))
                 return
+
         self.ui.progressBar.setFormat("n/a")
         self.ui.progressBar.setValue(0)
 
@@ -273,11 +271,6 @@ class Threepio(QtWidgets.QMainWindow):
         new_ra = self.data[len(self.data) - 1].timestamp
         self.stripchart_series_a.append(new_a, new_ra)
         self.stripchart_series_b.append(new_b, new_ra)
-
-        # while self.stripchart_display_ticks < len(self.data) - self.stripchart_offset:
-        #     self.stripchart_series_a.remove(0)
-        #     self.stripchart_series_b.remove(0)
-        #     self.stripchart_offset += 1
 
         # add channels to chart
         chart = QtChart.QChart()
@@ -298,12 +291,12 @@ class Threepio(QtWidgets.QMainWindow):
 
         self.ui.stripchart.setChart(chart)
 
-    def handle_clear(self):
+    def clear_stripchart(self):
         self.stripchart_offset += self.stripchart_series_a.count()
         self.stripchart_series_a.clear()
         self.stripchart_series_b.clear()
 
-    def handle_refresh(self):
+    def refresh_stripchart(self):
         self.stripchart_low = 32767
         self.stripchart_high = -32768
 
@@ -346,7 +339,7 @@ class Threepio(QtWidgets.QMainWindow):
             self.x.append(float(i))
 
     def calculate_declination(self, input_dec):
-        """calculate the true dec from declinometer input data and calibration data"""
+        """calculate the true dec from declinometer input and calibration data"""
 
         # input is below data
         if input_dec < self.x[0]:  # TODO: use minimum, not first
@@ -370,13 +363,29 @@ class Threepio(QtWidgets.QMainWindow):
     def message(self, message):
         self.ui.message_label.setText(message)
 
-    def alert(self, message):
-        alert = AlertDialog(message)
+    def alert(self, message, button_message="Close"):
+        alert = AlertDialog(message, button_message)
         alert.show()
         alert.exec_()
 
     def beep(self):
         print("beep! ", time.time())
+
+    def closeEvent(self, event):
+        """override quit action to confirm before closing"""
+        m = QtWidgets.QDialog()
+        m.ui = quit_ui.Ui_Dialog()
+        m.ui.setupUi(m)
+        m.setWindowTitle("Quit?")
+
+        m.setWindowFlags(QtCore.Qt.Window | QtCore.Qt.WindowTitleHint | QtCore.Qt.CustomizeWindowHint)
+
+        close = m.exec()
+        print(close)
+        if close:
+            event.accept()
+        else:
+            event.ignore()
 
 
 def main():
@@ -384,7 +393,8 @@ def main():
     app = QtWidgets.QApplication(sys.argv)
     app.setStyle("Fusion")
     window = Threepio()
-    window.setMinimumSize(800, 600)
+    # TODO: implement hiding/showing testing better
+    # window.ui.testing_frame.hide()
     window.show()
     sys.exit(app.exec_())
 

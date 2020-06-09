@@ -33,14 +33,12 @@ class DecDialog(QtWidgets.QDialog):
         self.ui.discard_cal_button.clicked.connect(self.handle_discard)
         self.ui.next_cal_button.clicked.connect(self.handle_next)
 
-        self.ui.north_or_south_combo_box.addItem("N → S")
-        self.ui.north_or_south_combo_box.addItem("S → N")
-
         self.handle_next()
 
     def handle_next(self):
         if self.current_dec > self.end_dec:  # base case, calibration complete
 
+            # copy over the current file to the backup file
             with open("dec_cal.txt") as f:
                 with open("dec_cal_backup.txt", 'w') as b:
                     for line in f:
@@ -60,7 +58,12 @@ class DecDialog(QtWidgets.QDialog):
 
             self.ui.set_dec_value.setText(str(self.current_dec))
             if self.current_dec == self.end_dec:
+                # specify action if it will save and not just progress
                 self.ui.next_cal_button.setText("Save")
+            elif self.current_dec > self.start_dec:
+                # disable N/S choice if not first
+                self.ui.north_or_south_combo_box.setDisabled(True)
+
             self.current_dec += self.step
 
     def handle_discard(self):

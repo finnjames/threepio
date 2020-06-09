@@ -7,44 +7,34 @@
     <x>0</x>
     <y>0</y>
     <width>320</width>
-    <height>100</height>
+    <height>110</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>RA Calibration</string>
+   <string>Quit?</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <item row="2" column="2">
+  <layout class="QGridLayout" name="gridLayout_2">
+   <item row="1" column="1">
     <widget class="QLabel" name="sidereal_label">
      <property name="font">
       <font>
        <family>Iosevka Aile</family>
-       <pointsize>13</pointsize>
       </font>
      </property>
      <property name="text">
-      <string>Current Sidereal Time</string>
+      <string>Are you sure you want to quit? Incomplete observations may not be usable.</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
      </property>
-    </widget>
-   </item>
-   <item row="2" column="3">
-    <widget class="QTimeEdit" name="sidereal_value">
-     <property name="font">
-      <font>
-       <family>Iosevka Aile</family>
-      </font>
-     </property>
-     <property name="displayFormat">
-      <string>HH:mm:ss</string>
+     <property name="wordWrap">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
-   <item row="3" column="2" colspan="2">
+   <item row="2" column="1">
     <widget class="QFrame" name="button_frame">
-     <layout class="QGridLayout" name="gridLayout_2">
+     <layout class="QGridLayout" name="gridLayout">
       <property name="leftMargin">
        <number>0</number>
       </property>
@@ -57,34 +47,7 @@
       <property name="bottomMargin">
        <number>0</number>
       </property>
-      <item row="1" column="1">
-       <widget class="QPushButton" name="cancel_button">
-        <property name="font">
-         <font>
-          <family>Iosevka Aile</family>
-         </font>
-        </property>
-        <property name="text">
-         <string>Cancel</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="2">
-       <widget class="QPushButton" name="ok_button">
-        <property name="font">
-         <font>
-          <family>Iosevka Aile</family>
-         </font>
-        </property>
-        <property name="text">
-         <string>Set RA</string>
-        </property>
-        <property name="default">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
+      <item row="0" column="0">
        <spacer name="horizontalSpacer">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -97,26 +60,56 @@
         </property>
        </spacer>
       </item>
+      <item row="0" column="3">
+       <widget class="QPushButton" name="ok_button">
+        <property name="font">
+         <font>
+          <family>Iosevka Aile</family>
+         </font>
+        </property>
+        <property name="text">
+         <string>Yes, Quit</string>
+        </property>
+        <property name="default">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QPushButton" name="cancel_button">
+        <property name="font">
+         <font>
+          <family>Iosevka Aile</family>
+         </font>
+        </property>
+        <property name="text">
+         <string>No, go back</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>ok_button</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
    <sender>cancel_button</sender>
    <signal>clicked()</signal>
    <receiver>Dialog</receiver>
-   <slot>reject()</slot>
+   <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>181</x>
-     <y>66</y>
+     <x>83</x>
+     <y>79</y>
     </hint>
     <hint type="destinationlabel">
-     <x>159</x>
-     <y>49</y>
+     <x>161</x>
+     <y>54</y>
     </hint>
    </hints>
   </connection>
@@ -127,12 +120,12 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>265</x>
-     <y>66</y>
+     <x>237</x>
+     <y>89</y>
     </hint>
     <hint type="destinationlabel">
      <x>159</x>
-     <y>49</y>
+     <y>54</y>
     </hint>
    </hints>
   </connection>

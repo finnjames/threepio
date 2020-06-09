@@ -5,6 +5,7 @@ Functionalities needed for working with files.
 import os
 from datetime import datetime
 
+
 class MyPrecious:
     MAX_BUFFER_SIZE = 0
 
@@ -33,7 +34,7 @@ class MyPrecious:
     def close(self):
         self.__buffer_write()
 
-    ### Helpfer functions below ###
+    # HELPER FUNCTIONS
 
     def __buffer_clear(self):
         """
@@ -50,14 +51,14 @@ class MyPrecious:
 
     def __buffer_append(self, data: str):
         self.__buffer.append(data)
-    
+
     def __buffer_size(self) -> int:
         return len(self.__buffer)
 
     def __file_write(self, data, mode='a'):
         if mode != 'a' and mode != 'w':
             print("Write mode not recognized. Please use " +
-            "'a' for append and 'w' for write (overwrite).")
+                  "'a' for append and 'w' for write (overwrite).")
         with open(self.dir + self.filename, mode) as file:
             print(data, end='\n', file=file)
 

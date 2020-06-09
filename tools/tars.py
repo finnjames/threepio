@@ -10,6 +10,10 @@ import serial.tools.list_ports
 import time
 
 import random as r  # for testing
+import math
+import threading  # I'm so sorry :(
+
+from dialogs import TestDialog
 
 
 def discovery() -> str:
@@ -37,7 +41,8 @@ class Tars:
     RANGE_RATE = (50000, 20000, 10000, 5000, 2000,
                   1000, 500, 200, 100, 50, 20, 10)
 
-    def __init__(self, device=None):
+    def __init__(self, parent=None, device=None):
+        self.parent = parent
         if device is not None:
             self.testing = False
 
@@ -80,10 +85,7 @@ class Tars:
                 return None
             return [(channel & 3, self.buffer_read(channel)) for channel in self.channels]
         else:
-            rand_a = r.random(-20, 30)
-            rand_b = r.random(-30, 20)
-            # a, b, dec
-            return [(0, rand_a), (1, rand_b), (2, 1.0)]
+            return self.random_data()
 
     def read_latest(self) -> list:
         """
@@ -101,12 +103,24 @@ class Tars:
                 current = self.read_one()
             return latest
         else:
-            rand_float = r.random()
-            rand_a = -8 + 16 * rand_float
-            rand_b = 8 + 2 * rand_float ** 2
-            # a, b, dec
-            return [(0, rand_a), (1, rand_b), (2, 1.0)]
-            # return [(0, 2.0), (1, 3.0), (2, 1.0)]
+            return self.random_data()
+
+    def random_data(self):
+        x = (time.time() / 2)
+
+        n = r.choice([-.2, 1]) / (64 * (r.random() + 0.02))
+        n *= self.parent.ui.noise_dial.value()
+
+        v = self.parent.ui.variance_dial.value()
+
+        f = math.sin(4*x)
+        g = (2.6) / (math.sin(2 * x) + 1.4) + (0.4) * math.sin(8 * x) - (0.8) * math.sin(4 * x) + ((1) / (math.sin(8 * x) + 1.4))
+
+        a = f + g * v + n
+        b = a - self.parent.ui.polarization_dial.value() * g
+
+        # a, b, dec
+        return [(0, a), (1, b), (2, float(self.parent.ui.declination_slider.value()))]
 
     # Helpers
 
