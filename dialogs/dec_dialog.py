@@ -46,6 +46,11 @@ class DecDialog(QtWidgets.QDialog):
 
             open("dec_cal.txt", 'w').close()  # overwrite file
             f = open("dec_cal.txt", 'a')
+
+            # reverse it if it's N -> S
+            if self.ui.north_or_south_combo_box.currentIndex() == 1:
+                self.data.reverse()
+
             for line in self.data:  # replace with new calibration data
                 if line == self.data[len(self.data) - 1]:
                     f.write(str(line))
@@ -53,8 +58,8 @@ class DecDialog(QtWidgets.QDialog):
                     f.write(str(line) + '\n')
             self.close()
         else:
-            # TODO: read data from declinometer
-            self.data.append(self.current_dec * math.fabs(self.current_dec) / 100 + random.randint(-4, 4))
+            # TODO: make this a little less hard-coded
+            self.data.append(self.tars.read_latest()[2][1])  # read just the declination value
 
             self.ui.set_dec_value.setText(str(self.current_dec))
             if self.current_dec == self.end_dec:

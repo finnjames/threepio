@@ -346,7 +346,7 @@ class Ui_MainWindow(object):
         self.polarization_dial.setMinimum(0)
         self.polarization_dial.setMaximum(16)
         self.polarization_dial.setPageStep(4)
-        self.polarization_dial.setProperty("value", 8)
+        self.polarization_dial.setProperty("value", 4)
         self.polarization_dial.setWrapping(False)
         self.polarization_dial.setNotchTarget(1.0)
         self.polarization_dial.setNotchesVisible(True)

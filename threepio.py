@@ -296,8 +296,8 @@ class Threepio(QtWidgets.QMainWindow):
         axis_y.setRange(
             self.clock.get_sidereal_seconds() - self.stripchart_display_seconds, self.clock.get_sidereal_seconds())
         axis_y.setVisible(False)
-        chart.setAxisY(axis_y)
 
+        chart.setAxisY(axis_y)
         self.stripchart_series_a.attachAxis(axis_y)
         self.stripchart_series_b.attachAxis(axis_y)
 
@@ -309,10 +309,6 @@ class Threepio(QtWidgets.QMainWindow):
         self.stripchart_offset += self.stripchart_series_a.count()
         self.stripchart_series_a.clear()
         self.stripchart_series_b.clear()
-
-    def refresh_stripchart(self):
-        self.stripchart_low = 32767
-        self.stripchart_high = -32768
 
     def handle_survey(self):
         obs = Survey()
@@ -367,7 +363,7 @@ class Threepio(QtWidgets.QMainWindow):
         for i in range(len(self.x)):
             if input_dec <= self.x[i + 1]:
                 if input_dec >= self.x[i]:
-                    # (Δy/Δx)x + y_0
+                    # (dy/dx)x + y_0
                     return ((self.y[i + 1] - self.y[i]) / (self.x[i + 1] - self.x[i]) * (input_dec - self.x[i])) + \
                            self.y[i]
 
