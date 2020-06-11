@@ -27,5 +27,9 @@ class RADialog(QtWidgets.QDialog):
 
         # TODO: clear old stripchart data
 
-        self.parent_window.clear_stripchart()
+        try:
+            self.parent_window.clear_stripchart()
+        except Exception:
+            pass
+
         self.close()

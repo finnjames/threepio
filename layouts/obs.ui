@@ -252,5 +252,38 @@
   <tabstop>file_name_value</tabstop>
  </tabstops>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>cancel_button</sender>
+   <signal>clicked()</signal>
+   <receiver>Dialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>110</x>
+     <y>233</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>159</x>
+     <y>130</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>accept_button</sender>
+   <signal>clicked()</signal>
+   <receiver>Dialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>230</x>
+     <y>233</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>159</x>
+     <y>130</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

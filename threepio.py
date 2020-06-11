@@ -89,18 +89,6 @@ class Threepio(QtWidgets.QMainWindow):
 
         self.ui.chart_legacy_button.clicked.connect(self.legacy_mode)
 
-        # initialize stripchart
-        self.stripchart_series_a = QtChart.QLineSeries()
-        self.stripchart_series_b = QtChart.QLineSeries()
-        self.ui.stripchart.setRenderHint(QtGui.QPainter.Antialiasing)
-        pen = QtGui.QPen(QtGui.QColor(self.BLUE))
-        pen.setWidth(1)
-        self.stripchart_series_a.setPen(pen)
-        pen.setColor(QtGui.QColor(self.RED))
-        self.stripchart_series_b.setPen(pen)
-
-        self.update_speed()
-
         # DATAQ stuff
         self.tars = Tars(parent=self)
         self.tars.setup()
@@ -109,6 +97,20 @@ class Threepio(QtWidgets.QMainWindow):
         # clock
         self.clock = None
         self.set_time()
+
+        # initialize stripchart
+        self.stripchart_series_a = QtChart.QLineSeries()
+        self.stripchart_series_b = QtChart.QLineSeries()
+        self.chart = QtChart.QChart()
+        self.ui.stripchart.setRenderHint(QtGui.QPainter.Antialiasing)
+        pen = QtGui.QPen(QtGui.QColor(self.BLUE))
+        pen.setWidth(1)
+        self.stripchart_series_a.setPen(pen)
+        pen.setColor(QtGui.QColor(self.RED))
+        self.stripchart_series_b.setPen(pen)
+        self.initialize_stripchart()
+
+        self.update_speed()
 
         # establish observation
         self.observation = None
@@ -153,7 +155,7 @@ class Threepio(QtWidgets.QMainWindow):
 
                 self.data.append(data_point)
 
-                self.update_strip_chart()  # make the stripchart scroll
+                self.update_stripchart()  # make the stripchart scroll
 
         else:
 
@@ -181,7 +183,7 @@ class Threepio(QtWidgets.QMainWindow):
                     data_point, time.time())
                 # print(self.transmission, time.time(), self.observation.state)
 
-                self.update_strip_chart()  # make the stripchart scroll
+                self.update_stripchart()  # make the stripchart scroll
 
                 if self.transmission != self.old_transmission:
                     if self.transmission == Comm.START_CAL:
@@ -279,17 +281,10 @@ class Threepio(QtWidgets.QMainWindow):
     def display_info(self, message):
         self.ui.message_label.setText(message)
 
-    def update_strip_chart(self):
-        new_a = self.data[len(self.data) - 1].a
-        new_b = self.data[len(self.data) - 1].b
-        new_ra = self.data[len(self.data) - 1].timestamp
-        self.stripchart_series_a.append(new_a, new_ra)
-        self.stripchart_series_b.append(new_b, new_ra)
-
+    def initialize_stripchart(self):
         # add channels to chart
-        chart = QtChart.QChart()
-        chart.addSeries(self.stripchart_series_b)
-        chart.addSeries(self.stripchart_series_a)
+        self.chart.addSeries(self.stripchart_series_b)
+        self.chart.addSeries(self.stripchart_series_a)
 
         # create and scale y axis
         axis_y = QtChart.QValueAxis()
@@ -297,13 +292,28 @@ class Threepio(QtWidgets.QMainWindow):
             self.clock.get_sidereal_seconds() - self.stripchart_display_seconds, self.clock.get_sidereal_seconds())
         axis_y.setVisible(False)
 
-        chart.setAxisY(axis_y)
+        self.chart.setAxisY(axis_y)
         self.stripchart_series_a.attachAxis(axis_y)
         self.stripchart_series_b.attachAxis(axis_y)
 
-        chart.legend().hide()
+        self.chart.legend().hide()
 
-        self.ui.stripchart.setChart(chart)
+        self.ui.stripchart.setChart(self.chart)
+
+    def update_stripchart(self):
+        new_a = self.data[len(self.data) - 1].a
+        new_b = self.data[len(self.data) - 1].b
+        new_ra = self.data[len(self.data) - 1].timestamp
+
+        self.stripchart_series_a.append(new_a, new_ra)
+        self.stripchart_series_b.append(new_b, new_ra)
+
+        self.chart.removeSeries(self.stripchart_series_b)
+        self.chart.removeSeries(self.stripchart_series_a)
+        self.chart.addSeries(self.stripchart_series_b)
+        self.chart.addSeries(self.stripchart_series_a)
+
+        self.ui.stripchart.repaint()
 
     def clear_stripchart(self):
         self.stripchart_offset += self.stripchart_series_a.count()
@@ -405,7 +415,7 @@ def main():
     window = Threepio()
     window.set_state_normal()
     window.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec_())  # exit with code from app
 
 
 if __name__ == '__main__':
