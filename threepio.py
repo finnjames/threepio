@@ -101,8 +101,9 @@ class Threepio(QtWidgets.QMainWindow):
         # initialize stripchart
         self.stripchart_series_a = QtChart.QLineSeries()
         self.stripchart_series_b = QtChart.QLineSeries()
+        self.axis_y = QtChart.QValueAxis()
         self.chart = QtChart.QChart()
-        self.ui.stripchart.setRenderHint(QtGui.QPainter.Antialiasing)
+        self.ui.stripchart.setRenderHint(QtGui.QPainter.Antialiasing)  # antialiasing :)
         pen = QtGui.QPen(QtGui.QColor(self.BLUE))
         pen.setWidth(1)
         self.stripchart_series_a.setPen(pen)
@@ -287,33 +288,43 @@ class Threepio(QtWidgets.QMainWindow):
         self.chart.addSeries(self.stripchart_series_a)
 
         # create and scale y axis
-        axis_y = QtChart.QValueAxis()
-        axis_y.setRange(
-            self.clock.get_sidereal_seconds() - self.stripchart_display_seconds, self.clock.get_sidereal_seconds())
-        axis_y.setVisible(False)
+        # axis_y = QtChart.QValueAxis()
+        # axis_y.setRange(
+        #     self.clock.get_sidereal_seconds() - self.stripchart_display_seconds, self.clock.get_sidereal_seconds())
+        # axis_y.setVisible(False)
 
-        self.chart.setAxisY(axis_y)
-        self.stripchart_series_a.attachAxis(axis_y)
-        self.stripchart_series_b.attachAxis(axis_y)
+        # self.chart.setAxisY(axis_y)
+        # self.stripchart_series_a.attachAxis(axis_y)
+        # self.stripchart_series_b.attachAxis(axis_y)
 
         self.chart.legend().hide()
 
         self.ui.stripchart.setChart(self.chart)
 
     def update_stripchart(self):
+        # get new data point
         new_a = self.data[len(self.data) - 1].a
         new_b = self.data[len(self.data) - 1].b
         new_ra = self.data[len(self.data) - 1].timestamp
 
+        # add new data point to both series
         self.stripchart_series_a.append(new_a, new_ra)
         self.stripchart_series_b.append(new_b, new_ra)
 
+        # magical song and dance in an attempt to appease the Qt gods
         self.chart.removeSeries(self.stripchart_series_b)
         self.chart.removeSeries(self.stripchart_series_a)
         self.chart.addSeries(self.stripchart_series_b)
         self.chart.addSeries(self.stripchart_series_a)
 
-        self.ui.stripchart.repaint()
+        new_axis_y = QtChart.QValueAxis()
+        new_axis_y.setMin(self.clock.get_sidereal_seconds() - self.stripchart_display_seconds)
+        new_axis_y.setMax(self.clock.get_sidereal_seconds())
+        new_axis_y.setVisible(False)
+
+        self.chart.setAxisY(new_axis_y)
+        self.stripchart_series_a.attachAxis(new_axis_y)
+        self.stripchart_series_b.attachAxis(new_axis_y)
 
     def clear_stripchart(self):
         self.stripchart_offset += self.stripchart_series_a.count()
@@ -401,7 +412,6 @@ class Threepio(QtWidgets.QMainWindow):
         m.setWindowFlags(QtCore.Qt.Window | QtCore.Qt.WindowTitleHint | QtCore.Qt.CustomizeWindowHint)
 
         close = m.exec()
-        print(close)
         if close:
             event.accept()
         else:
