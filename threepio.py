@@ -287,18 +287,11 @@ class Threepio(QtWidgets.QMainWindow):
         self.chart.addSeries(self.stripchart_series_b)
         self.chart.addSeries(self.stripchart_series_a)
 
-        # create and scale y axis
-        # axis_y = QtChart.QValueAxis()
-        # axis_y.setRange(
-        #     self.clock.get_sidereal_seconds() - self.stripchart_display_seconds, self.clock.get_sidereal_seconds())
-        # axis_y.setVisible(False)
-
-        # self.chart.setAxisY(axis_y)
-        # self.stripchart_series_a.attachAxis(axis_y)
-        # self.stripchart_series_b.attachAxis(axis_y)
-
+        # hide the legend. Okay that was pretty obvious, but I'm trying to be a good programmer and document
+        # my code. You're welcome lol
         self.chart.legend().hide()
 
+        # connect the Qt Designer stripchart view (`self.ui.stripchart`) with `self.chart`
         self.ui.stripchart.setChart(self.chart)
 
     def update_stripchart(self):
@@ -317,14 +310,14 @@ class Threepio(QtWidgets.QMainWindow):
         self.chart.addSeries(self.stripchart_series_b)
         self.chart.addSeries(self.stripchart_series_a)
 
-        new_axis_y = QtChart.QValueAxis()
-        new_axis_y.setMin(self.clock.get_sidereal_seconds() - self.stripchart_display_seconds)
-        new_axis_y.setMax(self.clock.get_sidereal_seconds())
-        new_axis_y.setVisible(False)
+        axis_y = QtChart.QValueAxis()
+        axis_y.setMin(self.clock.get_sidereal_seconds() - self.stripchart_display_seconds)
+        axis_y.setMax(self.clock.get_sidereal_seconds())
+        axis_y.setVisible(False)
 
-        self.chart.setAxisY(new_axis_y)
-        self.stripchart_series_a.attachAxis(new_axis_y)
-        self.stripchart_series_b.attachAxis(new_axis_y)
+        self.chart.setAxisY(axis_y)
+        self.stripchart_series_a.attachAxis(axis_y)
+        self.stripchart_series_b.attachAxis(axis_y)
 
     def clear_stripchart(self):
         self.stripchart_offset += self.stripchart_series_a.count()
