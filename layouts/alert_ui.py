@@ -40,6 +40,7 @@ class Ui_Dialog(object):
         self.gridLayout.addWidget(self.button_frame, 2, 0, 1, 2)
 
         self.retranslateUi(Dialog)
+        self.close_button.clicked.connect(Dialog.accept)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
     def retranslateUi(self, Dialog):

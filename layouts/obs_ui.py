@@ -129,6 +129,8 @@ class Ui_Dialog(object):
         self.data_acquisition_rate_label.setBuddy(self.data_acquisition_rate_value)
 
         self.retranslateUi(Dialog)
+        self.cancel_button.clicked.connect(Dialog.reject)
+        self.accept_button.clicked.connect(Dialog.accept)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
         Dialog.setTabOrder(self.start_time, self.end_time)
         Dialog.setTabOrder(self.end_time, self.starting_dec)
