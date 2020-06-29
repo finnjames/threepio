@@ -11,9 +11,6 @@ import time
 
 import random as r  # for testing
 import math
-import threading  # I'm so sorry :(
-
-from dialogs import TestDialog
 
 
 def discovery() -> str:
@@ -111,16 +108,16 @@ class Tars:
         x = (time.time() / 8)
 
         n = r.choice([-.2, 1]) / (64 * (r.random() + 0.02))
-        n *= 0.08*self.parent.ui.noise_dial.value()**2
+        n *= 0.08 * self.parent.ui.noise_dial.value() ** 2
 
         v = self.parent.ui.variance_dial.value()
 
-        f = math.sin(4*x)
-        g = 2.6 / (math.sin(2 * x) + 1.4) + 0.4 * math.sin(8 * x) - 0.8 * math.sin(4 * x) +\
+        f = math.sin(4 * x)
+        g = 2.6 / (math.sin(2 * x) + 1.4) + 0.4 * math.sin(8 * x) - 0.8 * math.sin(4 * x) + \
             (1 / (math.sin(8 * x) + 1.4))
 
         a = f + g * v + n
-        b = a - 0.1 * self.parent.ui.polarization_dial.value() * g * (v/2 +1)
+        b = a - 0.1 * self.parent.ui.polarization_dial.value() * g * (v / 2 + 1)
 
         # a, b, dec
         return [(0, a), (1, b), (2, float(self.parent.ui.declination_slider.value()))]
