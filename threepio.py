@@ -12,7 +12,7 @@ Written with frustration by Shengjie, Isabel, and Finn
 
 import time
 
-from PyQt5 import QtChart, QtCore, QtGui, QtWidgets
+from PyQt5 import QtChart, QtCore, QtGui, QtWidgets, QtMultimedia
 
 from dialogs import AlertDialog, CreditsDialog, DecDialog, ObsDialog, RADialog
 from layouts import threepio_ui, quit_ui
@@ -98,6 +98,12 @@ class Threepio(QtWidgets.QMainWindow):
         self.clock = None
         self.set_time()
 
+        # bleeps and bloops
+        self.sound = QtMultimedia.QSoundEffect()
+        self.sound.setSource(QtCore.QUrl.fromLocalFile("assets/beep3.wav"))
+        self.sound.setVolume(0.5)
+        # self.sound.play()
+
         # initialize stripchart
         self.stripchart_series_a = QtChart.QLineSeries()
         self.stripchart_series_b = QtChart.QLineSeries()
@@ -129,13 +135,6 @@ class Threepio(QtWidgets.QMainWindow):
         self.timer.start(self.timer_rate)  # set refresh rate
 
     def tick(self):  # primary controller for each clock tick
-
-        # TODO: make this use DAQ data
-        self.foo += .1
-        if self.foo > 90.0:
-            self.foo = 0.0
-
-        # for speed testing
 
         self.update_gui()  # update gui
 
@@ -393,6 +392,7 @@ class Threepio(QtWidgets.QMainWindow):
         alert.exec_()
 
     def beep(self):
+        self.sound.play()
         print("beep! ", time.time())
 
     def closeEvent(self, event):
