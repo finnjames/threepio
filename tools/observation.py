@@ -278,8 +278,8 @@ class Survey(Observation):
         self.file_comp = MyPrecious(self.name + '_comp.md2')
 
     def data_logic(self, data_point):
-        print(self.min_dec, data_point.dec, self.max_dec)
-        print(data_point.dec < self.min_dec, data_point.dec > self.max_dec)
+        # print(self.min_dec, data_point.dec, self.max_dec)
+        # print(data_point.dec < self.min_dec, data_point.dec > self.max_dec)
         if data_point.dec < self.min_dec or data_point.dec > self.max_dec:
             if self.outside:
                 return Comm.BEEP
