@@ -86,7 +86,7 @@ class Observation:
     def set_data_freq(self, data_freq):
         self.data_freq = data_freq
 
-    # This is the communication API
+    # Communication API
     def communicate(self, data_point, timestamp=None):
         if timestamp is None:
             timestamp = time.time()
@@ -278,6 +278,8 @@ class Survey(Observation):
         self.file_comp = MyPrecious(self.name + '_comp.md2')
 
     def data_logic(self, data_point):
+        print(self.min_dec, data_point.dec, self.max_dec)
+        print(data_point.dec < self.min_dec, data_point.dec > self.max_dec)
         if data_point.dec < self.min_dec or data_point.dec > self.max_dec:
             if self.outside:
                 return Comm.BEEP

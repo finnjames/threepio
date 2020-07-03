@@ -99,17 +99,18 @@ class Threepio(QtWidgets.QMainWindow):
         self.set_time()
 
         # bleeps and bloops
-        self.sound = QtMultimedia.QSoundEffect()
-        self.sound.setSource(QtCore.QUrl.fromLocalFile("assets/beep3.wav"))
-        self.sound.setVolume(0.5)
-        # self.sound.play()
+        self.click_sound = QtMultimedia.QSoundEffect()
+        url = QtCore.QUrl()
+        self.click_sound.setSource(url.fromLocalFile("assets/beep3.wav"))
+        self.click_sound.setVolume(0.5)
+        self.click_sound.play()
 
         # initialize stripchart
         self.stripchart_series_a = QtChart.QLineSeries()
         self.stripchart_series_b = QtChart.QLineSeries()
         self.axis_y = QtChart.QValueAxis()
         self.chart = QtChart.QChart()
-        self.ui.stripchart.setRenderHint(QtGui.QPainter.Antialiasing)  # antialiasing :)
+        self.ui.stripchart.setRenderHint(QtGui.QPainter.Antialiasing)
         pen = QtGui.QPen(QtGui.QColor(self.BLUE))
         pen.setWidth(1)
         self.stripchart_series_a.setPen(pen)
@@ -179,13 +180,13 @@ class Threepio(QtWidgets.QMainWindow):
 
                 self.data.append(data_point)
                 self.old_transmission = self.transmission
-                self.transmission = self.observation.communicate(
-                    data_point, time.time())
-                # print(self.transmission, time.time(), self.observation.state)
+                self.transmission = self.observation.communicate(data_point, time.time())
+                # print(self.transmission, time.time(), self.observation.state, data_point.dec)
 
                 self.update_stripchart()  # make the stripchart scroll
 
-                if self.transmission != self.old_transmission:
+                # TODO: clean this monster up, wow
+                if True or self.transmission != self.old_transmission:
                     if self.transmission == Comm.START_CAL:
                         self.alert("Set calibration switches to ON", "Okay")
                         self.alert("Are the calibration switches on?", "Yes")
@@ -250,8 +251,7 @@ class Threepio(QtWidgets.QMainWindow):
 
     def update_gui(self):
         self.ui.ra_value.setText(self.clock.get_sidereal_time())  # show RA
-        self.ui.dec_value.setText(
-            "%.2f" % self.calculate_declination(self.current_dec))  # show dec
+        self.ui.dec_value.setText("%.2f" % self.current_dec)  # show dec
         self.update_progress_bar()
 
         if len(self.data) > 0:
@@ -392,7 +392,7 @@ class Threepio(QtWidgets.QMainWindow):
         alert.exec_()
 
     def beep(self):
-        self.sound.play()
+        # self.click_sound.play()
         print("beep! ", time.time())
 
     def closeEvent(self, event):

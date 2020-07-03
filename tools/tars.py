@@ -104,7 +104,6 @@ class Tars:
 
     def random_data(self):
         """sometimes it's not worth asking"""
-        # TODO: make this function not a complete disaster
         x = (time.time() / 8)
 
         n = r.choice([-.2, 1]) / (64 * (r.random() + 0.02))

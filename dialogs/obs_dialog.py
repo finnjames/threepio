@@ -24,10 +24,10 @@ class ObsDialog(QtWidgets.QDialog):
 
         # If a scan or spectrum, only one Dec needed
         if self.observation.obs_type == "Scan" or self.observation.obs_type == "Spectrum":
-            self.ui.ending_dec.hide()
-            self.ui.end_dec_label.hide()
-            self.ui.ending_dec.setText("0")
-            self.ui.start_dec_label.setText("Declination")
+            self.ui.starting_dec.hide()
+            self.ui.start_dec_label.hide()
+            self.ui.starting_dec.setText("0")
+            self.ui.end_dec_label.setText("Declination")
 
         # store parent window
         self.parent_window = parent_window
@@ -63,7 +63,7 @@ class ObsDialog(QtWidgets.QDialog):
         # catch when the user doesn't bother to put in a declination or data frequency
         try:
             self.observation.set_ra(start_time, end_time)
-            self.observation.set_dec(int(self.ui.starting_dec.text()), int(self.ui.ending_dec.text()))
+            self.observation.set_dec(int(self.ui.ending_dec.text()), int(self.ui.starting_dec.text()))
             self.observation.set_data_freq(int(self.ui.data_acquisition_rate_value.text()))
         except ValueError:
             return 1
