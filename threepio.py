@@ -187,26 +187,25 @@ class Threepio(QtWidgets.QMainWindow):
                 self.update_stripchart()  # make the stripchart scroll
 
                 # TODO: clean this monster up, wow
-                if True or self.transmission != self.old_transmission:
-                    if self.transmission == Comm.START_CAL:
-                        self.alert("Set calibration switches to ON", "Okay")
-                        self.alert("Are the calibration switches on?", "Yes")
-                        self.observation.next()
-                        self.message("Taking calibration data...")
-                    elif self.transmission == Comm.STOP_CAL:
-                        self.alert("Set calibration switches to OFF", "Okay")
-                        self.alert("Are the calibration switches off?", "Yes")
-                        self.observation.next()
-                        self.message("Taking background data...")
-                    elif self.transmission == Comm.NEXT:
-                        self.observation.next()
-                    elif self.transmission == Comm.FINISHED:
-                        self.observation.next()
-                        self.message("Finished.")
-                    elif self.transmission == Comm.BEEP:
-                        self.beep()
-                    elif self.transmission == Comm.NO_ACTION:
-                        pass
+                if self.transmission == Comm.START_CAL:
+                    self.alert("Set calibration switches to ON", "Okay")
+                    self.alert("Are the calibration switches on?", "Yes")
+                    self.observation.next()
+                    self.message("Taking calibration data...")
+                elif self.transmission == Comm.STOP_CAL:
+                    self.alert("Set calibration switches to OFF", "Okay")
+                    self.alert("Are the calibration switches off?", "Yes")
+                    self.observation.next()
+                    self.message("Taking background data...")
+                elif self.transmission == Comm.NEXT:
+                    self.observation.next()
+                elif self.transmission == Comm.FINISHED:
+                    self.observation.next()
+                    self.message("Finished.")
+                elif self.transmission == Comm.BEEP:
+                    self.beep()
+                elif self.transmission == Comm.NO_ACTION:
+                    pass
 
                 time_until_start = self.observation.start_RA - time.time()
                 if time_until_start <= 0 and (self.observation.end_RA - time.time()) > 0:
