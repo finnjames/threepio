@@ -25,11 +25,10 @@ class RADialog(QtWidgets.QDialog):
         u_time = self.ui.sidereal_value.text()
         self.superclock.starting_sidereal_time = 3600 * int(u_time[:2]) + 60 * int(u_time[3:5]) + int(u_time[6:])
 
-        # TODO: clear old stripchart data
-
         try:
             self.parent_window.clear_stripchart()
-        except Exception:
+        except Exception as e:
+            print(str(e))
             pass
 
         self.close()

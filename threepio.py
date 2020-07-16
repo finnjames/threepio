@@ -103,7 +103,7 @@ class Threepio(QtWidgets.QMainWindow):
         url = QtCore.QUrl()
         self.click_sound.setSource(url.fromLocalFile("assets/beep3.wav"))
         self.click_sound.setVolume(0.5)
-        self.click_sound.play()
+        # self.click_sound.play()
         self.last_beep_time = 0.0
 
         # initialize stripchart
@@ -182,11 +182,10 @@ class Threepio(QtWidgets.QMainWindow):
                 self.data.append(data_point)
                 self.old_transmission = self.transmission
                 self.transmission = self.observation.communicate(data_point, time.time())
-                # print(self.transmission, time.time(), self.observation.state, data_point.dec)
 
                 self.update_stripchart()  # make the stripchart scroll
 
-                # TODO: clean this monster up, wow
+                # This is a mess, but I think it should be fine for now
                 if self.transmission == Comm.START_CAL:
                     self.alert("Set calibration switches to ON", "Okay")
                     self.alert("Are the calibration switches on?", "Yes")
@@ -403,7 +402,6 @@ class Threepio(QtWidgets.QMainWindow):
         m = QtWidgets.QDialog()
         m.ui = quit_ui.Ui_Dialog()
         m.ui.setupUi(m)
-        m.setWindowTitle("Quit?")
 
         m.setWindowFlags(QtCore.Qt.Window | QtCore.Qt.WindowTitleHint | QtCore.Qt.CustomizeWindowHint)
 

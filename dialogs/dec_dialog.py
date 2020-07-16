@@ -1,6 +1,3 @@
-import math
-import random
-
 from PyQt5 import QtWidgets, QtCore
 
 from layouts import dec_cal_ui  # compiled PyQt dialogue ui

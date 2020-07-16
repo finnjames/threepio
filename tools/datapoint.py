@@ -1,4 +1,4 @@
-class DataPoint():
+class DataPoint:
     """each data point taken (timestamp, dec, a, b)"""
 
     def __init__(self, timestamp, dec, a, b):

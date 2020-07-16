@@ -53,7 +53,7 @@ class Ui_Dialog(object):
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
-        Dialog.setWindowTitle(_translate("Dialog", "Quit?"))
-        self.sidereal_label.setText(_translate("Dialog", "Are you sure you want to quit? Incomplete observations may not be usable."))
-        self.ok_button.setText(_translate("Dialog", "Yes, Quit"))
+        Dialog.setWindowTitle(_translate("Dialog", "Exit?"))
+        self.sidereal_label.setText(_translate("Dialog", "Are you sure you want to exit? Incomplete observations may not be usable."))
+        self.ok_button.setText(_translate("Dialog", "Yes, Exit"))
         self.cancel_button.setText(_translate("Dialog", "No, go back"))
