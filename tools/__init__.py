@@ -1,3 +1,4 @@
+"""package containing all random tools used by larger threepio"""
 from .comm import Comm
 from .datapoint import DataPoint
 from .observation import Observation, Survey, Scan, Spectrum

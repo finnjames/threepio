@@ -7,7 +7,6 @@ r"""
 
 The helpful companion to the 40' telescope
 Written with frustration by Shengjie, Isabel, and Finn
-
 """
 
 import time
@@ -20,6 +19,7 @@ from tools import Comm, DataPoint, Survey, Scan, Spectrum, SuperClock, Tars
 
 
 # from playsound import playsound # TODO: test on Windows
+
 
 class Threepio(QtWidgets.QMainWindow):
     """main class for the app"""
@@ -48,8 +48,8 @@ class Threepio(QtWidgets.QMainWindow):
     y = []
 
     # palette
-    BLUE = 0x2196f3
-    RED = 0xff5252
+    BLUE = 0x2196F3
+    RED = 0xFF5252
 
     # tars communication interpretation
     transmission = None
@@ -60,17 +60,17 @@ class Threepio(QtWidgets.QMainWindow):
 
         # use main_ui for window setup
         self.ui = threepio_ui.Ui_MainWindow()
-        self.setStyleSheet(open('stylesheet.qss').read())
+        self.setStyleSheet(open("stylesheet.qss").read())
         self.ui.setupUi(self)
         self.setWindowTitle("Threepio")
 
         # hide the close/minimize/fullscreen buttons
-        self.setWindowFlags(QtCore.Qt.Window | QtCore.Qt.WindowTitleHint | QtCore.Qt.CustomizeWindowHint)
+        self.setWindowFlags(
+            QtCore.Qt.Window | QtCore.Qt.WindowTitleHint | QtCore.Qt.CustomizeWindowHint
+        )
 
         # connect buttons
         self.ui.stripchart_speed_slider.valueChanged.connect(self.update_speed)
-        # self.ui.speed_slower_radio.clicked.connect(self.update_speed)
-        # self.ui.speed_default_radio.clicked.connect(self.update_speed)
 
         self.ui.actionInfo.triggered.connect(self.handle_credits)
 
@@ -89,7 +89,7 @@ class Threepio(QtWidgets.QMainWindow):
 
         self.ui.chart_legacy_button.clicked.connect(self.legacy_mode)
 
-        # DATAQ stuff
+        # Tars/DATAQ stuff
         self.tars = Tars(parent=self)
         self.tars.setup()
         self.tars.start()
@@ -152,8 +152,12 @@ class Threepio(QtWidgets.QMainWindow):
                 tars_data = self.tars.read_latest()  # get data from DAQ
 
                 self.current_dec = self.calculate_declination(tars_data[2][1])
-                data_point = DataPoint(self.clock.get_sidereal_seconds(), self.current_dec, tars_data[0][1],
-                                       tars_data[1][1])
+                data_point = DataPoint(
+                    self.clock.get_sidereal_seconds(),
+                    self.current_dec,
+                    tars_data[0][1],
+                    tars_data[1][1],
+                )
 
                 self.data.append(data_point)
 
@@ -175,13 +179,18 @@ class Threepio(QtWidgets.QMainWindow):
                 tars_data = self.tars.read_latest()  # get data from DAQ
 
                 self.current_dec = self.calculate_declination(tars_data[2][1])
-                data_point = DataPoint(self.clock.get_sidereal_seconds(),
-                                       self.current_dec, tars_data[0][1],
-                                       tars_data[1][1])
+                data_point = DataPoint(
+                    self.clock.get_sidereal_seconds(),
+                    self.current_dec,
+                    tars_data[0][1],
+                    tars_data[1][1],
+                )
 
                 self.data.append(data_point)
                 self.old_transmission = self.transmission
-                self.transmission = self.observation.communicate(data_point, time.time())
+                self.transmission = self.observation.communicate(
+                    data_point, time.time()
+                )
 
                 self.update_stripchart()  # make the stripchart scroll
 
@@ -207,7 +216,10 @@ class Threepio(QtWidgets.QMainWindow):
                     pass
 
                 time_until_start = self.observation.start_RA - time.time()
-                if time_until_start <= 0 and (self.observation.end_RA - time.time()) > 0:
+                if (
+                    time_until_start <= 0
+                    and (self.observation.end_RA - time.time()) > 0
+                ):
                     self.message("Taking observation data...")
 
     def set_state_normal(self):
@@ -246,7 +258,9 @@ class Threepio(QtWidgets.QMainWindow):
         self.clock = new_clock
 
     def update_speed(self):
-        self.stripchart_display_seconds = (120 - ((110 / 6) * self.ui.stripchart_speed_slider.value()))
+        self.stripchart_display_seconds = 120 - (
+            (110 / 6) * self.ui.stripchart_speed_slider.value()
+        )
 
     def update_gui(self):
         self.ui.ra_value.setText(self.clock.get_sidereal_time())  # show RA
@@ -254,24 +268,33 @@ class Threepio(QtWidgets.QMainWindow):
         self.update_progress_bar()
 
         if len(self.data) > 0:
-            self.ui.channelA_value.setText(
-                "%.2f" % self.data[len(self.data) - 1].a)
-            self.ui.channelB_value.setText(
-                "%.2f" % self.data[len(self.data) - 1].b)
+            self.ui.channelA_value.setText("%.2f" % self.data[len(self.data) - 1].a)
+            self.ui.channelB_value.setText("%.2f" % self.data[len(self.data) - 1].b)
 
     def update_progress_bar(self):
         # this mess makes the progress bar display "T+/- XX.XX" when
         # assigned, and progress the bar when taking data
         if self.observation is not None:
             if not self.observation.end_RA - self.observation.start_RA <= 1:
-                if self.clock.get_time_until(self.observation.start_RA) > 0 and self.clock.get_time_until(
-                        self.observation.end_RA) < 0:
-                    self.ui.progressBar.setValue(int((self.clock.get_time_until(self.observation.end_RA) / (
-                            self.observation.end_RA - self.observation.start_RA)) * 100 % 100))
+                if (
+                    self.clock.get_time_until(self.observation.start_RA) > 0
+                    and self.clock.get_time_until(self.observation.end_RA) < 0
+                ):
+                    self.ui.progressBar.setValue(
+                        int(
+                            (
+                                self.clock.get_time_until(self.observation.end_RA)
+                                / (self.observation.end_RA - self.observation.start_RA)
+                            )
+                            * 100
+                            % 100
+                        )
+                    )
                 else:
                     self.ui.progressBar.setValue(0)
                 self.ui.progressBar.setFormat(
-                    "T%+.1fs" % (self.clock.get_time_until(self.observation.start_RA)))
+                    "T%+.1fs" % (self.clock.get_time_until(self.observation.start_RA))
+                )
                 return
 
         self.ui.progressBar.setFormat("n/a")
@@ -285,11 +308,12 @@ class Threepio(QtWidgets.QMainWindow):
         self.chart.addSeries(self.stripchart_series_b)
         self.chart.addSeries(self.stripchart_series_a)
 
-        # hide the legend. Okay that was pretty obvious, but I'm trying to be a good programmer and document
-        # my code. You're welcome lol
+        # hide the legend. Okay that was pretty obvious, but I'm trying to be a
+        # good programmer and document my code. You're welcome lol
         self.chart.legend().hide()
 
-        # connect the Qt Designer stripchart view (`self.ui.stripchart`) with `self.chart`
+        # connect the Qt Designer stripchart view (`self.ui.stripchart`) with
+        # `self.chart`
         self.ui.stripchart.setChart(self.chart)
 
     def update_stripchart(self):
@@ -309,7 +333,9 @@ class Threepio(QtWidgets.QMainWindow):
         self.chart.addSeries(self.stripchart_series_a)
 
         axis_y = QtChart.QValueAxis()
-        axis_y.setMin(self.clock.get_sidereal_seconds() - self.stripchart_display_seconds)
+        axis_y.setMin(
+            self.clock.get_sidereal_seconds() - self.stripchart_display_seconds
+        )
         axis_y.setMax(self.clock.get_sidereal_seconds())
         axis_y.setVisible(False)
 
@@ -335,8 +361,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.new_observation(obs)
 
     def new_observation(self, obs):
-        dialog = ObsDialog(
-            self, obs, self.clock)
+        dialog = ObsDialog(self, obs, self.clock)
         dialog.setWindowTitle("New " + obs.obs_type)
         dialog.show()
         dialog.exec_()
@@ -356,7 +381,7 @@ class Threepio(QtWidgets.QMainWindow):
             i += DecDialog.step
 
         # create x array
-        c = open("dec_cal.txt", 'r').read().splitlines()  # get data from file
+        c = open("dec_cal.txt", "r").read().splitlines()  # get data from file
         for i in c:
             self.x.append(float(i))
 
@@ -365,19 +390,30 @@ class Threepio(QtWidgets.QMainWindow):
 
         # input is below data
         if input_dec < self.x[0]:  # TODO: use minimum, not first
-            return ((self.y[1] - self.y[0]) / (self.x[1] - self.x[0]) * (input_dec - self.x[0])) + self.y[0]
+            return (
+                (self.y[1] - self.y[0])
+                / (self.x[1] - self.x[0])
+                * (input_dec - self.x[0])
+            ) + self.y[0]
 
         # input is above data
         if input_dec > self.x[-1]:  # TODO: use maximum, not last
-            return ((self.y[-1] - self.y[-2]) / (self.x[-1] - self.x[-2]) * (input_dec - self.x[-1])) + self.y[-1]
+            return (
+                (self.y[-1] - self.y[-2])
+                / (self.x[-1] - self.x[-2])
+                * (input_dec - self.x[-1])
+            ) + self.y[-1]
 
         # input is within data
         for i in range(len(self.x)):
             if input_dec <= self.x[i + 1]:
                 if input_dec >= self.x[i]:
                     # (dy/dx)x + y_0
-                    return ((self.y[i + 1] - self.y[i]) / (self.x[i + 1] - self.x[i]) * (input_dec - self.x[i])) + \
-                           self.y[i]
+                    return (
+                        (self.y[i + 1] - self.y[i])
+                        / (self.x[i + 1] - self.x[i])
+                        * (input_dec - self.x[i])
+                    ) + self.y[i]
 
     def ra_calibration(self):
         self.set_time()
@@ -403,7 +439,9 @@ class Threepio(QtWidgets.QMainWindow):
         m.ui = quit_ui.Ui_Dialog()
         m.ui.setupUi(m)
 
-        m.setWindowFlags(QtCore.Qt.Window | QtCore.Qt.WindowTitleHint | QtCore.Qt.CustomizeWindowHint)
+        m.setWindowFlags(
+            QtCore.Qt.Window | QtCore.Qt.WindowTitleHint | QtCore.Qt.CustomizeWindowHint
+        )
 
         close = m.exec()
         if close:
@@ -414,6 +452,7 @@ class Threepio(QtWidgets.QMainWindow):
 
 def main():
     import sys
+
     app = QtWidgets.QApplication(sys.argv)
     app.setStyle("Fusion")
     window = Threepio()
@@ -422,5 +461,5 @@ def main():
     sys.exit(app.exec_())  # exit with code from app
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

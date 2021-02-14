@@ -1,3 +1,4 @@
+"""dialogs __init__.py file"""
 from .alert_dialog import AlertDialog
 from .credits_dialog import CreditsDialog
 from .dec_dialog import DecDialog

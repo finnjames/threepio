@@ -29,4 +29,3 @@ def test1():
             print(obs.state)
             obs.next()
         print(obs.state)
-        

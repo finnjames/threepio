@@ -13,7 +13,9 @@ class ObsDialog(QtWidgets.QDialog):
         self.ui = obs_ui.Ui_Dialog()
         self.ui.setupUi(self)
         self.setModal(True)  # keep focus until dealt with
-        self.setWindowFlags(QtCore.Qt.Window | QtCore.Qt.WindowTitleHint | QtCore.Qt.CustomizeWindowHint)
+        self.setWindowFlags(
+            QtCore.Qt.Window | QtCore.Qt.WindowTitleHint | QtCore.Qt.CustomizeWindowHint
+        )
 
         self.observation = observation
         self.clock = clock
@@ -23,7 +25,10 @@ class ObsDialog(QtWidgets.QDialog):
         self.ui.file_name_value.setPlaceholderText(str(self.default_filename))
 
         # If a scan or spectrum, only one Dec needed
-        if self.observation.obs_type == "Scan" or self.observation.obs_type == "Spectrum":
+        if (
+            self.observation.obs_type == "Scan"
+            or self.observation.obs_type == "Spectrum"
+        ):
             self.ui.starting_dec.hide()
             self.ui.start_dec_label.hide()
             self.ui.starting_dec.setText("0")
@@ -46,12 +51,22 @@ class ObsDialog(QtWidgets.QDialog):
 
         # pattern = "%H:%M:%S"
         u_start_time = self.ui.start_time.text()
-        starting_sidereal_time = 3600 * int(u_start_time[:2]) + 60 * int(u_start_time[3:5]) + int(u_start_time[6:])
+        starting_sidereal_time = (
+            3600 * int(u_start_time[:2])
+            + 60 * int(u_start_time[3:5])
+            + int(u_start_time[6:])
+        )
         u_end_time = self.ui.end_time.text()
-        ending_sidereal_time = 3600 * int(u_end_time[:2]) + 60 * int(u_end_time[3:5]) + int(u_end_time[6:])
+        ending_sidereal_time = (
+            3600 * int(u_end_time[:2]) + 60 * int(u_end_time[3:5]) + int(u_end_time[6:])
+        )
 
-        start_time = starting_sidereal_time - self.clock.get_sidereal_seconds() + time.time()
-        end_time = ending_sidereal_time - self.clock.get_sidereal_seconds() + time.time()
+        start_time = (
+            starting_sidereal_time - self.clock.get_sidereal_seconds() + time.time()
+        )
+        end_time = (
+            ending_sidereal_time - self.clock.get_sidereal_seconds() + time.time()
+        )
 
         # set all of the relevant data to the observation
         # if no filename, use timestamp
@@ -63,8 +78,12 @@ class ObsDialog(QtWidgets.QDialog):
         # catch when the user doesn't bother to put in a declination or data frequency
         try:
             self.observation.set_ra(start_time, end_time)
-            self.observation.set_dec(int(self.ui.ending_dec.text()), int(self.ui.starting_dec.text()))
-            self.observation.set_data_freq(int(self.ui.data_acquisition_rate_value.text()))
+            self.observation.set_dec(
+                int(self.ui.ending_dec.text()), int(self.ui.starting_dec.text())
+            )
+            self.observation.set_data_freq(
+                int(self.ui.data_acquisition_rate_value.text())
+            )
         except ValueError:
             return 1
 

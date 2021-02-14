@@ -10,4 +10,6 @@ class CreditsDialog(QtWidgets.QDialog):
         self.ui = credits_ui.Ui_Dialog()
         self.ui.setupUi(self)
 
-        self.setWindowFlags(QtCore.Qt.Window | QtCore.Qt.WindowTitleHint | QtCore.Qt.CustomizeWindowHint)
+        self.setWindowFlags(
+            QtCore.Qt.Window | QtCore.Qt.WindowTitleHint | QtCore.Qt.CustomizeWindowHint
+        )

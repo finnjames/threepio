@@ -46,7 +46,7 @@ class MyPrecious:
         """
         Run this function to actually write to the file. It will automatically clear the buffer
         """
-        self.__file_append('\n'.join(self.__buffer))
+        self.__file_append("\n".join(self.__buffer))
         self.__buffer_clear()
 
     def __buffer_append(self, data: str):
@@ -55,19 +55,21 @@ class MyPrecious:
     def __buffer_size(self) -> int:
         return len(self.__buffer)
 
-    def __file_write(self, data, mode='a'):
-        if mode != 'a' and mode != 'w':
-            print("Write mode not recognized. Please use " +
-                  "'a' for append and 'w' for write (overwrite).")
+    def __file_write(self, data, mode="a"):
+        if mode != "a" and mode != "w":
+            print(
+                "Write mode not recognized. Please use "
+                + "'a' for append and 'w' for write (overwrite)."
+            )
         with open(self.dir + self.filename, mode) as file:
-            print(data, end='\n', file=file)
+            print(data, end="\n", file=file)
 
     def __file_overwrite(self, data):
-        self.__file_write(data, mode='w')
+        self.__file_write(data, mode="w")
 
     def __file_append(self, data):
-        self.__file_write(data, mode='a')
+        self.__file_write(data, mode="a")
 
     def __file_clear(self):
-        with open(self.dir + self.filename, 'w') as file:
-            print('', end='', file=file)
+        with open(self.dir + self.filename, "w") as file:
+            print("", end="", file=file)

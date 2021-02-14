@@ -25,7 +25,7 @@ def discovery() -> str:
 
 
 def convert(buffer: list, volt: int) -> float:
-    return volt * int.from_bytes(buffer, byteorder='little', signed=True) / 32768
+    return volt * int.from_bytes(buffer, byteorder="little", signed=True) / 32768
 
 
 class Tars:
@@ -35,8 +35,7 @@ class Tars:
     """
 
     RANGE_VOLT = (10, 5, 2, 1, 0.5, 0.2)
-    RANGE_RATE = (50000, 20000, 10000, 5000, 2000,
-                  1000, 500, 200, 100, 50, 20, 10)
+    RANGE_RATE = (50000, 20000, 10000, 5000, 2000, 1000, 500, 200, 100, 50, 20, 10)
 
     def __init__(self, parent=None, device=None):
         self.parent = parent
@@ -80,7 +79,9 @@ class Tars:
         if not self.testing:
             if self.in_waiting() < (2 * len(self.channels)):
                 return None
-            return [(channel & 3, self.buffer_read(channel)) for channel in self.channels]
+            return [
+                (channel & 3, self.buffer_read(channel)) for channel in self.channels
+            ]
         else:
             return self.random_data()
 
@@ -104,16 +105,20 @@ class Tars:
 
     def random_data(self):
         """sometimes it's not worth asking"""
-        x = (time.time() / 8)
+        x = time.time() / 8
 
-        n = r.choice([-.2, 1]) / (64 * (r.random() + 0.02))
+        n = r.choice([-0.2, 1]) / (64 * (r.random() + 0.02))
         n *= 0.08 * self.parent.ui.noise_dial.value() ** 2
 
         v = self.parent.ui.variance_dial.value()
 
         f = math.sin(4 * x)
-        g = 2.6 / (math.sin(2 * x) + 1.4) + 0.4 * math.sin(8 * x) - 0.8 * math.sin(4 * x) + \
-            (1 / (math.sin(8 * x) + 1.4))
+        g = (
+            2.6 / (math.sin(2 * x) + 1.4)
+            + 0.4 * math.sin(8 * x)
+            - 0.8 * math.sin(4 * x)
+            + (1 / (math.sin(8 * x) + 1.4))
+        )
 
         a = f + g * v + n
         b = a - 0.1 * self.parent.ui.polarization_dial.value() * g * (v / 2 + 1)
@@ -125,7 +130,7 @@ class Tars:
 
     def send(self, command: str):
         if not self.testing:
-            self.ser.write((command + '\r').encode())
+            self.ser.write((command + "\r").encode())
 
     def setup(self):
         if not self.testing:
@@ -158,7 +163,11 @@ class Tars:
             if self.in_waiting() < 2:
                 return None
             buffer = self.ser.read(2)
-            return Tars.RANGE_VOLT[channel >> 8] * int.from_bytes(buffer, byteorder='little', signed=True) / 32768
+            return (
+                Tars.RANGE_VOLT[channel >> 8]
+                * int.from_bytes(buffer, byteorder="little", signed=True)
+                / 32768
+            )
 
 
 def main():

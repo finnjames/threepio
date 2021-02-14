@@ -11,14 +11,16 @@ class SuperClock:
 
     def __init__(self):
         self.starting_time = time.time()
-        self.starting_sidereal_time = 0  # number of seconds since last sidereal midnight
+        self.starting_sidereal_time = (
+            0  # number of seconds since last sidereal midnight
+        )
 
     def get_time(self):
         return time.time()
 
     def get_time_slug(self):
         """get timestamp suitable for file naming"""
-        gmtime = (self.get_local_time())
+        gmtime = self.get_local_time()
         return "{:%Y.%m.%d-%H.%M}".format(datetime.datetime(*gmtime[:5]))
 
     def get_elapsed_time(self):
@@ -32,7 +34,9 @@ class SuperClock:
 
     def get_sidereal_seconds(self):
         """get time-stamp-able number of sidereal seconds since last sidereal midnight"""
-        sidereal_seconds = self.starting_sidereal_time + self.SIDEREAL * (self.get_elapsed_time())
+        sidereal_seconds = self.starting_sidereal_time + self.SIDEREAL * (
+            self.get_elapsed_time()
+        )
         return sidereal_seconds
 
     def get_sidereal_time(self):

@@ -14,9 +14,9 @@ from tools.precious import MyPrecious
 class Observation:
     """
     Superclass for each of the three types of observation you might encounter on your Pokemon journey
-    
+
     To interact with any type of the observation object (e.g an Oberservation object obs), first set
-    its properties using the three 'obs.set_xxx()' API. Then, call the method 'obs.communication()' 
+    its properties using the three 'obs.set_xxx()' API. Then, call the method 'obs.communication()'
     every 'obs.freq' seconds. Then when the comm method returns a message other than 'Comm.NO_ACTION',
     prompt user for the appropriate action and call 'obs.next()' once to proceed into next stage.
     An observation is finished when the 'communication()' method returns 'Comm.FINISHED'.
@@ -166,30 +166,30 @@ class Observation:
 
     def end_calibration_1(self):
         self.state = self.State.BG_1
-        self.write('*')
+        self.write("*")
         self.bg_start = time.time()
 
     def end_background_1(self):
         self.state = self.State.DATA
-        self.write('*')
+        self.write("*")
         self.freq = self.data_freq
 
     def start_calibration_2(self):
         self.state = self.State.CAL_2
-        self.write('*')
+        self.write("*")
         self.cal_start = time.time()
         self.freq = self.cal_freq
 
     def end_calibration_2(self):
         self.state = self.State.BG_2
-        self.write('*')
+        self.write("*")
         self.bg_start = time.time()
 
     def stop(self):
         self.state = self.State.DONE
         self.end_time = time.time()
-        self.write('*')
-        self.write('*')
+        self.write("*")
+        self.write("*")
         self.write_meta()
         self.close_file()
 
@@ -226,11 +226,11 @@ class Observation:
             self.file_b.write("%.4f" % point.b)
 
     def write_meta(self):
-        self.write('TELESCOPE: The Mighty Forty')
-        self.write('LOCAL START DATE: ' + get_date(self.start_time))
-        self.write('LOCAL START TIME: ' + get_time(self.start_time))
-        self.write('LOCAL STOP DATE: ' + get_date(self.end_time))
-        self.write('LOCAL STOP TIME: ' + get_time(self.end_time))
+        self.write("TELESCOPE: The Mighty Forty")
+        self.write("LOCAL START DATE: " + get_date(self.start_time))
+        self.write("LOCAL START TIME: " + get_time(self.start_time))
+        self.write("LOCAL STOP DATE: " + get_date(self.end_time))
+        self.write("LOCAL STOP TIME: " + get_time(self.end_time))
 
     def close_file(self):
         if self.composite:
@@ -253,9 +253,9 @@ class Scan(Observation):
         self.data_freq = 1
 
     def set_files(self):
-        self.file_a = MyPrecious(self.name + '_a.md1')
-        self.file_b = MyPrecious(self.name + '_b.md1')
-        self.file_comp = MyPrecious(self.name + '_comp.md1')
+        self.file_a = MyPrecious(self.name + "_a.md1")
+        self.file_b = MyPrecious(self.name + "_b.md1")
+        self.file_comp = MyPrecious(self.name + "_comp.md1")
 
     def data_logic(self, data_point):
         self.write_data(data_point)
@@ -273,9 +273,9 @@ class Survey(Observation):
         self.outside = False
 
     def set_files(self):
-        self.file_a = MyPrecious(self.name + '_a.md2')
-        self.file_b = MyPrecious(self.name + '_b.md2')
-        self.file_comp = MyPrecious(self.name + '_comp.md2')
+        self.file_a = MyPrecious(self.name + "_a.md2")
+        self.file_b = MyPrecious(self.name + "_b.md2")
+        self.file_comp = MyPrecious(self.name + "_comp.md2")
 
     def data_logic(self, data_point):
         # print(self.min_dec, data_point.dec, self.max_dec)
@@ -284,7 +284,7 @@ class Survey(Observation):
             if self.outside:
                 return Comm.BEEP
             else:
-                self.write('*')
+                self.write("*")
                 self.outside = True
                 return Comm.BEEP
         else:
@@ -318,9 +318,9 @@ class Spectrum(Observation):
         super().set_data_time(data_start, data_start + 180)
 
     def set_files(self):
-        self.file_a = MyPrecious(self.name + '_a.md1')
-        self.file_b = MyPrecious(self.name + '_b.md1')
-        self.file_comp = MyPrecious(self.name + '_comp.md1')
+        self.file_a = MyPrecious(self.name + "_a.md1")
+        self.file_b = MyPrecious(self.name + "_b.md1")
+        self.file_comp = MyPrecious(self.name + "_comp.md1")
 
     def data_logic(self, data_point):
         if self.freq_time is None:
@@ -337,8 +337,8 @@ class Spectrum(Observation):
 
 
 def get_date(epoch_time) -> str:
-    return time.strftime('%m/%d/%Y', time.localtime(epoch_time))
+    return time.strftime("%m/%d/%Y", time.localtime(epoch_time))
 
 
 def get_time(epoch_time) -> str:
-    return time.strftime('%I:%M:%S %p', time.localtime(epoch_time))
+    return time.strftime("%I:%M:%S %p", time.localtime(epoch_time))

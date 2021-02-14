@@ -18,7 +18,8 @@ class DecDialog(QtWidgets.QDialog):
 
         # hide the close/minimize/fullscreen buttons
         self.setWindowFlags(
-            QtCore.Qt.Window | QtCore.Qt.WindowTitleHint | QtCore.Qt.CustomizeWindowHint)
+            QtCore.Qt.Window | QtCore.Qt.WindowTitleHint | QtCore.Qt.CustomizeWindowHint
+        )
 
         self.data = []
         self.current_dec = self.start_dec
@@ -37,12 +38,12 @@ class DecDialog(QtWidgets.QDialog):
 
             # copy over the current file to the backup file
             with open("dec_cal.txt") as f:
-                with open("dec_cal_backup.txt", 'w') as b:
+                with open("dec_cal_backup.txt", "w") as b:
                     for line in f:
                         b.write(line)
 
-            open("dec_cal.txt", 'w').close()  # overwrite file
-            f = open("dec_cal.txt", 'a')
+            open("dec_cal.txt", "w").close()  # overwrite file
+            f = open("dec_cal.txt", "a")
 
             # reverse it if it's N -> S
             if self.ui.north_or_south_combo_box.currentIndex() == 1:
@@ -52,11 +53,13 @@ class DecDialog(QtWidgets.QDialog):
                 if line == self.data[len(self.data) - 1]:
                     f.write(str(line))
                 else:
-                    f.write(str(line) + '\n')
+                    f.write(str(line) + "\n")
             self.close()
         else:
             # TODO: make this a little less hard-coded
-            self.data.append(self.tars.read_latest()[2][1])  # read just the declination value
+            self.data.append(
+                self.tars.read_latest()[2][1]
+            )  # read just the declination value
 
             self.ui.set_dec_value.setText(str(self.current_dec))
             if self.current_dec == self.end_dec:
