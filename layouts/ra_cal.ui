@@ -18,7 +18,6 @@
     <widget class="QLabel" name="sidereal_label">
      <property name="font">
       <font>
-       <family>Iosevka Aile</family>
        <pointsize>13</pointsize>
       </font>
      </property>
@@ -59,11 +58,6 @@
       </property>
       <item row="1" column="1">
        <widget class="QPushButton" name="cancel_button">
-        <property name="font">
-         <font>
-          <family>Iosevka Aile</family>
-         </font>
-        </property>
         <property name="text">
          <string>Cancel</string>
         </property>
@@ -71,11 +65,6 @@
       </item>
       <item row="1" column="2">
        <widget class="QPushButton" name="ok_button">
-        <property name="font">
-         <font>
-          <family>Iosevka Aile</family>
-         </font>
-        </property>
         <property name="text">
          <string>Set RA</string>
         </property>

@@ -16,22 +16,12 @@
   <layout class="QGridLayout" name="gridLayout_3">
    <item row="1" column="0" colspan="2">
     <widget class="QGroupBox" name="declination_group_box">
-     <property name="font">
-      <font>
-       <family>Iosevka Aile</family>
-      </font>
-     </property>
      <property name="title">
       <string>Declination</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_5">
       <item row="0" column="0">
        <widget class="QLabel" name="south_label">
-        <property name="font">
-         <font>
-          <family>Iosevka Aile</family>
-         </font>
-        </property>
         <property name="text">
          <string>South</string>
         </property>
@@ -42,11 +32,6 @@
       </item>
       <item row="0" column="2">
        <widget class="QLabel" name="north_label">
-        <property name="font">
-         <font>
-          <family>Iosevka Aile</family>
-         </font>
-        </property>
         <property name="text">
          <string>North</string>
         </property>
@@ -54,11 +39,6 @@
       </item>
       <item row="0" column="1">
        <widget class="QSlider" name="horizontalSlider">
-        <property name="font">
-         <font>
-          <family>Iosevka Aile</family>
-         </font>
-        </property>
         <property name="minimum">
          <number>-25</number>
         </property>
@@ -99,11 +79,6 @@
       </property>
       <item row="1" column="1">
        <widget class="QPushButton" name="close_button">
-        <property name="font">
-         <font>
-          <family>Iosevka Aile</family>
-         </font>
-        </property>
         <property name="text">
          <string>Close</string>
         </property>
@@ -140,22 +115,12 @@
    </item>
    <item row="0" column="0" colspan="2">
     <widget class="QGroupBox" name="signal_group_box">
-     <property name="font">
-      <font>
-       <family>Iosevka Aile</family>
-      </font>
-     </property>
      <property name="title">
       <string>Signal</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
       <item row="1" column="1">
        <widget class="QDial" name="variance_dial">
-        <property name="font">
-         <font>
-          <family>Iosevka Aile</family>
-         </font>
-        </property>
         <property name="minimum">
          <number>-10</number>
         </property>
@@ -175,11 +140,6 @@
       </item>
       <item row="1" column="2">
        <widget class="QDial" name="noise_dial">
-        <property name="font">
-         <font>
-          <family>Iosevka Aile</family>
-         </font>
-        </property>
         <property name="minimum">
          <number>-10</number>
         </property>
@@ -199,11 +159,6 @@
       </item>
       <item row="1" column="3">
        <widget class="QDial" name="polarization_dial">
-        <property name="font">
-         <font>
-          <family>Iosevka Aile</family>
-         </font>
-        </property>
         <property name="minimum">
          <number>-10</number>
         </property>
@@ -223,11 +178,6 @@
       </item>
       <item row="0" column="1">
        <widget class="QLabel" name="variance_label">
-        <property name="font">
-         <font>
-          <family>Iosevka Aile</family>
-         </font>
-        </property>
         <property name="text">
          <string>Variance</string>
         </property>
@@ -238,11 +188,6 @@
       </item>
       <item row="0" column="2">
        <widget class="QLabel" name="polarization_label">
-        <property name="font">
-         <font>
-          <family>Iosevka Aile</family>
-         </font>
-        </property>
         <property name="text">
          <string>Polarization</string>
         </property>
@@ -253,11 +198,6 @@
       </item>
       <item row="0" column="3">
        <widget class="QLabel" name="noise_label">
-        <property name="font">
-         <font>
-          <family>Iosevka Aile</family>
-         </font>
-        </property>
         <property name="text">
          <string>Noise</string>
         </property>

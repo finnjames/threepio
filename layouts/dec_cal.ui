@@ -16,11 +16,6 @@
   <layout class="QGridLayout" name="gridLayout">
    <item row="1" column="0" colspan="2">
     <widget class="QLabel" name="set_dec_label">
-     <property name="font">
-      <font>
-       <family>Iosevka Aile</family>
-      </font>
-     </property>
      <property name="text">
       <string>Set declination to</string>
      </property>
@@ -58,11 +53,6 @@
       </property>
       <item row="0" column="0">
        <widget class="QComboBox" name="north_or_south_combo_box">
-        <property name="font">
-         <font>
-          <family>Iosevka Aile</family>
-         </font>
-        </property>
         <item>
          <property name="text">
           <string>N → S</string>
@@ -77,11 +67,6 @@
       </item>
       <item row="0" column="2">
        <widget class="QPushButton" name="discard_cal_button">
-        <property name="font">
-         <font>
-          <family>Iosevka Aile</family>
-         </font>
-        </property>
         <property name="text">
          <string>Discard</string>
         </property>
@@ -89,11 +74,6 @@
       </item>
       <item row="0" column="3">
        <widget class="QPushButton" name="next_cal_button">
-        <property name="font">
-         <font>
-          <family>Iosevka Aile</family>
-         </font>
-        </property>
         <property name="text">
          <string>Next</string>
         </property>

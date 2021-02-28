@@ -16,11 +16,6 @@
   <layout class="QGridLayout" name="gridLayout_2">
    <item row="1" column="1">
     <widget class="QLabel" name="sidereal_label">
-     <property name="font">
-      <font>
-       <family>Iosevka Aile</family>
-      </font>
-     </property>
      <property name="text">
       <string>Are you sure you want to exit? Incomplete observations may not be usable.</string>
      </property>
@@ -62,11 +57,6 @@
       </item>
       <item row="0" column="3">
        <widget class="QPushButton" name="ok_button">
-        <property name="font">
-         <font>
-          <family>Iosevka Aile</family>
-         </font>
-        </property>
         <property name="text">
          <string>Yes, Exit</string>
         </property>
@@ -74,11 +64,6 @@
       </item>
       <item row="0" column="2">
        <widget class="QPushButton" name="cancel_button">
-        <property name="font">
-         <font>
-          <family>Iosevka Aile</family>
-         </font>
-        </property>
         <property name="text">
          <string>No, go back</string>
         </property>

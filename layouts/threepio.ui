@@ -48,11 +48,6 @@
        </item>
        <item row="0" column="0">
         <widget class="QGroupBox" name="groupBox">
-         <property name="font">
-          <font>
-           <family>Iosevka Aile</family>
-          </font>
-         </property>
          <property name="title">
           <string>Info</string>
          </property>
@@ -61,7 +56,6 @@
            <widget class="QLabel" name="message_label">
             <property name="font">
              <font>
-              <family>Iosevka Aile</family>
               <pointsize>20</pointsize>
              </font>
             </property>
@@ -77,11 +71,6 @@
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
-            </property>
-            <property name="font">
-             <font>
-              <family>Iosevka Aile</family>
-             </font>
             </property>
             <property name="alignment">
              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -102,11 +91,6 @@
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <property name="font">
-          <font>
-           <family>Iosevka Aile</family>
-          </font>
-         </property>
          <property name="title">
           <string>Strip chart</string>
          </property>
@@ -122,11 +106,6 @@
              </property>
              <item row="0" column="0">
               <widget class="QLabel" name="stripchart_slower_label">
-               <property name="font">
-                <font>
-                 <family>Iosevka Aile</family>
-                </font>
-               </property>
                <property name="text">
                 <string>Slower</string>
                </property>
@@ -156,11 +135,6 @@
              </item>
              <item row="0" column="2">
               <widget class="QLabel" name="stripchart_faster_label">
-               <property name="font">
-                <font>
-                 <family>Iosevka Aile</family>
-                </font>
-               </property>
                <property name="text">
                 <string>Faster</string>
                </property>
@@ -189,11 +163,6 @@
              </property>
              <item>
               <widget class="QPushButton" name="chart_clear_button">
-               <property name="font">
-                <font>
-                 <family>Iosevka Aile</family>
-                </font>
-               </property>
                <property name="text">
                 <string>Clear chart</string>
                </property>
@@ -201,11 +170,6 @@
              </item>
              <item>
               <widget class="QPushButton" name="chart_legacy_button">
-               <property name="font">
-                <font>
-                 <family>Iosevka Aile</family>
-                </font>
-               </property>
                <property name="text">
                 <string>Legacy Mode</string>
                </property>
@@ -225,11 +189,6 @@
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <property name="font">
-          <font>
-           <family>Iosevka Aile</family>
-          </font>
-         </property>
          <property name="title">
           <string>Data</string>
          </property>
@@ -238,7 +197,6 @@
            <widget class="QLabel" name="dec_label">
             <property name="font">
              <font>
-              <family>Iosevka Aile</family>
               <pointsize>22</pointsize>
              </font>
             </property>
@@ -251,7 +209,6 @@
            <widget class="QLabel" name="channelB_label">
             <property name="font">
              <font>
-              <family>Iosevka Aile</family>
               <pointsize>22</pointsize>
              </font>
             </property>
@@ -370,7 +327,6 @@
            <widget class="QLabel" name="channelA_label">
             <property name="font">
              <font>
-              <family>Iosevka Aile</family>
               <pointsize>22</pointsize>
              </font>
             </property>
@@ -489,7 +445,6 @@
            <widget class="QLabel" name="ra_label">
             <property name="font">
              <font>
-              <family>Iosevka Aile</family>
               <pointsize>22</pointsize>
              </font>
             </property>
@@ -530,22 +485,12 @@
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <property name="font">
-          <font>
-           <family>Iosevka Aile</family>
-          </font>
-         </property>
          <property name="title">
           <string>Declination</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_9">
           <item row="0" column="0" rowspan="2">
            <widget class="QSlider" name="declination_slider">
-            <property name="font">
-             <font>
-              <family>Iosevka Aile</family>
-             </font>
-            </property>
             <property name="minimum">
              <number>-25</number>
             </property>
@@ -559,11 +504,6 @@
           </item>
           <item row="0" column="1">
            <widget class="QLabel" name="north_label">
-            <property name="font">
-             <font>
-              <family>Iosevka Aile</family>
-             </font>
-            </property>
             <property name="text">
              <string>North</string>
             </property>
@@ -574,11 +514,6 @@
           </item>
           <item row="1" column="1">
            <widget class="QLabel" name="south_label">
-            <property name="font">
-             <font>
-              <family>Iosevka Aile</family>
-             </font>
-            </property>
             <property name="text">
              <string>South</string>
             </property>
@@ -598,22 +533,12 @@
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <property name="font">
-          <font>
-           <family>Iosevka Aile</family>
-          </font>
-         </property>
          <property name="title">
           <string>Signal</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_6">
           <item row="1" column="0">
            <widget class="QDial" name="variance_dial">
-            <property name="font">
-             <font>
-              <family>Iosevka Aile</family>
-             </font>
-            </property>
             <property name="minimum">
              <number>0</number>
             </property>
@@ -639,11 +564,6 @@
           </item>
           <item row="0" column="0">
            <widget class="QLabel" name="variance_label">
-            <property name="font">
-             <font>
-              <family>Iosevka Aile</family>
-             </font>
-            </property>
             <property name="text">
              <string>Variance</string>
             </property>
@@ -654,11 +574,6 @@
           </item>
           <item row="0" column="1">
            <widget class="QLabel" name="polarization_label">
-            <property name="font">
-             <font>
-              <family>Iosevka Aile</family>
-             </font>
-            </property>
             <property name="text">
              <string>Polarization</string>
             </property>
@@ -669,11 +584,6 @@
           </item>
           <item row="0" column="3">
            <widget class="QLabel" name="noise_label">
-            <property name="font">
-             <font>
-              <family>Iosevka Aile</family>
-             </font>
-            </property>
             <property name="text">
              <string>Interference</string>
             </property>
@@ -684,11 +594,6 @@
           </item>
           <item row="1" column="1">
            <widget class="QDial" name="polarization_dial">
-            <property name="font">
-             <font>
-              <family>Iosevka Aile</family>
-             </font>
-            </property>
             <property name="minimum">
              <number>0</number>
             </property>
@@ -714,11 +619,6 @@
           </item>
           <item row="1" column="3">
            <widget class="QDial" name="noise_dial">
-            <property name="font">
-             <font>
-              <family>Iosevka Aile</family>
-             </font>
-            </property>
             <property name="minimum">
              <number>0</number>
             </property>
@@ -756,13 +656,8 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>22</height>
+     <height>24</height>
     </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Iosevka Aile</family>
-    </font>
    </property>
    <widget class="QMenu" name="menuCalibration">
     <property name="title">

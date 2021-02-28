@@ -6,103 +6,42 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>383</width>
-    <height>362</height>
+    <width>366</width>
+    <height>567</height>
    </rect>
-  </property>
-  <property name="minimumSize">
-   <size>
-    <width>383</width>
-    <height>362</height>
-   </size>
-  </property>
-  <property name="maximumSize">
-   <size>
-    <width>383</width>
-    <height>362</height>
-   </size>
   </property>
   <property name="windowTitle">
    <string>Credits</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item>
-    <widget class="QLabel" name="label">
-     <property name="font">
-      <font>
-       <family>Courier New</family>
-      </font>
-     </property>
-     <property name="text">
-      <string>  __  __                    _                 
- / /_/ /  _______ ___ ___  (_)__    ___  __ __
-/ __/ _ \/ __/ -_) -_) _ \/ / _ \_ / _ \/ // /
-\__/_//_/_/  \__/\__/ .__/_/\___(_) .__/\_, / 
-                   /_/           /_/   /___/  
-</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-     </property>
-    </widget>
-   </item>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
    <item>
     <spacer name="verticalSpacer_2">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Expanding</enum>
+     </property>
      <property name="sizeHint" stdset="0">
       <size>
-       <width>20</width>
-       <height>20</height>
+       <width>0</width>
+       <height>0</height>
       </size>
      </property>
     </spacer>
    </item>
    <item>
     <widget class="QLabel" name="label_2">
-     <property name="font">
-      <font>
-       <family>Iosevka Aile</family>
-      </font>
-     </property>
      <property name="text">
-      <string>The helpful companion to the 40' telescope
-
-Written with frustration by Shengjie, Isabel, and Finn
-
-No frills, all thrills 😎</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;threepio.py&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Written by Finn, Shengjie, and Isabel&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
      </property>
     </widget>
-   </item>
-   <item>
-    <spacer name="verticalSpacer_3">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
    </item>
    <item>
     <widget class="QFrame" name="button_frame">
@@ -132,18 +71,6 @@ No frills, all thrills 😎</string>
         </property>
        </spacer>
       </item>
-      <item row="0" column="1">
-       <widget class="QPushButton" name="close_button">
-        <property name="font">
-         <font>
-          <family>Iosevka Aile</family>
-         </font>
-        </property>
-        <property name="text">
-         <string>Close</string>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="2">
        <spacer name="horizontalSpacer_2">
         <property name="orientation">
@@ -157,7 +84,40 @@ No frills, all thrills 😎</string>
         </property>
        </spacer>
       </item>
+      <item row="0" column="1">
+       <widget class="QPushButton" name="close_button">
+        <property name="text">
+         <string>Close</string>
+        </property>
+       </widget>
+      </item>
      </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::MinimumExpanding</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>0</width>
+       <height>10</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string/>
+     </property>
+     <property name="pixmap">
+      <pixmap>../../../../../Code/python/verdant-shores/threepio/assets/c3po.png</pixmap>
+     </property>
     </widget>
    </item>
   </layout>

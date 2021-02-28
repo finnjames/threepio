@@ -18,9 +18,6 @@ from layouts import threepio_ui, quit_ui
 from tools import Comm, DataPoint, Survey, Scan, Spectrum, SuperClock, Tars
 
 
-# from playsound import playsound # TODO: test on Windows
-
-
 class Threepio(QtWidgets.QMainWindow):
     """main class for the app"""
 
@@ -272,6 +269,7 @@ class Threepio(QtWidgets.QMainWindow):
             self.ui.channelB_value.setText("%.2f" % self.data[len(self.data) - 1].b)
 
     def update_progress_bar(self):
+        """updates the progress bar"""
         # this mess makes the progress bar display "T+/- XX.XX" when
         # assigned, and progress the bar when taking data
         if self.observation is not None:
