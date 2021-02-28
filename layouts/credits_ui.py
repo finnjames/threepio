@@ -40,7 +40,7 @@ class Ui_Dialog(object):
         self.verticalLayout.addItem(spacerItem3)
         self.label = QtWidgets.QLabel(Dialog)
         self.label.setText("")
-        self.label.setPixmap(QtGui.QPixmap("../../../../../Code/python/verdant-shores/threepio/assets/c3po.png"))
+        self.label.setPixmap(QtGui.QPixmap("../assets/c3po.png"))
         self.label.setObjectName("label")
         self.verticalLayout.addWidget(self.label)
 

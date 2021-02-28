@@ -116,7 +116,7 @@
       <string/>
      </property>
      <property name="pixmap">
-      <pixmap>../../../../../Code/python/verdant-shores/threepio/assets/c3po.png</pixmap>
+      <pixmap>../assets/c3po.png</pixmap>
      </property>
     </widget>
    </item>
