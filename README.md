@@ -27,7 +27,7 @@ $ source ./env/bin/activate
 Check that the python version is correct (any 3.7.x is fine).
 ```
 $ python --version
-Python 3.7.8
+Python 3.7.10
 ```
 
 Install dependencies. You may need to update pip.
