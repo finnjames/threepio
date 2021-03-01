@@ -4,33 +4,33 @@ This repo includes data for the data acquisition system for the 40-foot radio te
 
 ## Dependencies
 
-**Threepio** uses `PyQt5` for GUI and `pySerial` for communication to the data collection hardware (DataQ)
+**Threepio** uses `PyQt5` for GUI and `pySerial` for communication to the data collection hardware (DataQ).
 
 ## Setting Up
 
-Clone the repo and `cd` into it
+Clone the repo and `cd` into it.
 ```
-$ git clone https://github.com/radiolevity/verdant-shores.git
-$ cd verdant-shores/threepio/
+$ git clone https://github.com/radiolevity/threepio.git
+$ cd threepio
 ```
 
-**Threepio** requires Python 3.7; we strongly recommend using a virtual environment, such as through venv
+**Threepio** requires Python 3.7; we strongly recommend using a virtual environment.
 ```
 $ python -m venv env
 ```
 
-Activate the virtual environment
+Activate the virtual environment.
 ```
 $ source ./env/bin/activate
 ```
 
-Check that the python version is correct (any 3.7.x is fine)
+Check that the python version is correct (any 3.7.x is fine).
 ```
 $ python --version
-Python 3.7.8
+Python 3.7.10
 ```
 
-Install dependencies
+Install dependencies. You may need to update pip.
 ```
 $ pip install -r requirements.txt
 ```
