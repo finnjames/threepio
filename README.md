@@ -26,7 +26,7 @@ Activate the virtual environment.
 $ source ./venv/bin/activate
 ```
 
-Update pip and install dependencies.
+Install dependencies.
 ```
 env $ pip install -r requirements.txt
 ```
