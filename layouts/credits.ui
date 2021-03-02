@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>366</width>
-    <height>567</height>
+    <height>595</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -36,7 +36,7 @@
    <item>
     <widget class="QLabel" name="label_2">
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;threepio.py&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Written by Finn, Shengjie, and Isabel&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;threepio.py&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Written by Finn, Shengjie, and Isabel&lt;/p&gt;&lt;p&gt;Licensed under GPLv3&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
