@@ -14,8 +14,10 @@ $ git clone https://github.com/radiolevity/threepio.git
 $ cd threepio
 ```
 
-**Threepio** requires Python 3.7; we strongly recommend using a virtual environment.
+**Threepio** requires Python 3.7.x. Using a virtual environment is strongly recommended.
 ```
+$ python --version
+Python 3.7.10
 $ python -m venv env
 ```
 
@@ -24,18 +26,13 @@ Activate the virtual environment.
 $ source ./env/bin/activate
 ```
 
-Check that the python version is correct (any 3.7.x is fine).
+Update pip and install dependencies.
 ```
-$ python --version
-Python 3.7.10
-```
-
-Install dependencies. You may need to update pip.
-```
-$ pip install -r requirements.txt
+env $ pip install --upgrade pip
+env $ pip install -r requirements.txt
 ```
 
 Run
 ```
-$ python threepio.py
+env $ python threepio.py
 ```
