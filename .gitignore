@@ -1,7 +1,8 @@
 .DS_Store
 .idea
-env
-# Byte-compiled / optimized / DLL files
+.vscode
+venv/
+.python-version
 __pycache__/
 *.py[cod]
 *$py.class
