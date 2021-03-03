@@ -21,9 +21,13 @@ Python 3.9.1
 $ python -m venv --upgrade-deps venv
 ```
 
-Activate the virtual environment.
+Activate the virtual environment. For Linux/Mac OS, run
 ```
 $ source ./venv/bin/activate
+```
+For windows, run
+```
+.\venv\Scripts\Activate.ps1
 ```
 
 Install dependencies.
