@@ -8,7 +8,7 @@ The new data acquisition system for the 40-foot radio telescope at the [Green Ba
 
 ## Setting Up
 
-### For Linux/Mac OS
+### For Linux & macOS
 Clone the repo and `cd` into it.
 ```
 $ git clone https://github.com/radiolevity/threepio.git
