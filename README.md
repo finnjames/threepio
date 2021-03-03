@@ -8,6 +8,7 @@ The new data acquisition system for the 40-foot radio telescope at the [Green Ba
 
 ## Setting Up
 
+### For Linux/Mac OS
 Clone the repo and `cd` into it.
 ```
 $ git clone https://github.com/radiolevity/threepio.git
@@ -28,10 +29,39 @@ $ source ./venv/bin/activate
 
 Install dependencies.
 ```
-env $ pip install -r requirements.txt
+(venv) $ pip install -r requirements.txt
 ```
 
 Run
 ```
-env $ python threepio.py
+(venv) $ python threepio.py
+```
+
+### For Windows
+Clone the repo and `cd` into it.
+```
+$ git clone https://github.com/radiolevity/threepio.git
+$ cd threepio
+```
+
+**Threepio** requires Python 3.9.x. Using a virtual environment is strongly recommended.
+```
+$ python --version
+Python 3.9.1
+$ python -m venv --upgrade-deps venv
+```
+
+Activate the virtual environment.
+```
+$ .\venv\Scripts\Activate.ps1
+```
+
+Install dependencies.
+```
+(venv) $ python -m pip install -r requirements.txt
+```
+
+Run
+```
+(venv) $ python threepio.py
 ```
