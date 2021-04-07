@@ -5,11 +5,10 @@ r"""
 \__/_//_/_/  \__/\__/ .__/_/\___(_) .__/\_, /
                    /_/           /_/   /___/
 
-The helpful companion to the 40' telescope
-Written with frustration by Shengjie, Isabel, and Finn
 """
 
 import time
+from functools import reduce
 
 from PyQt5 import QtChart, QtCore, QtGui, QtWidgets, QtMultimedia
 
@@ -48,6 +47,9 @@ class Threepio(QtWidgets.QMainWindow):
     BLUE = 0x2196F3
     RED = 0xFF5252
 
+    # green bank coords
+    GB_LAT = 38.4339
+
     # tars communication interpretation
     transmission = None
     old_transmission = None
@@ -59,12 +61,35 @@ class Threepio(QtWidgets.QMainWindow):
         self.ui = threepio_ui.Ui_MainWindow()
         self.setStyleSheet(open("stylesheet.qss").read())
         self.ui.setupUi(self)
-        self.setWindowTitle("Threepio")
+        self.setWindowTitle("threepio")
 
         # hide the close/minimize/fullscreen buttons
         self.setWindowFlags(
             QtCore.Qt.Window | QtCore.Qt.WindowTitleHint | QtCore.Qt.CustomizeWindowHint
         )
+
+        # "console" output
+        self.message_log = ["Starting threepio..."]
+        self.update_console()
+
+        # initialize stripchart
+        self.log("Initializing stripchart...")
+        self.stripchart_series_a = QtChart.QLineSeries()
+        self.stripchart_series_b = QtChart.QLineSeries()
+        # self.stripchart_series_a.setUseOpenGL(True)
+        # self.stripchart_series_b.setUseOpenGL(True)
+        self.axis_y = QtChart.QValueAxis()
+        self.chart = QtChart.QChart()
+        # comment this for better performance
+        # self.ui.stripchart.setRenderHint(QtGui.QPainter.Antialiasing)
+        pen = QtGui.QPen(QtGui.QColor(self.BLUE))
+        pen.setWidth(1)
+        self.stripchart_series_a.setPen(pen)
+        pen.setColor(QtGui.QColor(self.RED))
+        self.stripchart_series_b.setPen(pen)
+        self.initialize_stripchart()
+
+        self.update_speed()
 
         # connect buttons
         self.ui.stripchart_speed_slider.valueChanged.connect(self.update_speed)
@@ -86,6 +111,8 @@ class Threepio(QtWidgets.QMainWindow):
 
         self.ui.chart_legacy_button.clicked.connect(self.legacy_mode)
 
+        self.log("Initializing buttons...")
+
         # Tars/DATAQ stuff
         self.tars = Tars(parent=self)
         self.tars.setup()
@@ -96,6 +123,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.set_time()
 
         # bleeps and bloops
+        self.log("Initializing audio...")
         self.click_sound = QtMultimedia.QSoundEffect()
         url = QtCore.QUrl()
         self.click_sound.setSource(url.fromLocalFile("assets/beep3.wav"))
@@ -103,22 +131,8 @@ class Threepio(QtWidgets.QMainWindow):
         # self.click_sound.play()
         self.last_beep_time = 0.0
 
-        # initialize stripchart
-        self.stripchart_series_a = QtChart.QLineSeries()
-        self.stripchart_series_b = QtChart.QLineSeries()
-        self.axis_y = QtChart.QValueAxis()
-        self.chart = QtChart.QChart()
-        self.ui.stripchart.setRenderHint(QtGui.QPainter.Antialiasing)
-        pen = QtGui.QPen(QtGui.QColor(self.BLUE))
-        pen.setWidth(1)
-        self.stripchart_series_a.setPen(pen)
-        pen.setColor(QtGui.QColor(self.RED))
-        self.stripchart_series_b.setPen(pen)
-        self.initialize_stripchart()
-
-        self.update_speed()
-
         # establish observation
+        self.log("Initializing observation...")
         self.observation = None
 
         # establish data array & most recent dec
@@ -133,9 +147,24 @@ class Threepio(QtWidgets.QMainWindow):
         self.timer.timeout.connect(self.tick)  # do everything
         self.timer.start(self.timer_rate)  # set refresh rate
 
+        # used for measuring refresh rate
+        self.time_since_last_tick = 0
+        self.time_of_last_tick = self.clock.get_time()
+        self.time_of_last_refresh_update = self.time_of_last_tick
+
+        # testing QGraphicsView TODO: move this into its own method
+        self.dec_scene = QtWidgets.QGraphicsScene()
+        self.ui.dec_view.setScene(self.dec_scene)
+        self.update_dec_view()
+        self.ticker = 1
+
     def tick(self):  # primary controller for each clock tick
 
         self.update_gui()  # update gui
+
+        current_time = self.clock.get_time()
+        self.time_since_last_tick = current_time - self.time_of_last_tick
+        self.time_of_last_tick = current_time
 
         # TODO: make this a little less redundant
 
@@ -213,10 +242,7 @@ class Threepio(QtWidgets.QMainWindow):
                     pass
 
                 time_until_start = self.observation.start_RA - time.time()
-                if (
-                    time_until_start <= 0
-                    and (self.observation.end_RA - time.time()) > 0
-                ):
+                if time_until_start <= 0 < (self.observation.end_RA - time.time()):
                     self.message("Taking observation data...")
 
     def set_state_normal(self):
@@ -264,9 +290,17 @@ class Threepio(QtWidgets.QMainWindow):
         self.ui.dec_value.setText("%.2f" % self.current_dec)  # show dec
         self.update_progress_bar()
 
+        self.update_dec_view()
+        self.update_console()
+
         if len(self.data) > 0:
             self.ui.channelA_value.setText("%.2f" % self.data[len(self.data) - 1].a)
             self.ui.channelB_value.setText("%.2f" % self.data[len(self.data) - 1].b)
+
+        current_time = self.clock.get_time()
+        if current_time - self.time_of_last_refresh_update > 1:
+            self.ui.refresh_value.setText("%06.2fHz" % self.get_refresh_rate())
+            self.time_of_last_refresh_update = current_time
 
     def update_progress_bar(self):
         """updates the progress bar"""
@@ -275,8 +309,9 @@ class Threepio(QtWidgets.QMainWindow):
         if self.observation is not None:
             if not self.observation.end_RA - self.observation.start_RA <= 1:
                 if (
-                    self.clock.get_time_until(self.observation.start_RA) > 0
-                    and self.clock.get_time_until(self.observation.end_RA) < 0
+                    self.clock.get_time_until(self.observation.start_RA)
+                    > 0
+                    > self.clock.get_time_until(self.observation.end_RA)
                 ):
                     self.ui.progressBar.setValue(
                         int(
@@ -298,6 +333,23 @@ class Threepio(QtWidgets.QMainWindow):
         self.ui.progressBar.setFormat("n/a")
         self.ui.progressBar.setValue(0)
 
+    def update_dec_view(self):
+        angle = self.current_dec - self.GB_LAT
+
+        dish = QtGui.QPixmap("assets/dish.png").scaled(64, 64)
+        # rotation = QtGui.QTransform().rotate(angle)
+        # dish = dish.transformed(rotation)
+        dish = QtWidgets.QGraphicsPixmapItem(dish)
+        dish.setTransformOriginPoint(32, 32)
+        dish.setRotation(angle)
+
+        base = QtGui.QPixmap("assets/base.png").scaled(64, 64)
+        base = QtWidgets.QGraphicsPixmapItem(base)
+
+        self.dec_scene.clear()
+        for i in [dish, base]:
+            self.dec_scene.addItem(i)
+
     def display_info(self, message):
         self.ui.message_label.setText(message)
 
@@ -306,8 +358,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.chart.addSeries(self.stripchart_series_b)
         self.chart.addSeries(self.stripchart_series_a)
 
-        # hide the legend. Okay that was pretty obvious, but I'm trying to be a
-        # good programmer and document my code. You're welcome lol
+        # hide the legend
         self.chart.legend().hide()
 
         # connect the Qt Designer stripchart view (`self.ui.stripchart`) with
@@ -345,6 +396,10 @@ class Threepio(QtWidgets.QMainWindow):
         self.stripchart_offset += self.stripchart_series_a.count()
         self.stripchart_series_a.clear()
         self.stripchart_series_b.clear()
+
+    def get_refresh_rate(self):
+        # TODO: make this an average over the last second OR last N ticks
+        return 1 / self.time_since_last_tick if self.time_since_last_tick > 0 else -1.0
 
     def handle_survey(self):
         obs = Survey()
@@ -417,7 +472,19 @@ class Threepio(QtWidgets.QMainWindow):
         self.set_time()
 
     def message(self, message):
+        self.log(message)
         self.ui.message_label.setText(message)
+
+    def log(self, message):
+        # TODO: add timestamps
+        # TODO: add a way to signal that a task completed successfully (like returning an object with "mark_done()" and "mark_failed" methods)
+        if message != self.message_log[-1]:
+            self.message_log.append(message)
+
+    def update_console(self):
+        self.ui.console_label.setText(
+            reduce(lambda c, a: c + "\n" + a, self.message_log[-6:])
+        )
 
     def alert(self, message, button_message="Close"):
         alert = AlertDialog(message, button_message)
@@ -455,6 +522,7 @@ def main():
     app.setStyle("Fusion")
     window = Threepio()
     window.set_state_normal()
+    # window.set_state_testing()
     window.show()
     sys.exit(app.exec_())  # exit with code from app
 

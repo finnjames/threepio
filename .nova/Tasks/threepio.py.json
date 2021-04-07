@@ -1,0 +1,9 @@
+{
+  "actions" : {
+    "run" : {
+      "enabled" : true,
+      "script" : "#!\/bin\/sh\n\/Users\/finn\/code\/python\/threepio\/venv\/bin\/python threepio.py"
+    }
+  },
+  "identifier" : "DC1E9EF6-6D0B-472E-936C-27CB8032568C"
+}

@@ -33,6 +33,7 @@ class ObsDialog(QtWidgets.QDialog):
             self.ui.start_dec_label.hide()
             self.ui.starting_dec.setText("0")
             self.ui.end_dec_label.setText("Declination")
+        self.adjustSize()
 
         # store parent window
         self.parent_window = parent_window
