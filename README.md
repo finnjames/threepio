@@ -1,4 +1,4 @@
-# Threepio 🤖
+# threepio 🤖
 
 The new data acquisition system for the 40-foot radio telescope at the [Green Bank Observatory](https://greenbankobservatory.org/). This software is part of the [ERIRA](https://www.danreichart.com/erira) program.
 
