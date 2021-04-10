@@ -21,7 +21,7 @@ class Threepio(QtWidgets.QMainWindow):
     """main class for the app"""
 
     # basic time
-    timer_rate = 10  # ms
+    timer_rate = 16  # ms
     # how many data points to draw to stripchart
     stripchart_display_seconds = 8
     stripchart_offset = 0
@@ -81,7 +81,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.axis_y = QtChart.QValueAxis()
         self.chart = QtChart.QChart()
         # comment this for better performance
-        # self.ui.stripchart.setRenderHint(QtGui.QPainter.Antialiasing)
+        self.ui.stripchart.setRenderHint(QtGui.QPainter.Antialiasing)
         pen = QtGui.QPen(QtGui.QColor(self.BLUE))
         pen.setWidth(1)
         self.stripchart_series_a.setPen(pen)
@@ -160,24 +160,27 @@ class Threepio(QtWidgets.QMainWindow):
 
     def tick(self):  # primary controller for each clock tick
 
-        self.update_gui()  # update gui
-
         current_time = self.clock.get_time()
         self.time_since_last_tick = current_time - self.time_of_last_tick
         self.time_of_last_tick = current_time
 
-        # TODO: make this a little less redundant
+        if current_time - self.time_of_last_refresh_update > 1:
+            self.ui.refresh_value.setText("%.2fHz" % self.get_refresh_rate())
+            self.time_of_last_refresh_update = current_time
+
+        # TODO: make this less redundant
 
         if self.observation is None:
 
             period = self.timer_rate * 0.001  # s -> ms
 
-            if (time.time() - self.tick_time) > (period * self.timing_margin):
-                self.tick_time = time.time()
+            if (current_time - self.tick_time) > (period * self.timing_margin):
+                self.tick_time = current_time
 
                 tars_data = self.tars.read_latest()  # get data from DAQ
 
                 self.current_dec = self.calculate_declination(tars_data[2][1])
+
                 data_point = DataPoint(
                     self.clock.get_sidereal_seconds(),
                     self.current_dec,
@@ -187,11 +190,12 @@ class Threepio(QtWidgets.QMainWindow):
 
                 self.data.append(data_point)
 
+                self.update_gui()  # update gui
                 self.update_stripchart()  # make the stripchart scroll
 
         else:
 
-            # can't reset RA/Dec after loading obs
+            # can't reset RA/Dec after loading obs; TODO: move this elsewhere
             self.ui.actionRA.setDisabled(True)
             self.ui.actionDec.setDisabled(True)
             self.ui.menuNew.setDisabled(True)
@@ -218,6 +222,7 @@ class Threepio(QtWidgets.QMainWindow):
                     data_point, time.time()
                 )
 
+                self.update_gui()
                 self.update_stripchart()  # make the stripchart scroll
 
                 # This is a mess, but I think it should be fine for now
@@ -241,8 +246,8 @@ class Threepio(QtWidgets.QMainWindow):
                 elif self.transmission == Comm.NO_ACTION:
                     pass
 
-                time_until_start = self.observation.start_RA - time.time()
-                if time_until_start <= 0 < (self.observation.end_RA - time.time()):
+                time_until_start = self.observation.start_RA - current_time
+                if time_until_start <= 0 < (self.observation.end_RA - current_time):
                     self.message("Taking observation data...")
 
     def set_state_normal(self):
@@ -287,20 +292,16 @@ class Threepio(QtWidgets.QMainWindow):
 
     def update_gui(self):
         self.ui.ra_value.setText(self.clock.get_sidereal_time())  # show RA
-        self.ui.dec_value.setText("%.2f" % self.current_dec)  # show dec
+        self.ui.dec_value.setText("%.2f°" % self.current_dec)  # show dec
         self.update_progress_bar()
 
         self.update_dec_view()
         self.update_console()
 
         if len(self.data) > 0:
-            self.ui.channelA_value.setText("%.2f" % self.data[len(self.data) - 1].a)
-            self.ui.channelB_value.setText("%.2f" % self.data[len(self.data) - 1].b)
+            self.ui.channelA_value.setText("%.2fV" % self.data[len(self.data) - 1].a)
+            self.ui.channelB_value.setText("%.2fV" % self.data[len(self.data) - 1].b)
 
-        current_time = self.clock.get_time()
-        if current_time - self.time_of_last_refresh_update > 1:
-            self.ui.refresh_value.setText("%06.2fHz" % self.get_refresh_rate())
-            self.time_of_last_refresh_update = current_time
 
     def update_progress_bar(self):
         """updates the progress bar"""
