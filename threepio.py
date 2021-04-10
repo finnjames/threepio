@@ -202,9 +202,9 @@ class Threepio(QtWidgets.QMainWindow):
 
             period = 1 / self.observation.freq
 
-            if (time.time() - self.tick_time) > (period * self.timing_margin):
+            if (current_time - self.tick_time) > (period * self.timing_margin):
 
-                self.tick_time = time.time()
+                self.tick_time = current_time
 
                 tars_data = self.tars.read_latest()  # get data from DAQ
 
@@ -302,7 +302,6 @@ class Threepio(QtWidgets.QMainWindow):
             self.ui.channelA_value.setText("%.2fV" % self.data[len(self.data) - 1].a)
             self.ui.channelB_value.setText("%.2fV" % self.data[len(self.data) - 1].b)
 
-
     def update_progress_bar(self):
         """updates the progress bar"""
         # this mess makes the progress bar display "T+/- XX.XX" when
@@ -376,6 +375,18 @@ class Threepio(QtWidgets.QMainWindow):
         self.stripchart_series_a.append(new_a, new_ra)
         self.stripchart_series_b.append(new_b, new_ra)
 
+        # we need these value several times
+        current_sideral_seconds = self.clock.get_sidereal_seconds()
+        oldest_y = current_sideral_seconds - self.stripchart_display_seconds
+
+        # if the second to last point is out of range, delete two. Alright so here's
+        # what I'm thinking: this way, although there are some moments where this isn't
+        # ideal, it will generally keep things in sync and has O(1)
+        if self.stripchart_series_a.at(1).y() < oldest_y:
+            self.stripchart_series_a.removePoints(0, 2)
+        if self.stripchart_series_b.at(1).y() < oldest_y:
+            self.stripchart_series_b.removePoints(0, 2)
+
         # magical song and dance in an attempt to appease the Qt gods
         self.chart.removeSeries(self.stripchart_series_b)
         self.chart.removeSeries(self.stripchart_series_a)
@@ -383,10 +394,8 @@ class Threepio(QtWidgets.QMainWindow):
         self.chart.addSeries(self.stripchart_series_a)
 
         axis_y = QtChart.QValueAxis()
-        axis_y.setMin(
-            self.clock.get_sidereal_seconds() - self.stripchart_display_seconds
-        )
-        axis_y.setMax(self.clock.get_sidereal_seconds())
+        axis_y.setMin(oldest_y)
+        axis_y.setMax(current_sideral_seconds)
         axis_y.setVisible(False)
 
         self.chart.setAxisY(axis_y)
@@ -441,6 +450,7 @@ class Threepio(QtWidgets.QMainWindow):
 
     def calculate_declination(self, input_dec):
         """calculate the true dec from declinometer input and calibration data"""
+        # TODO: N -> S AND S -> N
 
         # input is below data
         if input_dec < self.x[0]:  # TODO: use minimum, not first
@@ -478,7 +488,8 @@ class Threepio(QtWidgets.QMainWindow):
 
     def log(self, message):
         # TODO: add timestamps
-        # TODO: add a way to signal that a task completed successfully (like returning an object with "mark_done()" and "mark_failed" methods)
+        # TODO: add a way to signal that a task completed successfully (like returning
+        #  an object with "mark_done()" and "mark_failed" methods)
         if message != self.message_log[-1]:
             self.message_log.append(message)
 
