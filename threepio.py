@@ -21,7 +21,7 @@ class Threepio(QtWidgets.QMainWindow):
     """main class for the app"""
 
     # basic time
-    timer_rate = 16  # ms
+    timer_rate = 10  # ms
     # how many data points to draw to stripchart
     stripchart_display_seconds = 8
     stripchart_offset = 0
@@ -59,7 +59,8 @@ class Threepio(QtWidgets.QMainWindow):
 
         # use main_ui for window setup
         self.ui = threepio_ui.Ui_MainWindow()
-        self.setStyleSheet(open("stylesheet.qss").read())
+        with open("stylesheet.qss") as f:
+            self.setStyleSheet(f.read())
         self.ui.setupUi(self)
         self.setWindowTitle("threepio")
 
@@ -71,6 +72,10 @@ class Threepio(QtWidgets.QMainWindow):
         # "console" output
         self.message_log = ["Starting threepio..."]
         self.update_console()
+
+        # clock
+        self.clock = None
+        self.set_time()
 
         # initialize stripchart
         self.log("Initializing stripchart...")
@@ -118,10 +123,6 @@ class Threepio(QtWidgets.QMainWindow):
         self.tars.setup()
         self.tars.start()
 
-        # clock
-        self.clock = None
-        self.set_time()
-
         # bleeps and bloops
         self.log("Initializing audio...")
         self.click_sound = QtMultimedia.QSoundEffect()
@@ -149,6 +150,7 @@ class Threepio(QtWidgets.QMainWindow):
 
         # used for measuring refresh rate
         self.time_since_last_tick = 0
+        # noinspection PyUnresolvedReferences
         self.time_of_last_tick = self.clock.get_time()
         self.time_of_last_refresh_update = self.time_of_last_tick
 
@@ -196,9 +198,8 @@ class Threepio(QtWidgets.QMainWindow):
         else:
 
             # can't reset RA/Dec after loading obs; TODO: move this elsewhere
-            self.ui.actionRA.setDisabled(True)
-            self.ui.actionDec.setDisabled(True)
-            self.ui.menuNew.setDisabled(True)
+            for a in [self.ui.actionRA, self.ui.actionDec, self.ui.actionSurvey, self.ui.actionScan, self.ui.actionSpectrum]:
+                a.setDisabled(True)
 
             period = 1 / self.observation.freq
 
@@ -240,7 +241,7 @@ class Threepio(QtWidgets.QMainWindow):
                     self.observation.next()
                 elif self.transmission == Comm.FINISHED:
                     self.observation.next()
-                    self.message("Finished.")
+                    self.message("Finished")
                 elif self.transmission == Comm.BEEP:
                     self.beep()
                 elif self.transmission == Comm.NO_ACTION:
@@ -262,12 +263,13 @@ class Threepio(QtWidgets.QMainWindow):
 
     def legacy_mode(self):
         """lol"""
-        f = open("stylesheet.qss", "w")
-        f.write("background-color:#00ff00; color: #ff0000")
-        self.setStyleSheet("background-color:#00ff00; color: #ff0000")
-        self.setAutoFillBackground(True)
+        with open("stylesheet.qss", "w") as f:
+            f.write("background-color:#00ff00; color: #ff0000")
+            self.setStyleSheet("background-color:#00ff00; color: #ff0000")
+            self.setAutoFillBackground(True)
 
-    def handle_credits(self):
+    @staticmethod
+    def handle_credits():
         dialog = CreditsDialog()
         dialog.show()
         dialog.exec_()
@@ -337,13 +339,12 @@ class Threepio(QtWidgets.QMainWindow):
         angle = self.current_dec - self.GB_LAT
 
         dish = QtGui.QPixmap("assets/dish.png").scaled(64, 64)
-        # rotation = QtGui.QTransform().rotate(angle)
-        # dish = dish.transformed(rotation)
         dish = QtWidgets.QGraphicsPixmapItem(dish)
         dish.setTransformOriginPoint(32, 32)
+        dish.setY(16)
         dish.setRotation(angle)
 
-        base = QtGui.QPixmap("assets/base.png").scaled(64, 64)
+        base = QtGui.QPixmap("assets/base.png").scaled(64, 96)
         base = QtWidgets.QGraphicsPixmapItem(base)
 
         self.dec_scene.clear()
@@ -438,19 +439,21 @@ class Threepio(QtWidgets.QMainWindow):
 
     def load_dec_cal(self):
         # create y array
-        i = DecDialog.start_dec
-        while i <= DecDialog.end_dec:
+        self.y = []
+        i = DecDialog.south_dec
+        while i <= DecDialog.north_dec:
             self.y.append(float(i))
-            i += DecDialog.step
+            i += abs(DecDialog.step)
 
         # create x array
-        c = open("dec_cal.txt", "r").read().splitlines()  # get data from file
-        for i in c:
-            self.x.append(float(i))
+        self.x = []
+        with open("dec-cal.txt", "r") as f:  # get data from file
+            c = f.read().splitlines()
+            for i in c:
+                self.x.append(float(i))
 
     def calculate_declination(self, input_dec):
         """calculate the true dec from declinometer input and calibration data"""
-        # TODO: N -> S AND S -> N
 
         # input is below data
         if input_dec < self.x[0]:  # TODO: use minimum, not first
@@ -487,11 +490,13 @@ class Threepio(QtWidgets.QMainWindow):
         self.ui.message_label.setText(message)
 
     def log(self, message):
-        # TODO: add timestamps
         # TODO: add a way to signal that a task completed successfully (like returning
         #  an object with "mark_done()" and "mark_failed" methods)
-        if message != self.message_log[-1]:
-            self.message_log.append(message)
+        if message != self.message_log[-1][11:]:
+            try:
+                self.message_log.append(f"[{self.clock.get_sidereal_time()}] {message}")
+            except AttributeError:
+                self.message_log.append(message)
 
     def update_console(self):
         self.ui.console_label.setText(

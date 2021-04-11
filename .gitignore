@@ -3,6 +3,8 @@
 .vscode
 .nova
 venv/
+data/*
+!data/.git-placeholder.txt
 .python-version
 __pycache__/
 *.py[cod]

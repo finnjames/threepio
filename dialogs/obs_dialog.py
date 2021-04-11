@@ -8,11 +8,10 @@ import time
 class ObsDialog(QtWidgets.QDialog):
     """New observation dialogue window"""
 
-    def __init__(self, parent_window, observation, clock):
+    def __init__(self, parent_window, observation, clock, info=False):
         QtWidgets.QWidget.__init__(self)
         self.ui = obs_ui.Ui_Dialog()
         self.ui.setupUi(self)
-        self.setModal(True)  # keep focus until dealt with
         self.setWindowFlags(
             QtCore.Qt.Window | QtCore.Qt.WindowTitleHint | QtCore.Qt.CustomizeWindowHint
         )
@@ -25,14 +24,14 @@ class ObsDialog(QtWidgets.QDialog):
         self.ui.file_name_value.setPlaceholderText(str(self.default_filename))
 
         # If a scan or spectrum, only one Dec needed
-        if (
-            self.observation.obs_type == "Scan"
-            or self.observation.obs_type == "Spectrum"
-        ):
+        if self.observation.obs_type in ["Scan", "Spectrum"]:
             self.ui.starting_dec.hide()
             self.ui.start_dec_label.hide()
             self.ui.starting_dec.setText("0")
             self.ui.end_dec_label.setText("Declination")
+        if self.observation.obs_type == "Spectrum":
+            self.ui.end_label.hide()
+            self.ui.end_time.hide()
         self.adjustSize()
 
         # store parent window
@@ -67,7 +66,7 @@ class ObsDialog(QtWidgets.QDialog):
         )
         end_time = (
             ending_sidereal_time - self.clock.get_sidereal_seconds() + time.time()
-        )
+        ) if self.observation.obs_type != "Spectrum" else start_time + 180
 
         # set all of the relevant data to the observation
         # if no filename, use timestamp

@@ -31,8 +31,8 @@ class RADialog(QtWidgets.QDialog):
 
         try:
             self.parent_window.clear_stripchart()
-        except Exception as e:
-            print(str(e))
+        except AttributeError:
+            # when the stripchart hasn't been initialized yet
             pass
 
         self.close()

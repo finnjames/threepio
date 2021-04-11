@@ -27,195 +27,6 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="1" column="0">
-     <widget class="QFrame" name="testing_frame">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="minimumSize">
-       <size>
-        <width>0</width>
-        <height>180</height>
-       </size>
-      </property>
-      <layout class="QGridLayout" name="gridLayout_8">
-       <property name="topMargin">
-        <number>0</number>
-       </property>
-       <item row="0" column="1">
-        <widget class="QGroupBox" name="dec_group_box">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="title">
-          <string>Declination</string>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_9">
-          <item row="0" column="0" rowspan="2">
-           <widget class="QSlider" name="declination_slider">
-            <property name="minimum">
-             <number>-25</number>
-            </property>
-            <property name="maximum">
-             <number>95</number>
-            </property>
-            <property name="singleStep">
-             <number>5</number>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QLabel" name="north_label">
-            <property name="text">
-             <string>North</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QLabel" name="south_label">
-            <property name="text">
-             <string>South</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QGroupBox" name="signal_group_box">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="title">
-          <string>Signal</string>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_6">
-          <item row="1" column="0">
-           <widget class="QDial" name="variance_dial">
-            <property name="minimum">
-             <number>0</number>
-            </property>
-            <property name="maximum">
-             <number>16</number>
-            </property>
-            <property name="pageStep">
-             <number>4</number>
-            </property>
-            <property name="value">
-             <number>4</number>
-            </property>
-            <property name="wrapping">
-             <bool>false</bool>
-            </property>
-            <property name="notchTarget">
-             <double>1.000000000000000</double>
-            </property>
-            <property name="notchesVisible">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="variance_label">
-            <property name="text">
-             <string>Variance</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QLabel" name="polarization_label">
-            <property name="text">
-             <string>Polarization</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="3">
-           <widget class="QLabel" name="noise_label">
-            <property name="text">
-             <string>Interference</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QDial" name="polarization_dial">
-            <property name="minimum">
-             <number>0</number>
-            </property>
-            <property name="maximum">
-             <number>16</number>
-            </property>
-            <property name="pageStep">
-             <number>4</number>
-            </property>
-            <property name="value">
-             <number>4</number>
-            </property>
-            <property name="wrapping">
-             <bool>false</bool>
-            </property>
-            <property name="notchTarget">
-             <double>1.000000000000000</double>
-            </property>
-            <property name="notchesVisible">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="3">
-           <widget class="QDial" name="noise_dial">
-            <property name="minimum">
-             <number>0</number>
-            </property>
-            <property name="maximum">
-             <number>16</number>
-            </property>
-            <property name="pageStep">
-             <number>4</number>
-            </property>
-            <property name="value">
-             <number>4</number>
-            </property>
-            <property name="wrapping">
-             <bool>false</bool>
-            </property>
-            <property name="notchTarget">
-             <double>1.000000000000000</double>
-            </property>
-            <property name="notchesVisible">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </item>
     <item row="0" column="0">
      <widget class="QFrame" name="main_frame">
       <layout class="QGridLayout" name="gridLayout_7">
@@ -318,10 +129,10 @@
              <property name="bottomMargin">
               <number>0</number>
              </property>
-             <item row="0" column="0">
-              <widget class="QLabel" name="stripchart_slower_label">
+             <item row="0" column="2">
+              <widget class="QLabel" name="stripchart_faster_label">
                <property name="text">
-                <string>Slower</string>
+                <string>Faster</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -347,10 +158,10 @@
                </property>
               </widget>
              </item>
-             <item row="0" column="2">
-              <widget class="QLabel" name="stripchart_faster_label">
+             <item row="0" column="0">
+              <widget class="QLabel" name="stripchart_slower_label">
                <property name="text">
-                <string>Faster</string>
+                <string>Slower</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -467,16 +278,10 @@
                 <item row="0" column="1">
                  <widget class="QGraphicsView" name="dec_view">
                   <property name="sizePolicy">
-                   <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                   <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>16777215</width>
-                    <height>100</height>
-                   </size>
                   </property>
                   <property name="styleSheet">
                    <string notr="true">background: transparent</string>
@@ -492,6 +297,9 @@
                   </property>
                   <property name="horizontalScrollBarPolicy">
                    <enum>Qt::ScrollBarAlwaysOff</enum>
+                  </property>
+                  <property name="renderHints">
+                   <set>QPainter::Antialiasing|QPainter::TextAntialiasing</set>
                   </property>
                  </widget>
                 </item>
@@ -804,6 +612,198 @@
       </layout>
      </widget>
     </item>
+    <item row="1" column="0">
+     <widget class="QFrame" name="testing_frame">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>180</height>
+       </size>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_8">
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <item row="0" column="1">
+        <widget class="QGroupBox" name="dec_group_box">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="title">
+          <string>Declination</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_9">
+          <item row="0" column="0" rowspan="2">
+           <widget class="QSlider" name="declination_slider">
+            <property name="minimum">
+             <number>-100</number>
+            </property>
+            <property name="maximum">
+             <number>100</number>
+            </property>
+            <property name="singleStep">
+             <number>5</number>
+            </property>
+            <property name="tickInterval">
+             <number>20</number>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLabel" name="north_label">
+            <property name="text">
+             <string>North</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLabel" name="south_label">
+            <property name="text">
+             <string>South</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QGroupBox" name="signal_group_box">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="title">
+          <string>Signal</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_6">
+          <item row="1" column="0">
+           <widget class="QDial" name="variance_dial">
+            <property name="minimum">
+             <number>0</number>
+            </property>
+            <property name="maximum">
+             <number>16</number>
+            </property>
+            <property name="pageStep">
+             <number>4</number>
+            </property>
+            <property name="value">
+             <number>4</number>
+            </property>
+            <property name="wrapping">
+             <bool>false</bool>
+            </property>
+            <property name="notchTarget">
+             <double>1.000000000000000</double>
+            </property>
+            <property name="notchesVisible">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="3">
+           <widget class="QDial" name="noise_dial">
+            <property name="minimum">
+             <number>0</number>
+            </property>
+            <property name="maximum">
+             <number>16</number>
+            </property>
+            <property name="pageStep">
+             <number>4</number>
+            </property>
+            <property name="value">
+             <number>4</number>
+            </property>
+            <property name="wrapping">
+             <bool>false</bool>
+            </property>
+            <property name="notchTarget">
+             <double>1.000000000000000</double>
+            </property>
+            <property name="notchesVisible">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="variance_label">
+            <property name="text">
+             <string>Variance</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="3">
+           <widget class="QLabel" name="noise_label">
+            <property name="text">
+             <string>Interference</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QDial" name="polarization_dial">
+            <property name="minimum">
+             <number>0</number>
+            </property>
+            <property name="maximum">
+             <number>16</number>
+            </property>
+            <property name="pageStep">
+             <number>4</number>
+            </property>
+            <property name="value">
+             <number>4</number>
+            </property>
+            <property name="wrapping">
+             <bool>false</bool>
+            </property>
+            <property name="notchTarget">
+             <double>1.000000000000000</double>
+            </property>
+            <property name="notchesVisible">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="2">
+           <widget class="QLabel" name="polarization_label">
+            <property name="text">
+             <string>Polarization</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -826,16 +826,6 @@
     <property name="title">
      <string>File</string>
     </property>
-    <widget class="QMenu" name="menuNew">
-     <property name="title">
-      <string>New</string>
-     </property>
-     <addaction name="actionSurvey"/>
-     <addaction name="actionScan"/>
-     <addaction name="actionSpectrum"/>
-    </widget>
-    <addaction name="menuNew"/>
-    <addaction name="separator"/>
     <addaction name="actionHelp"/>
     <addaction name="actionInfo"/>
     <addaction name="separator"/>
@@ -849,7 +839,18 @@
     <addaction name="actionLegacy"/>
     <addaction name="actionTesting"/>
    </widget>
+   <widget class="QMenu" name="menuObservation">
+    <property name="title">
+     <string>Observation</string>
+    </property>
+    <addaction name="actionSurvey"/>
+    <addaction name="actionScan"/>
+    <addaction name="actionSpectrum"/>
+    <addaction name="separator"/>
+    <addaction name="actionGetInfo"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuObservation"/>
    <addaction name="menuCalibration"/>
    <addaction name="menuMode"/>
   </widget>
@@ -865,7 +866,7 @@
   </action>
   <action name="actionSurvey">
    <property name="text">
-    <string>Survey</string>
+    <string>New Survey...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+1</string>
@@ -891,7 +892,7 @@
   </action>
   <action name="actionScan">
    <property name="text">
-    <string>Scan</string>
+    <string>New Scan...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+2</string>
@@ -899,7 +900,7 @@
   </action>
   <action name="actionSpectrum">
    <property name="text">
-    <string>Spectrum</string>
+    <string>New Spectrum...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+3</string>
@@ -936,6 +937,11 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Z</string>
+   </property>
+  </action>
+  <action name="actionGetInfo">
+   <property name="text">
+    <string>Get Info...</string>
    </property>
   </action>
  </widget>

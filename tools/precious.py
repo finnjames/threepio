@@ -13,7 +13,7 @@ class MyPrecious:
         self.filename = filename
         self.__buffer = []
 
-        self.dir = "../data/"
+        self.dir = "./data/"
         if not os.path.isdir(self.dir):
             os.mkdir(self.dir)
 

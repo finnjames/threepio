@@ -13,6 +13,9 @@
   <property name="windowTitle">
    <string>Declination Calibration</string>
   </property>
+  <property name="modal">
+   <bool>true</bool>
+  </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="1" column="0" colspan="2">
     <widget class="QLabel" name="set_dec_label">
@@ -55,12 +58,12 @@
        <widget class="QComboBox" name="north_or_south_combo_box">
         <item>
          <property name="text">
-          <string>N → S</string>
+          <string>S → N</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>S → N</string>
+          <string>N → S</string>
          </property>
         </item>
        </widget>
