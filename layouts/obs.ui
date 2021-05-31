@@ -53,7 +53,7 @@
    <item row="2" column="1">
     <widget class="QLabel" name="start_dec_label">
      <property name="text">
-      <string>Starting Declination</string>
+      <string>Minimum Declination</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -63,7 +63,7 @@
    <item row="4" column="1">
     <widget class="QLabel" name="end_dec_label">
      <property name="text">
-      <string>Ending Declination</string>
+      <string>Maximum Declination</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
