@@ -24,7 +24,7 @@ class Threepio(QtWidgets.QMainWindow):
     timer_rate = 10  # ms
     # how many data points to draw to stripchart
     stripchart_display_seconds = 8
-    stripchart_offset = 0
+    should_clear_stripchart = False
 
     # test data
     ticker = 0
@@ -39,16 +39,16 @@ class Threepio(QtWidgets.QMainWindow):
     stripchart_low = -1
     stripchart_high = 1
 
-    # declination calibration arrays
-    x = []
-    y = []
+    # declination calibration lists
+    x = list[float]
+    y = list[float]
 
     # palette
     BLUE = 0x2196F3
     RED = 0xFF5252
 
     # green bank coords
-    GB_LAT = 38.4339
+    GB_LATITUDE = 38.4339
 
     # tars communication interpretation
     transmission = None
@@ -133,7 +133,6 @@ class Threepio(QtWidgets.QMainWindow):
         self.last_beep_time = 0.0
 
         # establish observation
-        self.log("Initializing observation...")
         self.observation = None
 
         # establish data array & most recent dec
@@ -143,6 +142,9 @@ class Threepio(QtWidgets.QMainWindow):
         # run initial calibration
         self.load_dec_cal()
 
+        # alert user
+        self.message("Ready!!!")
+
         # refresh timer
         self.timer = QtCore.QTimer(self)
         self.timer.timeout.connect(self.tick)  # do everything
@@ -150,8 +152,9 @@ class Threepio(QtWidgets.QMainWindow):
 
         # used for measuring refresh rate
         self.time_since_last_tick = 0
+        # TODO: do I need both of these type checks?
         # noinspection PyUnresolvedReferences
-        self.time_of_last_tick = self.clock.get_time()
+        self.time_of_last_tick = self.clock.get_time()  # type: ignore
         self.time_of_last_refresh_update = self.time_of_last_tick
 
         # testing QGraphicsView TODO: move this into its own method
@@ -184,10 +187,10 @@ class Threepio(QtWidgets.QMainWindow):
                 self.current_dec = self.calculate_declination(tars_data[2][1])
 
                 data_point = DataPoint(
-                    self.clock.get_sidereal_seconds(),
-                    self.current_dec,
-                    tars_data[0][1],
-                    tars_data[1][1],
+                    self.clock.get_sidereal_seconds(),  # ra
+                    self.current_dec,  # dec
+                    tars_data[0][1],  # channel a
+                    tars_data[1][1],  # channel b
                 )
 
                 self.data.append(data_point)
@@ -198,7 +201,13 @@ class Threepio(QtWidgets.QMainWindow):
         else:
 
             # can't reset RA/Dec after loading obs; TODO: move this elsewhere
-            for a in [self.ui.actionRA, self.ui.actionDec, self.ui.actionSurvey, self.ui.actionScan, self.ui.actionSpectrum]:
+            for a in [
+                self.ui.actionRA,
+                self.ui.actionDec,
+                self.ui.actionSurvey,
+                self.ui.actionScan,
+                self.ui.actionSpectrum,
+            ]:
                 a.setDisabled(True)
 
             period = 1 / self.observation.freq
@@ -294,15 +303,15 @@ class Threepio(QtWidgets.QMainWindow):
 
     def update_gui(self):
         self.ui.ra_value.setText(self.clock.get_sidereal_time())  # show RA
-        self.ui.dec_value.setText("%.2f°" % self.current_dec)  # show dec
+        self.ui.dec_value.setText("%.4f°" % self.current_dec)  # show dec
         self.update_progress_bar()
 
         self.update_dec_view()
         self.update_console()
 
         if len(self.data) > 0:
-            self.ui.channelA_value.setText("%.2fV" % self.data[len(self.data) - 1].a)
-            self.ui.channelB_value.setText("%.2fV" % self.data[len(self.data) - 1].b)
+            self.ui.channelA_value.setText("%.4fV" % self.data[len(self.data) - 1].a)
+            self.ui.channelB_value.setText("%.4fV" % self.data[len(self.data) - 1].b)
 
     def update_progress_bar(self):
         """updates the progress bar"""
@@ -336,16 +345,20 @@ class Threepio(QtWidgets.QMainWindow):
         self.ui.progressBar.setValue(0)
 
     def update_dec_view(self):
-        angle = self.current_dec - self.GB_LAT
+        angle = self.current_dec - self.GB_LATITUDE
 
-        dish = QtGui.QPixmap("assets/dish.png").scaled(64, 64)
+        # construct telescope dish
+        dish = QtGui.QPixmap("assets/dish.png")
         dish = QtWidgets.QGraphicsPixmapItem(dish)
         dish.setTransformOriginPoint(32, 32)
+        dish.setTransformationMode(QtCore.Qt.SmoothTransformation)
         dish.setY(16)
         dish.setRotation(angle)
 
-        base = QtGui.QPixmap("assets/base.png").scaled(64, 96)
+        # construct telescope base
+        base = QtGui.QPixmap("assets/base.png")
         base = QtWidgets.QGraphicsPixmapItem(base)
+        base.setTransformationMode(QtCore.Qt.SmoothTransformation)
 
         self.dec_scene.clear()
         for i in [dish, base]:
@@ -355,15 +368,11 @@ class Threepio(QtWidgets.QMainWindow):
         self.ui.message_label.setText(message)
 
     def initialize_stripchart(self):
-        # add channels to chart
         self.chart.addSeries(self.stripchart_series_b)
         self.chart.addSeries(self.stripchart_series_a)
 
-        # hide the legend
         self.chart.legend().hide()
 
-        # connect the Qt Designer stripchart view (`self.ui.stripchart`) with
-        # `self.chart`
         self.ui.stripchart.setChart(self.chart)
 
     def update_stripchart(self):
@@ -376,19 +385,20 @@ class Threepio(QtWidgets.QMainWindow):
         self.stripchart_series_a.append(new_a, new_ra)
         self.stripchart_series_b.append(new_b, new_ra)
 
-        # we need these value several times
+        # we use these value several times
         current_sideral_seconds = self.clock.get_sidereal_seconds()
         oldest_y = current_sideral_seconds - self.stripchart_display_seconds
 
-        # if the second to last point is out of range, delete two. Alright so here's
-        # what I'm thinking: this way, although there are some moments where this isn't
-        # ideal, it will generally keep things in sync and has O(1)
-        if self.stripchart_series_a.at(1).y() < oldest_y:
-            self.stripchart_series_a.removePoints(0, 2)
-        if self.stripchart_series_b.at(1).y() < oldest_y:
-            self.stripchart_series_b.removePoints(0, 2)
+        # remove the trailing end of the series
+        clear_it = self.should_clear_stripchart  # prevents a race hazard?
+        for i in [self.stripchart_series_a, self.stripchart_series_b]:
+            if clear_it:
+                i.clear()
+            elif i.count() > 2 and i.at(1).y() < oldest_y:
+                i.removePoints(0, 2)
+        self.should_clear_stripchart = False
 
-        # magical song and dance in an attempt to appease the Qt gods
+        # These lines are required to prevent a Qt error
         self.chart.removeSeries(self.stripchart_series_b)
         self.chart.removeSeries(self.stripchart_series_a)
         self.chart.addSeries(self.stripchart_series_b)
@@ -404,9 +414,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.stripchart_series_b.attachAxis(axis_y)
 
     def clear_stripchart(self):
-        self.stripchart_offset += self.stripchart_series_a.count()
-        self.stripchart_series_a.clear()
-        self.stripchart_series_b.clear()
+        self.should_clear_stripchart = True
 
     def get_refresh_rate(self):
         # TODO: make this an average over the last second OR last N ticks
@@ -452,7 +460,7 @@ class Threepio(QtWidgets.QMainWindow):
             for i in c:
                 self.x.append(float(i))
 
-    def calculate_declination(self, input_dec):
+    def calculate_declination(self, input_dec: float):
         """calculate the true dec from declinometer input and calibration data"""
 
         # input is below data
@@ -504,6 +512,7 @@ class Threepio(QtWidgets.QMainWindow):
         )
 
     def alert(self, message, button_message="Close"):
+        self.log(message)
         alert = AlertDialog(message, button_message)
         self.beep()
         alert.show()

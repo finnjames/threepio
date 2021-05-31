@@ -52,7 +52,6 @@ class DecDialog(QtWidgets.QDialog):
     def handle_next(self):
         # read just the declination value
         self.data.append(self.tars.read_latest()[2][1])
-        print(self.current_dec, self.data)
 
         self.current_dec += self.step
         if self.current_dec not in [self.south_dec, self.north_dec]:
@@ -75,12 +74,7 @@ class DecDialog(QtWidgets.QDialog):
                 # reverse it if it's N -> S
                 self.step < 0 and self.data.reverse()
 
-                for line in self.data[:-1]:  # replace with new calibration data
-                    # if line == self.data[len(self.data) - 1]:
-                    #     f.write(str(line))
-                    # else:
-                    f.write(str(line) + "\n")
-                f.write(str(line))
+                f.write('\n'.join(str(line) for line in self.data))
 
             self.close()
 

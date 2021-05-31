@@ -381,7 +381,7 @@
              </font>
             </property>
             <property name="text">
-             <string>0.0deg</string>
+             <string>0.0000deg</string>
             </property>
             <property name="scaledContents">
              <bool>false</bool>
@@ -466,7 +466,7 @@
              </font>
             </property>
             <property name="text">
-             <string>0.00V</string>
+             <string>0.0000V</string>
             </property>
             <property name="scaledContents">
              <bool>false</bool>
@@ -584,7 +584,7 @@
              </font>
             </property>
             <property name="text">
-             <string>0.00V</string>
+             <string>0.0000V</string>
             </property>
             <property name="scaledContents">
              <bool>false</bool>
@@ -843,8 +843,8 @@
     <property name="title">
      <string>Observation</string>
     </property>
-    <addaction name="actionSurvey"/>
     <addaction name="actionScan"/>
+    <addaction name="actionSurvey"/>
     <addaction name="actionSpectrum"/>
     <addaction name="separator"/>
     <addaction name="actionGetInfo"/>
@@ -869,7 +869,7 @@
     <string>New Survey...</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+1</string>
+    <string>Ctrl+2</string>
    </property>
   </action>
   <action name="actionInfo">
@@ -895,7 +895,7 @@
     <string>New Scan...</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+2</string>
+    <string>Ctrl+1</string>
    </property>
   </action>
   <action name="actionSpectrum">
