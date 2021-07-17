@@ -25,13 +25,22 @@ class ObsDialog(QtWidgets.QDialog):
 
         # If a scan or spectrum, only one Dec needed
         if self.observation.obs_type in ["Scan", "Spectrum"]:
-            self.ui.starting_dec.hide()
-            self.ui.start_dec_label.hide()
+            for i in [self.ui.starting_dec, self.ui.start_dec_label]:
+                i.hide()
             self.ui.starting_dec.setText("0")
             self.ui.end_dec_label.setText("Declination")
         if self.observation.obs_type == "Spectrum":
-            self.ui.end_label.hide()
-            self.ui.end_time.hide()
+            for i in [self.ui.end_label, self.ui.end_time]:
+                i.hide()
+        if self.observation.obs_type == "Survey":
+            for i in [
+                self.ui.data_acquisition_rate_label,
+                self.ui.data_acquisition_rate_value,
+            ]:
+                i.hide()
+            self.ui.data_acquisition_rate_value.setValue(
+                6
+            )  # all surveys have a rate of 6
         self.adjustSize()
 
         # store parent window
@@ -65,8 +74,10 @@ class ObsDialog(QtWidgets.QDialog):
             starting_sidereal_time - self.clock.get_sidereal_seconds() + time.time()
         )
         end_time = (
-            ending_sidereal_time - self.clock.get_sidereal_seconds() + time.time()
-        ) if self.observation.obs_type != "Spectrum" else start_time + 180
+            (ending_sidereal_time - self.clock.get_sidereal_seconds() + time.time())
+            if self.observation.obs_type != "Spectrum"
+            else start_time + 180
+        )
 
         # set all of the relevant data to the observation
         # if no filename, use timestamp
