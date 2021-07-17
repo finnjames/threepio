@@ -21,7 +21,9 @@ class Threepio(QtWidgets.QMainWindow):
     """main class for the app"""
 
     # basic time
-    timer_rate = 10  # ms
+    PERIOD = 10  # ms
+    STRIPCHART_PERIOD = 16.7  # ms
+    VOLTAGE_PERIOD = 1000  # ms
     # how many data points to draw to stripchart
     stripchart_display_seconds = 8
     should_clear_stripchart = False
@@ -148,36 +150,47 @@ class Threepio(QtWidgets.QMainWindow):
         # refresh timer
         self.timer = QtCore.QTimer(self)
         self.timer.timeout.connect(self.tick)  # do everything
-        self.timer.start(self.timer_rate)  # set refresh rate
+        self.timer.start(self.PERIOD)  # set refresh rate
 
         # used for measuring refresh rate
         self.time_since_last_tick = 0
+        self.time_since_last_stripchart_update = 0
+        self.time_since_last_voltage_update = 0
         # TODO: do I need both of these type checks?
         # noinspection PyUnresolvedReferences
         self.time_of_last_tick = self.clock.get_time()  # type: ignore
         self.time_of_last_refresh_update = self.time_of_last_tick
+        self.time_of_last_voltage_update = self.time_of_last_tick
+        self.time_of_last_stripchart_update = self.time_of_last_tick
 
         # QGraphicsView TODO: move this into its own method
         self.dec_scene = QtWidgets.QGraphicsScene()
         self.ui.dec_view.setScene(self.dec_scene)
         self.update_dec_view()
-        self.ticker = 1
 
     def tick(self):  # primary controller for each clock tick
 
+        # update all of the timing vars
         current_time = self.clock.get_time()
         self.time_since_last_tick = current_time - self.time_of_last_tick
+        self.time_since_last_stripchart_update = (
+            current_time - self.time_of_last_stripchart_update
+        )
+        self.time_since_last_voltage_update = (
+            current_time - self.time_of_last_voltage_update
+        )
+
         self.time_of_last_tick = current_time
 
         if current_time - self.time_of_last_refresh_update > 1:
             self.ui.refresh_value.setText("%.2fHz" % self.get_refresh_rate())
             self.time_of_last_refresh_update = current_time
 
-        # TODO: make this less redundant
+        # TODO: clean up main clock loop
 
         if self.observation is None:
 
-            period = self.timer_rate * 0.001  # s -> ms
+            period = self.PERIOD * 0.001  # s -> ms
 
             if (current_time - self.tick_time) > (period * self.timing_margin):
                 self.tick_time = current_time
@@ -195,8 +208,7 @@ class Threepio(QtWidgets.QMainWindow):
 
                 self.data.append(data_point)
 
-                self.update_gui()  # update gui
-                self.update_stripchart()  # make the stripchart scroll
+                self.update_gui()  # update gui except voltage and stripchart
 
         else:
 
@@ -236,6 +248,7 @@ class Threepio(QtWidgets.QMainWindow):
                 self.update_stripchart()  # make the stripchart scroll
 
                 # This is a mess, but I think it should be fine for now
+                # TODO: at least move this to its own method
                 if self.transmission == Comm.START_CAL:
                     self.alert("Set calibration switches to ON", "Okay")
                     self.alert("Are the calibration switches on?", "Yes")
@@ -259,6 +272,13 @@ class Threepio(QtWidgets.QMainWindow):
                 time_until_start = self.observation.start_RA - current_time
                 if time_until_start <= 0 < (self.observation.end_RA - current_time):
                     self.message("Taking observation data...")
+                elif time_until_start >= 0:
+                    # self.message(
+                    #     "Observation will start in %.0f seconds" % time_until_start,
+                    #     beep=False,
+                    #     log=False,
+                    # )
+                    pass
 
     def set_state_normal(self):
         self.ui.actionNormal.setChecked(True)
@@ -303,6 +323,8 @@ class Threepio(QtWidgets.QMainWindow):
         )
 
     def update_gui(self):
+        current_time = self.clock.get_time()
+
         self.ui.ra_value.setText(self.clock.get_sidereal_time())  # show RA
         self.ui.dec_value.setText("%.4f°" % self.current_dec)  # show dec
         self.update_progress_bar()
@@ -310,9 +332,12 @@ class Threepio(QtWidgets.QMainWindow):
         self.update_dec_view()
         self.update_console()
 
-        if len(self.data) > 0:
-            self.ui.channelA_value.setText("%.4fV" % self.data[len(self.data) - 1].a)
-            self.ui.channelB_value.setText("%.4fV" % self.data[len(self.data) - 1].b)
+        if self.time_since_last_voltage_update >= self.VOLTAGE_PERIOD * 0.001:
+            self.update_voltage()
+            self.time_of_last_voltage_update = current_time
+        if self.time_since_last_stripchart_update >= self.STRIPCHART_PERIOD * 0.001:
+            self.update_stripchart()
+            self.time_of_last_stripchart_update = current_time
 
     def update_progress_bar(self):
         """updates the progress bar"""
@@ -417,6 +442,11 @@ class Threepio(QtWidgets.QMainWindow):
     def clear_stripchart(self):
         self.should_clear_stripchart = True
 
+    def update_voltage(self):
+        if len(self.data) > 0:
+            self.ui.channelA_value.setText("%.4fV" % self.data[len(self.data) - 1].a)
+            self.ui.channelB_value.setText("%.4fV" % self.data[len(self.data) - 1].b)
+
     def get_refresh_rate(self):
         # TODO: make this an average over the last second OR last N ticks
         return 1 / self.time_since_last_tick if self.time_since_last_tick > 0 else -1.0
@@ -494,8 +524,11 @@ class Threepio(QtWidgets.QMainWindow):
     def ra_calibration(self):
         self.set_time()
 
-    def message(self, message):
-        self.log(message)
+    def message(self, message, beep=True, log=True):
+        if log:
+            self.log(message)
+        if beep:
+            self.beep()
         self.ui.message_label.setText(message)
 
     def log(self, message):
