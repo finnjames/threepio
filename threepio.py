@@ -35,7 +35,7 @@ class Threepio(QtWidgets.QMainWindow):
 
     # speed measurement
     tick_time = 0.0
-    timing_margin = 0.995
+    timing_margin = 0.97
 
     # stripchart
     stripchart_low = -1
