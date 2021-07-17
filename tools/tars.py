@@ -112,7 +112,11 @@ class Tars:
 
         v = self.parent.ui.variance_dial.value()
 
-        f = math.sin(4 * x)
+        c = 1 if self.parent.ui.calibration_check_box.isChecked() else 0
+
+        f = 0
+        # f = math.sin(4 * x)
+
         g = (
             2.6 / (math.sin(2 * x) + 1.4)
             + 0.4 * math.sin(8 * x)
@@ -120,8 +124,16 @@ class Tars:
             + (1 / (math.sin(8 * x) + 1.4))
         )
 
-        a = f + g * v + n
+        a = f + g * v + n + c
         b = a - 0.1 * self.parent.ui.polarization_dial.value() * g * (v / 2 + 1)
+
+        def normalize_kinda(x):
+            return x / 116 + c
+
+        a = normalize_kinda(a)
+        b = normalize_kinda(b)
+
+        print(a, b)
 
         # a, b, dec
         return [(0, a), (1, b), (2, float(self.parent.ui.declination_slider.value()))]

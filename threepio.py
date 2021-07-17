@@ -269,18 +269,19 @@ class Threepio(QtWidgets.QMainWindow):
         self.ui.actionNormal.setChecked(True)
         self.ui.actionTesting.setChecked(False)
         self.ui.testing_frame.hide()
+        self.adjustSize()
+        self.setFixedSize(800, 640)
 
     def set_state_testing(self):
         self.ui.actionNormal.setChecked(False)
         self.ui.actionTesting.setChecked(True)
+        self.setFixedSize(800, 826)
         self.ui.testing_frame.show()
 
     def legacy_mode(self):
         """lol"""
-        with open("stylesheet.qss", "w") as f:
-            f.write("background-color:#00ff00; color: #ff0000")
-            self.setStyleSheet("background-color:#00ff00; color: #ff0000")
-            self.setAutoFillBackground(True)
+        self.setStyleSheet("background-color:#00ff00; color: #ff0000")
+        self.setAutoFillBackground(True)
 
     @staticmethod
     def handle_credits():
