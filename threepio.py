@@ -14,7 +14,7 @@ from PyQt5 import QtChart, QtCore, QtGui, QtWidgets, QtMultimedia
 
 from dialogs import AlertDialog, CreditsDialog, DecDialog, ObsDialog, RADialog
 from layouts import threepio_ui, quit_ui
-from tools import Comm, DataPoint, Survey, Scan, Spectrum, SuperClock, Tars
+from tools import Comm, DataPoint, Survey, Scan, Spectrum, SuperClock, Tars, discovery
 
 
 class Threepio(QtWidgets.QMainWindow):
@@ -119,7 +119,8 @@ class Threepio(QtWidgets.QMainWindow):
         self.log("Initializing buttons...")
 
         # Tars/DATAQ stuff
-        self.tars = Tars(parent=self)
+        device = discovery()
+        self.tars = Tars(parent=self, device=device)
         self.tars.setup()
         self.tars.start()
 
@@ -182,18 +183,22 @@ class Threepio(QtWidgets.QMainWindow):
             if (current_time - self.tick_time) > (period * self.timing_margin):
                 self.tick_time = current_time
 
-                tars_data = self.tars.read_latest()  # get data from DAQ
+                try:
+                    tars_data = self.tars.read_latest()  # get data from DAQ
 
-                self.current_dec = self.calculate_declination(tars_data[2][1])
+                    self.current_dec = self.calculate_declination(tars_data[2][1])
 
-                data_point = DataPoint(
-                    self.clock.get_sidereal_seconds(),  # ra
-                    self.current_dec,  # dec
-                    tars_data[0][1],  # channel a
-                    tars_data[1][1],  # channel b
-                )
+                    data_point = DataPoint(
+                        self.clock.get_sidereal_seconds(),  # ra
+                        self.current_dec,  # dec
+                        tars_data[0][1],  # channel a
+                        tars_data[1][1],  # channel b
+                    )
 
-                self.data.append(data_point)
+                    self.data.append(data_point)
+                except TypeError:
+                    # print("TypeError")
+                    pass
 
                 self.update_gui()  # update gui
                 self.update_stripchart()  # make the stripchart scroll
