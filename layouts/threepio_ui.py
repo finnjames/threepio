@@ -14,15 +14,13 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(800, 917)
+        MainWindow.resize(800, 640)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(MainWindow.sizePolicy().hasHeightForWidth())
         MainWindow.setSizePolicy(sizePolicy)
-        icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("../assets/robot.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        MainWindow.setWindowIcon(icon)
+        MainWindow.setMinimumSize(QtCore.QSize(0, 640))
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
@@ -250,7 +248,7 @@ class Ui_MainWindow(object):
         self.gridLayout_11.setContentsMargins(0, -1, 0, -1)
         self.gridLayout_11.setObjectName("gridLayout_11")
         self.console_inner_frame_2 = QtWidgets.QFrame(self.console_background)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Minimum)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.console_inner_frame_2.sizePolicy().hasHeightForWidth())
@@ -276,11 +274,6 @@ class Ui_MainWindow(object):
         self.console_label.setObjectName("console_label")
         self.gridLayout_12.addWidget(self.console_label, 0, 0, 1, 1)
         self.dec_view = QtWidgets.QGraphicsView(self.console_inner_frame_2)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.dec_view.sizePolicy().hasHeightForWidth())
-        self.dec_view.setSizePolicy(sizePolicy)
         self.dec_view.setStyleSheet("background: transparent")
         self.dec_view.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.dec_view.setFrameShadow(QtWidgets.QFrame.Plain)
@@ -470,6 +463,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
+        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.data_display_group.setTitle(_translate("MainWindow", "Data"))
         self.dec_label.setText(_translate("MainWindow", "Declination:"))
         self.channelB_label.setText(_translate("MainWindow", "Channel B:"))
