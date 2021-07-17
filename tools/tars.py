@@ -134,7 +134,11 @@ class Tars:
         b = normalize_kinda(b)
 
         # a, b, dec
-        return [(0, a), (1, b), (2, float(self.parent.ui.declination_slider.value()))]
+        return [
+            (0, a),
+            (1, b),
+            (2, float(self.parent.ui.declination_slider.value()) / 100),
+        ]
 
     # Helpers
 
