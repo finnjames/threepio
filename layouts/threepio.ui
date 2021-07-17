@@ -718,32 +718,7 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="3">
-           <widget class="QDial" name="noise_dial">
-            <property name="minimum">
-             <number>0</number>
-            </property>
-            <property name="maximum">
-             <number>16</number>
-            </property>
-            <property name="pageStep">
-             <number>4</number>
-            </property>
-            <property name="value">
-             <number>4</number>
-            </property>
-            <property name="wrapping">
-             <bool>false</bool>
-            </property>
-            <property name="notchTarget">
-             <double>1.000000000000000</double>
-            </property>
-            <property name="notchesVisible">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
+          <item row="3" column="0">
            <widget class="QLabel" name="variance_label">
             <property name="text">
              <string>Variance</string>
@@ -753,10 +728,20 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="3">
+          <item row="3" column="3">
            <widget class="QLabel" name="noise_label">
             <property name="text">
              <string>Interference</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="2">
+           <widget class="QLabel" name="polarization_label">
+            <property name="text">
+             <string>Polarization</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -788,13 +773,41 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="2">
-           <widget class="QLabel" name="polarization_label">
-            <property name="text">
-             <string>Polarization</string>
+          <item row="1" column="3">
+           <widget class="QDial" name="noise_dial">
+            <property name="minimum">
+             <number>0</number>
             </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
+            <property name="maximum">
+             <number>16</number>
+            </property>
+            <property name="pageStep">
+             <number>4</number>
+            </property>
+            <property name="value">
+             <number>4</number>
+            </property>
+            <property name="wrapping">
+             <bool>false</bool>
+            </property>
+            <property name="notchTarget">
+             <double>1.000000000000000</double>
+            </property>
+            <property name="notchesVisible">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="4" rowspan="3">
+           <widget class="QCheckBox" name="calibration_check_box">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>Calibration</string>
             </property>
            </widget>
           </item>
