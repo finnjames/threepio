@@ -27,7 +27,7 @@ class DecDialog(QtWidgets.QDialog):
 
         self.data = []
         self.current_dec = self.south_dec
-        self.ui.set_dec_value.setText(str(self.current_dec))
+        self.update_label()
 
         self.tars = tars
 
@@ -47,7 +47,7 @@ class DecDialog(QtWidgets.QDialog):
         else:
             self.current_dec = self.north_dec
             self.step = -10
-        self.ui.set_dec_value.setText(str(self.current_dec))
+        self.update_label()
 
     def handle_next(self):
         # read just the declination value
@@ -60,7 +60,7 @@ class DecDialog(QtWidgets.QDialog):
         elif self.current_dec <= self.south_dec or self.current_dec >= self.north_dec:
             self.ui.next_cal_button.setText("Save")
 
-        self.ui.set_dec_value.setText(str(self.current_dec))
+        self.update_label()
 
         # is calibration complete?
         if self.current_dec > self.north_dec or self.current_dec < self.south_dec:
@@ -74,9 +74,12 @@ class DecDialog(QtWidgets.QDialog):
                 # reverse it if it's N -> S
                 self.step < 0 and self.data.reverse()
 
-                f.write('\n'.join(str(line) for line in self.data))
+                f.write("\n".join(str(line) for line in self.data))
 
             self.close()
 
     def handle_discard(self):
         self.close()
+
+    def update_label(self):
+        self.ui.set_dec_value.setText(str(self.current_dec) + "°")
