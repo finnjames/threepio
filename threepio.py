@@ -157,7 +157,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.time_of_last_tick = self.clock.get_time()  # type: ignore
         self.time_of_last_refresh_update = self.time_of_last_tick
 
-        # testing QGraphicsView TODO: move this into its own method
+        # QGraphicsView TODO: move this into its own method
         self.dec_scene = QtWidgets.QGraphicsScene()
         self.ui.dec_view.setScene(self.dec_scene)
         self.update_dec_view()
