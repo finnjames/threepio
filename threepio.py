@@ -71,6 +71,9 @@ class Threepio(QtWidgets.QMainWindow):
             QtCore.Qt.Window | QtCore.Qt.WindowTitleHint | QtCore.Qt.CustomizeWindowHint
         )
 
+        # mode
+        self.legacy_mode = False
+
         # "console" output
         self.message_log = ["Starting threepio..."]
         self.update_console()
@@ -98,6 +101,7 @@ class Threepio(QtWidgets.QMainWindow):
 
         self.update_speed()
 
+        self.log("Initializing buttons...")
         # connect buttons
         self.ui.stripchart_speed_slider.valueChanged.connect(self.update_speed)
 
@@ -112,13 +116,9 @@ class Threepio(QtWidgets.QMainWindow):
 
         self.ui.actionNormal.triggered.connect(self.set_state_normal)
         self.ui.actionTesting.triggered.connect(self.set_state_testing)
-        self.ui.actionLegacy.triggered.connect(self.legacy_mode)
+        self.ui.actionLegacy.triggered.connect(self.toggle_state_legacy)
 
         self.ui.chart_clear_button.clicked.connect(self.clear_stripchart)
-
-        self.ui.chart_legacy_button.clicked.connect(self.legacy_mode)
-
-        self.log("Initializing buttons...")
 
         # Tars/DATAQ stuff
         device = discovery()
@@ -298,10 +298,16 @@ class Threepio(QtWidgets.QMainWindow):
         self.setFixedSize(800, 826)
         self.ui.testing_frame.show()
 
-    def legacy_mode(self):
+    def toggle_state_legacy(self):
         """lol"""
-        self.setStyleSheet("background-color:#00ff00; color: #ff0000")
-        self.setAutoFillBackground(True)
+        if self.legacy_mode:
+            self.ui.actionLegacy.setChecked(False)
+            self.setStyleSheet("")
+            self.legacy_mode = False
+        else:
+            self.ui.actionLegacy.setChecked(True)
+            self.setStyleSheet("background-color:#00ff00; color: #ff0000")
+            self.legacy_mode = True
 
     @staticmethod
     def handle_credits():

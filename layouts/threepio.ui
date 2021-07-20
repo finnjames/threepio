@@ -25,6 +25,9 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
+  <property name="autoFillBackground">
+   <bool>true</bool>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
@@ -390,13 +393,6 @@
                </property>
               </widget>
              </item>
-             <item>
-              <widget class="QPushButton" name="chart_legacy_button">
-               <property name="text">
-                <string>Legacy Mode</string>
-               </property>
-              </widget>
-             </item>
             </layout>
            </widget>
           </item>
@@ -507,7 +503,7 @@
                <property name="font">
                 <font>
                  <family>Iosevka Aile</family>
-                 <pointsize>12</pointsize>
+                 <pointsize>10</pointsize>
                  <weight>75</weight>
                  <bold>true</bold>
                 </font>
@@ -791,12 +787,6 @@
           </item>
           <item row="1" column="4" rowspan="3">
            <widget class="QCheckBox" name="calibration_check_box">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
             <property name="text">
              <string>Calibration</string>
             </property>
@@ -840,8 +830,8 @@
      <string>Mode</string>
     </property>
     <addaction name="actionNormal"/>
-    <addaction name="actionLegacy"/>
     <addaction name="actionTesting"/>
+    <addaction name="actionLegacy"/>
    </widget>
    <widget class="QMenu" name="menuObservation">
     <property name="title">
@@ -938,9 +928,6 @@
    </property>
    <property name="text">
     <string>Legacy</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+Z</string>
    </property>
   </action>
   <action name="actionGetInfo">
