@@ -128,7 +128,7 @@ class Tars:
         b = a - 0.1 * self.parent.ui.polarization_dial.value() * g * (v / 2 + 1)
 
         def normalize_kinda(x):
-            return x / 116 + c
+            return x / 272 + c + 1
 
         a = normalize_kinda(a)
         b = normalize_kinda(b)
