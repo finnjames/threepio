@@ -63,6 +63,15 @@ class Observation:
         self.data_start = None
         self.data_end = None
 
+        # alerts before start of observation
+        beeplist = (
+            [300]
+            + list(range(60, 300, 60))
+            + list(range(10, 60, 10))
+            + list(range(1, 10))
+        )
+        self.beeptimes = [[j, False] for j in beeplist]
+
         # # The data list, for backup
         # self.data       = []
 
@@ -91,27 +100,39 @@ class Observation:
         if timestamp is None:
             timestamp = time.time()
 
+        user_start_time = self.start_RA - (self.bg_dur + self.cal_dur + 30)
+
+        def no_action(timestamp):
+
+            tobeepornottobeep = False
+            for i in self.beeptimes:
+                if not i[1] and timestamp > user_start_time - (i[0]):
+                    i[1] = True
+                    tobeepornottobeep = True
+
+            return Comm.BEEP if tobeepornottobeep else Comm.NO_ACTION
+
         if self.state == self.State.OFF:
-            if timestamp < self.start_RA - (self.bg_dur + self.cal_dur + 30):
-                # A 30 seconds buffer for user actions
-                return Comm.NO_ACTION
+            if timestamp < user_start_time:
+                # A 30 second buffer for user actions
+                return no_action(timestamp)
             else:
                 return Comm.START_CAL
         elif self.state == self.State.CAL_1:
             if timestamp - self.cal_start < self.cal_dur:
                 self.write_data(data_point)
-                return Comm.NO_ACTION
+                return no_action(timestamp)
             else:
                 return Comm.STOP_CAL
         elif self.state == self.State.BG_1:
             if timestamp - self.bg_start < self.bg_dur:
                 self.write_data(data_point)
-                return Comm.NO_ACTION
+                return no_action(timestamp)
             else:
                 return Comm.NEXT
         elif self.state == self.State.DATA:
             if timestamp < self.start_RA:
-                return Comm.NO_ACTION
+                return no_action(timestamp)
             elif timestamp < self.end_RA:
                 return self.data_logic(data_point)
             else:
@@ -119,13 +140,13 @@ class Observation:
         elif self.state == self.State.CAL_2:
             if timestamp - self.cal_start < self.cal_dur:
                 self.write_data(data_point)
-                return Comm.NO_ACTION
+                return no_action(timestamp)
             else:
                 return Comm.STOP_CAL
         elif self.state == self.State.BG_2:
             if timestamp - self.bg_start < self.bg_dur:
                 self.write_data(data_point)
-                return Comm.NO_ACTION
+                return no_action(timestamp)
             else:
                 return Comm.FINISHED
         elif self.state == self.State.DONE:
