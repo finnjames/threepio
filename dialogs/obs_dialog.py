@@ -23,6 +23,9 @@ class ObsDialog(QtWidgets.QDialog):
         self.default_filename = self.clock.get_time_slug()
         self.ui.file_name_value.setPlaceholderText(str(self.default_filename))
 
+        # hide error label to start
+        self.ui.error_label.hide()
+
         # If a scan or spectrum, only one Dec needed
         if self.observation.obs_type in ["Scan", "Spectrum"]:
             for i in [self.ui.starting_dec, self.ui.start_dec_label]:
@@ -53,7 +56,7 @@ class ObsDialog(QtWidgets.QDialog):
             self.parent_window.observation = self.observation
             self.close()
         else:
-            print("error creating observation")
+            self.ui.error_label.show()
 
     def set_observation(self):
         """add all necessary info to the encapsulated observation; 1: error"""
@@ -79,8 +82,9 @@ class ObsDialog(QtWidgets.QDialog):
             else start_time + 180
         )
 
-        # set all of the relevant data to the observation
-        # if no filename, use timestamp
+        # final check and write to observation
+
+        # if no filename, use default (timestamp)
         filename = self.ui.file_name_value.text()
         if filename == "":
             filename = self.default_filename
