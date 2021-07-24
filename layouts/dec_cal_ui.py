@@ -14,13 +14,10 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(320, 100)
+        Dialog.resize(320, 122)
         Dialog.setModal(True)
         self.gridLayout = QtWidgets.QGridLayout(Dialog)
         self.gridLayout.setObjectName("gridLayout")
-        self.set_dec_label = QtWidgets.QLabel(Dialog)
-        self.set_dec_label.setObjectName("set_dec_label")
-        self.gridLayout.addWidget(self.set_dec_label, 1, 0, 1, 2)
         self.set_dec_value = QtWidgets.QLabel(Dialog)
         font = QtGui.QFont()
         font.setFamily("Iosevka Aile")
@@ -28,6 +25,9 @@ class Ui_Dialog(object):
         self.set_dec_value.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.set_dec_value.setObjectName("set_dec_value")
         self.gridLayout.addWidget(self.set_dec_value, 1, 2, 1, 1)
+        self.set_dec_label = QtWidgets.QLabel(Dialog)
+        self.set_dec_label.setObjectName("set_dec_label")
+        self.gridLayout.addWidget(self.set_dec_label, 1, 0, 1, 2)
         self.button_frame = QtWidgets.QFrame(Dialog)
         self.button_frame.setObjectName("button_frame")
         self.gridLayout_2 = QtWidgets.QGridLayout(self.button_frame)
@@ -56,8 +56,8 @@ class Ui_Dialog(object):
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
         Dialog.setWindowTitle(_translate("Dialog", "Declination Calibration"))
-        self.set_dec_label.setText(_translate("Dialog", "Set declination to"))
         self.set_dec_value.setText(_translate("Dialog", "dec"))
+        self.set_dec_label.setText(_translate("Dialog", "Set declination to"))
         self.north_or_south_combo_box.setItemText(0, _translate("Dialog", "S → N"))
         self.north_or_south_combo_box.setItemText(1, _translate("Dialog", "N → S"))
         self.discard_cal_button.setText(_translate("Dialog", "Discard"))

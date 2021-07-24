@@ -38,6 +38,8 @@ class DecDialog(QtWidgets.QDialog):
             self.switch_direction
         )
 
+        self.confirmed = False
+
         # self.handle_next()
 
     def switch_direction(self):
@@ -50,33 +52,47 @@ class DecDialog(QtWidgets.QDialog):
         self.update_label()
 
     def handle_next(self):
-        # read just the declination value
-        self.data.append(self.tars.read_latest()[2][1])
 
-        self.current_dec += self.step
-        if self.current_dec not in [self.south_dec, self.north_dec]:
-            # disable N/S choice if not first
-            self.ui.north_or_south_combo_box.setDisabled(True)
-        elif self.current_dec <= self.south_dec or self.current_dec >= self.north_dec:
-            self.ui.next_cal_button.setText("Save")
+        if not self.confirmed:
+            self.ui.set_dec_label.setText("Are you sure?")
+            self.ui.next_cal_button.setText("Yes")
+            self.confirmed = True
+        else:
+            # read just the declination value
+            self.data.append(self.tars.read_latest()[2][1])
 
-        self.update_label()
+            self.current_dec += self.step
+            self.ui.next_cal_button.setText("Next")
+            self.ui.set_dec_label.setText("Set declination to")
 
-        # is calibration complete?
-        if self.current_dec > self.north_dec or self.current_dec < self.south_dec:
-            # copy over the current file to the backup file
-            with open(self.CAL_FILENAME) as f, open(self.CAL_BACKUP_FILENAME, "w") as b:
-                for line in f:
-                    b.write(line)
+            if self.current_dec not in [self.south_dec, self.north_dec]:
+                # disable N/S choice if not first
+                self.ui.north_or_south_combo_box.setDisabled(True)
+            elif (
+                self.current_dec <= self.south_dec or self.current_dec >= self.north_dec
+            ):
+                self.ui.next_cal_button.setText("Save")
 
-            open(self.CAL_FILENAME, "w").close()  # overwrite file
-            with open(self.CAL_FILENAME, "a") as f:
-                # reverse it if it's N -> S
-                self.step < 0 and self.data.reverse()
+            self.update_label()
+            self.confirmed = False
 
-                f.write("\n".join(str(line) for line in self.data))
+            # is calibration complete?
+            if self.current_dec > self.north_dec or self.current_dec < self.south_dec:
+                # copy over the current file to the backup file
+                with open(self.CAL_FILENAME) as f, open(
+                    self.CAL_BACKUP_FILENAME, "w"
+                ) as b:
+                    for line in f:
+                        b.write(line)
 
-            self.close()
+                open(self.CAL_FILENAME, "w").close()  # overwrite file
+                with open(self.CAL_FILENAME, "a") as f:
+                    # reverse it if it's N -> S
+                    self.step < 0 and self.data.reverse()
+
+                    f.write("\n".join(str(line) for line in self.data))
+
+                self.close()
 
     def handle_discard(self):
         self.close()
