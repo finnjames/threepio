@@ -312,7 +312,6 @@ class Threepio(QtWidgets.QMainWindow):
     @staticmethod
     def handle_credits():
         dialog = CreditsDialog()
-        dialog.show()
         dialog.exec_()
 
     def set_time(self):
