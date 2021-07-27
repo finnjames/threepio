@@ -73,6 +73,7 @@ class Threepio(QtWidgets.QMainWindow):
 
         # mode
         self.legacy_mode = False
+        self.mode = "normal"
 
         # "console" output
         self.message_log = ["Starting threepio..."]
@@ -291,12 +292,14 @@ class Threepio(QtWidgets.QMainWindow):
         self.ui.testing_frame.hide()
         self.adjustSize()
         self.setFixedSize(800, 640)
+        self.mode = "normal"
 
     def set_state_testing(self):
         self.ui.actionNormal.setChecked(False)
         self.ui.actionTesting.setChecked(True)
         self.setFixedSize(800, 826)
         self.ui.testing_frame.show()
+        self.mode = "testing"
 
     def toggle_state_legacy(self):
         """lol"""
@@ -481,7 +484,8 @@ class Threepio(QtWidgets.QMainWindow):
 
     def dec_calibration(self):
         dialog = DecDialog(self.tars)
-        dialog.show()
+        if self.mode == "testing":
+            dialog.show()
         dialog.exec_()
 
         self.load_dec_cal()
