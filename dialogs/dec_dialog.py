@@ -13,7 +13,7 @@ class DecDialog(QtWidgets.QDialog):
     CAL_FILENAME = "dec-cal.txt"
     CAL_BACKUP_FILENAME = "dec-cal-backup.txt"
 
-    def __init__(self, tars):
+    def __init__(self, tars, parent):
         QtWidgets.QWidget.__init__(self)
         self.ui = dec_cal_ui.Ui_Dialog()
         self.ui.setupUi(self)
@@ -30,6 +30,7 @@ class DecDialog(QtWidgets.QDialog):
         self.update_label()
 
         self.tars = tars
+        self.parent = parent
 
         # connect buttons
         self.ui.discard_cal_button.clicked.connect(self.handle_discard)
@@ -59,7 +60,15 @@ class DecDialog(QtWidgets.QDialog):
             self.confirmed = True
         else:
             # read just the declination value
-            self.data.append(self.tars.read_latest()[2][1])
+            new_dec = self.tars.read_latest()[2][1]
+            if (
+                len(self.data) >= 2
+                and (new_dec - self.data[-1]) * (self.data[-1] - self.data[-2]) <= 0
+            ):
+                self.parent.log("Dec cal failed, invalid data")
+                self.handle_discard()
+
+            self.data.append(new_dec)
 
             self.current_dec += self.step
             self.ui.next_cal_button.setText("Next")

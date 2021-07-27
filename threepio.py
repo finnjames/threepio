@@ -461,7 +461,6 @@ class Threepio(QtWidgets.QMainWindow):
             self.ui.channelB_value.setText("%.4fV" % self.data[len(self.data) - 1].b)
 
     def get_refresh_rate(self):
-        # TODO: make this an average over the last second OR last N ticks
         return 1 / self.time_since_last_tick if self.time_since_last_tick > 0 else -1.0
 
     def handle_survey(self):
@@ -483,7 +482,7 @@ class Threepio(QtWidgets.QMainWindow):
         dialog.exec_()
 
     def dec_calibration(self):
-        dialog = DecDialog(self.tars)
+        dialog = DecDialog(self.tars, self)
         if self.mode == "testing":
             dialog.show()
         dialog.exec_()
