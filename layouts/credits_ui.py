@@ -52,5 +52,5 @@ class Ui_Dialog(object):
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
         Dialog.setWindowTitle(_translate("Dialog", "Credits"))
-        self.label_2.setText(_translate("Dialog", "<html><head/><body><p><span style=\" font-weight:600;\">threepio.py</span></p><p>Written by Finn, Shengjie, and Isabel</p><p>Licensed under GPLv3</p></body></html>"))
+        self.label_2.setText(_translate("Dialog", "<html><head/><body><p><span style=\" font-weight:600;\">threepio.py</span></p><p>Written by Finn and Shengjie</p><p>Licensed under GPLv3</p></body></html>"))
         self.close_button.setText(_translate("Dialog", "Close"))
