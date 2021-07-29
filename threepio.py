@@ -21,7 +21,7 @@ class Threepio(QtWidgets.QMainWindow):
     """main class for the app"""
 
     # basic time
-    PERIOD = 10  # ms
+    BASE_PERIOD = 10  # ms
     STRIPCHART_PERIOD = 16.7  # ms
     VOLTAGE_PERIOD = 1000  # ms
     # how many data points to draw to stripchart
@@ -152,7 +152,7 @@ class Threepio(QtWidgets.QMainWindow):
         # refresh timer
         self.timer = QtCore.QTimer(self)
         self.timer.timeout.connect(self.tick)  # do everything
-        self.timer.start(self.PERIOD)  # set refresh rate
+        self.timer.start(self.BASE_PERIOD)  # set refresh rate
 
         # used for measuring refresh rate
         self.time_since_last_tick = 0
@@ -192,7 +192,7 @@ class Threepio(QtWidgets.QMainWindow):
 
         if self.observation is None:
 
-            period = self.PERIOD * 0.001  # s -> ms
+            period = self.BASE_PERIOD * 0.001  # ms -> s
 
             if (current_time - self.tick_time) > (period * self.timing_margin):
                 self.tick_time = current_time
@@ -211,10 +211,9 @@ class Threepio(QtWidgets.QMainWindow):
 
                     self.data.append(data_point)
                 except TypeError:
-                    # print("TypeError")
                     pass
 
-                self.update_gui()  # update gui except voltage and stripchart
+                # self.update_gui()  # update gui except voltage and stripchart
 
         else:
 
@@ -229,8 +228,6 @@ class Threepio(QtWidgets.QMainWindow):
                 a.setDisabled(True)
 
             period = 1 / self.observation.freq
-
-            self.update_gui()  # the GUI besides the stripchart handles its own timing
 
             if (current_time - self.tick_time) > (period * self.timing_margin):
 
@@ -279,6 +276,8 @@ class Threepio(QtWidgets.QMainWindow):
                 time_until_start = self.observation.start_RA - current_time
                 if time_until_start <= 0 < (self.observation.end_RA - current_time):
                     self.message("Taking observation data...")
+
+        self.update_gui()  # the GUI handles its own timingO
 
     def set_state_normal(self):
         self.ui.actionNormal.setChecked(True)
