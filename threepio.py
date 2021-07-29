@@ -7,7 +7,7 @@ r"""
 
 """
 
-import time
+import time, math
 from functools import reduce
 
 from PyQt5 import QtChart, QtCore, QtGui, QtWidgets, QtMultimedia
@@ -345,9 +345,7 @@ class Threepio(QtWidgets.QMainWindow):
             self.time_of_last_stripchart_update = current_time
 
     def update_progress_bar(self):
-        """updates the progress bar"""
-        # this mess makes the bar display "T+/- XX.XX" when
-        # assigned, and progress the bar when taking data
+        # T=start_RA
         if self.observation is not None:
             # if not self.observation.end_RA - self.observation.start_RA <= 1:
             if (
@@ -367,9 +365,20 @@ class Threepio(QtWidgets.QMainWindow):
                 )
             else:
                 self.ui.progressBar.setValue(0)
-            # either way, T=start_RA
+
+            # display the time nicely
+            tus = self.clock.get_time_until(
+                self.observation.start_RA
+            )  # time until start
+            hours = int((abs_tus := abs(tus)) / 3600)
+            minutes = int((abs_tus - (hours * 3600)) / 60)
+            seconds = int(abs_tus - (hours * 3600) - (minutes * 60))
             self.ui.progressBar.setFormat(
-                "T%+.1fs" % (self.clock.get_time_until(self.observation.start_RA))
+                "T"
+                + ("-" if tus < 0 else "+")
+                + (str(hours) + ":" if hours != 0 else "")
+                + (str(minutes) + ":" if minutes != 0 else "")
+                + str(seconds)
             )
             return
 
