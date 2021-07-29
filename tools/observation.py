@@ -103,13 +103,11 @@ class Observation:
         user_start_time = self.start_RA - (self.bg_dur + self.cal_dur + 30)
 
         def no_action(timestamp):
-
             tobeepornottobeep = False
             for i in self.beeptimes:
                 if not i[1] and timestamp > user_start_time - (i[0]):
                     i[1] = True
                     tobeepornottobeep = True
-
             return Comm.BEEP if tobeepornottobeep else Comm.NO_ACTION
 
         if self.state == self.State.OFF:
