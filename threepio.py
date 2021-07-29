@@ -76,7 +76,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.mode = "normal"
 
         # "console" output
-        self.message_log = ["Starting threepio..."]
+        self.message_log = ["Starting threepio!!!"]
         self.update_console()
 
         # clock
@@ -84,7 +84,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.set_time()
 
         # initialize stripchart
-        self.log("Initializing stripchart...")
+        self.log("Initializing stripchart!!!")
         self.stripchart_series_a = QtChart.QLineSeries()
         self.stripchart_series_b = QtChart.QLineSeries()
         # self.stripchart_series_a.setUseOpenGL(True)
@@ -102,7 +102,7 @@ class Threepio(QtWidgets.QMainWindow):
 
         self.update_speed()
 
-        self.log("Initializing buttons...")
+        self.log("Initializing buttons!!!")
         # connect buttons
         self.ui.stripchart_speed_slider.valueChanged.connect(self.update_speed)
 
@@ -128,7 +128,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.tars.start()
 
         # bleeps and bloops
-        self.log("Initializing audio...")
+        self.log("Initializing audio!!!")
         self.click_sound = QtMultimedia.QSoundEffect()
         url = QtCore.QUrl()
         self.click_sound.setSource(url.fromLocalFile("assets/beep3.wav"))
@@ -257,12 +257,12 @@ class Threepio(QtWidgets.QMainWindow):
                     self.alert("Set calibration switches to ON", "Okay")
                     self.alert("Are the calibration switches on?", "Yes")
                     self.observation.next()
-                    self.message("Taking calibration data...")
+                    self.message("Taking calibration data!!!")
                 elif self.transmission == Comm.STOP_CAL:
                     self.alert("Set calibration switches to OFF", "Okay")
                     self.alert("Are the calibration switches off?", "Yes")
                     self.observation.next()
-                    self.message("Taking background data...")
+                    self.message("Taking background data!!!")
                 elif self.transmission == Comm.NEXT:
                     self.observation.next()
                 elif self.transmission == Comm.FINISHED:
@@ -275,7 +275,7 @@ class Threepio(QtWidgets.QMainWindow):
 
                 time_until_start = self.observation.start_RA - current_time
                 if time_until_start <= 0 < (self.observation.end_RA - current_time):
-                    self.message("Taking observation data...")
+                    self.message("Taking observation data!!!")
 
         self.update_gui()  # the GUI handles its own timingO
 
