@@ -72,6 +72,8 @@ class ObsDialog(QtWidgets.QDialog):
         ending_sidereal_time = (
             3600 * int(u_end_time[:2]) + 60 * int(u_end_time[3:5]) + int(u_end_time[6:])
         )
+        if ending_sidereal_time < starting_sidereal_time:
+            ending_sidereal_time += 3600 * 24
 
         start_time = (
             starting_sidereal_time - self.clock.get_sidereal_seconds() + time.time()
