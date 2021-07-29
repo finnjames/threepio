@@ -27,6 +27,7 @@ class SuperClock:
         return time.time() - self.starting_time
 
     def get_time_until(self, destination_time):
+        """Positive means it already happened, negative means it will happen"""
         return time.time() - destination_time
 
     def get_local_time(self):

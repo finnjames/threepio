@@ -230,6 +230,8 @@ class Threepio(QtWidgets.QMainWindow):
 
             period = 1 / self.observation.freq
 
+            self.update_gui()  # the GUI besides the stripchart handles its own timing
+
             if (current_time - self.tick_time) > (period * self.timing_margin):
 
                 self.tick_time = current_time
@@ -250,8 +252,7 @@ class Threepio(QtWidgets.QMainWindow):
                     data_point, time.time()
                 )
 
-                self.update_gui()
-                self.update_stripchart()  # make the stripchart scroll
+                self.update_stripchart()
 
                 # This is a mess, but I think it should be fine for now
                 # TODO: at least move this to its own method
@@ -269,7 +270,7 @@ class Threepio(QtWidgets.QMainWindow):
                     self.observation.next()
                 elif self.transmission == Comm.FINISHED:
                     self.observation.next()
-                    self.message("Finished")
+                    self.message("Observation complete!")
                 elif self.transmission == Comm.BEEP:
                     self.beep()
                 elif self.transmission == Comm.NO_ACTION:
@@ -278,13 +279,6 @@ class Threepio(QtWidgets.QMainWindow):
                 time_until_start = self.observation.start_RA - current_time
                 if time_until_start <= 0 < (self.observation.end_RA - current_time):
                     self.message("Taking observation data...")
-                elif time_until_start >= 0:
-                    # self.message(
-                    #     "Observation will start in %.0f seconds" % time_until_start,
-                    #     beep=False,
-                    #     log=False,
-                    # )
-                    pass
 
     def set_state_normal(self):
         self.ui.actionNormal.setChecked(True)
@@ -304,13 +298,12 @@ class Threepio(QtWidgets.QMainWindow):
     def toggle_state_legacy(self):
         """lol"""
         if self.legacy_mode:
-            self.ui.actionLegacy.setChecked(False)
             self.setStyleSheet("")
             self.legacy_mode = False
         else:
-            self.ui.actionLegacy.setChecked(True)
             self.setStyleSheet("background-color:#00ff00; color: #ff0000")
             self.legacy_mode = True
+        self.ui.actionLegacy.setChecked(self.legacy_mode)
 
     @staticmethod
     def handle_credits():
@@ -354,31 +347,32 @@ class Threepio(QtWidgets.QMainWindow):
 
     def update_progress_bar(self):
         """updates the progress bar"""
-        # this mess makes the progress bar display "T+/- XX.XX" when
+        # this mess makes the bar display "T+/- XX.XX" when
         # assigned, and progress the bar when taking data
         if self.observation is not None:
-            if not self.observation.end_RA - self.observation.start_RA <= 1:
-                if (
-                    self.clock.get_time_until(self.observation.start_RA)
-                    > 0
-                    > self.clock.get_time_until(self.observation.end_RA)
-                ):
-                    self.ui.progressBar.setValue(
-                        int(
-                            (
-                                self.clock.get_time_until(self.observation.end_RA)
-                                / (self.observation.end_RA - self.observation.start_RA)
-                            )
-                            * 100
-                            % 100
+            # if not self.observation.end_RA - self.observation.start_RA <= 1:
+            if (
+                self.clock.get_time_until(self.observation.start_RA)
+                > 0
+                > self.clock.get_time_until(self.observation.end_RA)
+            ):  # between start and end time
+                self.ui.progressBar.setValue(
+                    int(
+                        (
+                            self.clock.get_time_until(self.observation.end_RA)
+                            / (self.observation.end_RA - self.observation.start_RA)
                         )
+                        * 100
+                        % 100
                     )
-                else:
-                    self.ui.progressBar.setValue(0)
-                self.ui.progressBar.setFormat(
-                    "T%+.1fs" % (self.clock.get_time_until(self.observation.start_RA))
                 )
-                return
+            else:
+                self.ui.progressBar.setValue(0)
+            # either way, T=start_RA
+            self.ui.progressBar.setFormat(
+                "T%+.1fs" % (self.clock.get_time_until(self.observation.start_RA))
+            )
+            return
 
         self.ui.progressBar.setFormat("n/a")
         self.ui.progressBar.setValue(0)
@@ -386,7 +380,7 @@ class Threepio(QtWidgets.QMainWindow):
     def update_dec_view(self):
         angle = self.current_dec - self.GB_LATITUDE
 
-        # construct telescope dish
+        # telescope dish
         dish = QtGui.QPixmap("assets/dish.png")
         dish = QtWidgets.QGraphicsPixmapItem(dish)
         dish.setTransformOriginPoint(32, 32)
@@ -394,7 +388,7 @@ class Threepio(QtWidgets.QMainWindow):
         dish.setY(16)
         dish.setRotation(angle)
 
-        # construct telescope base
+        # telescope base
         base = QtGui.QPixmap("assets/base.png")
         base = QtWidgets.QGraphicsPixmapItem(base)
         base.setTransformationMode(QtCore.Qt.SmoothTransformation)
@@ -478,7 +472,6 @@ class Threepio(QtWidgets.QMainWindow):
     def new_observation(self, obs):
         dialog = ObsDialog(self, obs, self.clock)
         dialog.setWindowTitle("New " + obs.obs_type)
-        dialog.show()
         dialog.exec_()
 
     def dec_calibration(self):
@@ -544,10 +537,10 @@ class Threepio(QtWidgets.QMainWindow):
             self.beep()
         self.ui.message_label.setText(message)
 
-    def log(self, message):
+    def log(self, message, allowDups=False):
         # TODO: add a way to signal that a task completed successfully (like returning
         #  an object with "mark_done()" and "mark_failed" methods)
-        if message != self.message_log[-1][11:]:
+        if allowDups or message != self.message_log[-1][11:]:
             try:
                 self.message_log.append(f"[{self.clock.get_sidereal_time()}] {message}")
             except AttributeError:
@@ -555,7 +548,7 @@ class Threepio(QtWidgets.QMainWindow):
 
     def update_console(self):
         self.ui.console_label.setText(
-            reduce(lambda c, a: c + "\n" + a, self.message_log[-6:])
+            reduce(lambda c, a: c + "\n" + a, self.message_log[-7:])
         )
 
     def alert(self, message, button_message="Close"):
