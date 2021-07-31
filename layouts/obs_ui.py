@@ -79,7 +79,6 @@ class Ui_Dialog(object):
         font = QtGui.QFont()
         font.setFamily("Iosevka Aile")
         self.data_acquisition_rate_value.setFont(font)
-        self.data_acquisition_rate_value.setButtonSymbols(QtWidgets.QAbstractSpinBox.NoButtons)
         self.data_acquisition_rate_value.setMinimum(1)
         self.data_acquisition_rate_value.setMaximum(100)
         self.data_acquisition_rate_value.setProperty("value", 10)

@@ -134,9 +134,6 @@
        <family>Iosevka Aile</family>
       </font>
      </property>
-     <property name="buttonSymbols">
-      <enum>QAbstractSpinBox::NoButtons</enum>
-     </property>
      <property name="minimum">
       <number>1</number>
      </property>
