@@ -594,8 +594,7 @@ def main():
 
     app = QtWidgets.QApplication(sys.argv)
     app.setStyle("Fusion")
-    icon_type = "icns" if sys.platform == "darwin" else "png"
-    app.setWindowIcon(QtGui.QIcon(f"assets/robot.{icon_type}"))
+    app.setWindowIcon(QtGui.QIcon(f"assets/robot.png"))
     window = Threepio()
     window.set_state_normal()
     # window.set_state_testing()
