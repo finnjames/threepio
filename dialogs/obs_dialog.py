@@ -55,6 +55,9 @@ class ObsDialog(QtWidgets.QDialog):
             self.parent_window.observation = None
             self.parent_window.observation = self.observation
             self.close()
+            self.parent_window.alert(
+                f"Set declination to {self.observation.min_dec - 5}°", "Okay"
+            )
         else:
             self.ui.error_label.show()
 

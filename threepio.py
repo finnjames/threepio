@@ -23,7 +23,6 @@ from tools import (
     SuperClock,
     Tars,
     discovery,
-    State,
 )
 
 
@@ -94,7 +93,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.set_time()
 
         # initialize stripchart
-        self.log("Initializing stripchart!!!")
+        self.log("Initializing stripchart...")
         self.stripchart_series_a = QtChart.QLineSeries()
         self.stripchart_series_b = QtChart.QLineSeries()
         # self.stripchart_series_a.setUseOpenGL(True)
@@ -112,7 +111,7 @@ class Threepio(QtWidgets.QMainWindow):
 
         self.update_speed()
 
-        self.log("Initializing buttons!!!")
+        self.log("Initializing buttons...")
         # connect buttons
         self.ui.stripchart_speed_slider.valueChanged.connect(self.update_speed)
 
@@ -138,7 +137,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.tars.start()
 
         # bleeps and bloops
-        self.log("Initializing audio!!!")
+        self.log("Initializing audio...")
         self.click_sound = QtMultimedia.QSoundEffect()
         url = QtCore.QUrl()
         self.click_sound.setSource(url.fromLocalFile("assets/beep3.wav"))
@@ -275,21 +274,33 @@ class Threepio(QtWidgets.QMainWindow):
                     self.alert("Are the calibration switches off?", "Yes")
                     self.observation.next()
                     self.message("Taking background data!!!")
-                elif self.transmission == Comm.NEXT:
-                    current_state = self.observation.next()
-                    if current_state == State.WAITING:
-                        self.message(f"Waiting for {obs_type} to begin...")
+                elif self.transmission == Comm.START_WAIT:
+                    self.observation.next()
+                    self.message(f"Waiting for {obs_type.lower()} to begin...")
+                elif self.transmission == Comm.START_DATA:
+                    self.observation.next()
+                    self.message(f"Taking {obs_type.lower()} data!!!")
                 elif self.transmission == Comm.FINISHED:
                     self.observation.next()
                     self.message(f"{obs_type} complete!!!")
+                    if self.stop_tel_alert and self.observation.obs_type == "Survey":
+                        self.alert("STOP the telescope", "Okay")
+                        self.alert("Has the telescope been stopped?", "Yes")
+                        self.stop_tel_alert = False
+                elif self.transmission == Comm.SEND_TEL_NORTH:
+                    self.alert("Send telescope NORTH at maximum speed!!!", "Okay")
+                elif self.transmission == Comm.SEND_TEL_SOUTH:
+                    self.alert("Send telescope SOUTH at maximum speed!!!", "Okay")
                 elif self.transmission == Comm.BEEP:
                     self.beep()
+                elif self.transmission == Comm.NEXT:
+                    self.observation.next()
                 elif self.transmission == Comm.NO_ACTION:
                     pass
 
-                time_until_start = self.observation.start_RA - current_time
-                if time_until_start <= 0 < (self.observation.end_RA - current_time):
-                    self.message(f"Taking {obs_type} data!!!")
+                # time_until_start = self.observation.start_RA - current_time
+                # if time_until_start <= 0 < (self.observation.end_RA - current_time):
+                #     self.message(f"Taking {obs_type} data!!!")
 
         self.update_gui()  # the GUI handles its own timingO
 
@@ -499,6 +510,7 @@ class Threepio(QtWidgets.QMainWindow):
         dialog = ObsDialog(self, obs, self.clock)
         dialog.setWindowTitle("New " + obs.obs_type)
         dialog.exec_()
+        self.stop_tel_alert = True
 
     def dec_calibration(self):
         dialog = DecDialog(self.tars, self)
