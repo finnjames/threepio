@@ -300,6 +300,12 @@ class Threepio(QtWidgets.QMainWindow):
         self.setStyleSheet(
             "background-color:#00ff00; color:#ff0000" if self.legacy_mode else ""
         )
+        url = QtCore.QUrl()
+        self.click_sound.setSource(
+            url.fromLocalFile(
+                f"assets/beep{'-legacy' if self.legacy_mode else '3'}.wav"
+            )
+        )
         self.ui.actionLegacy.setChecked(self.legacy_mode)
 
     @staticmethod
