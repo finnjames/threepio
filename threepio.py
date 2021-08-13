@@ -394,9 +394,9 @@ class Threepio(QtWidgets.QMainWindow):
             self.ui.progressBar.setFormat(
                 "T"
                 + ("-" if tus < 0 else "+")
-                + (str(hours) + ":" if hours != 0 else "")
-                + (str(minutes) + ":" if minutes != 0 else "")
-                + str(seconds)
+                + ("{:0>2}".format(hours) + ":" if hours != 0 else "")
+                + ("{:0>2}".format(minutes) + ":" if minutes != 0 else "")
+                + "{:0>2}".format(seconds)
             )
             return
 
