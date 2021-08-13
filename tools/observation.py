@@ -11,6 +11,19 @@ from tools.datapoint import DataPoint
 from tools.precious import MyPrecious
 
 
+# State machine
+class State(Enum):
+    OFF = 1
+    CAL_1 = 2
+    BG_1 = 3
+    DATA = 4
+    CAL_2 = 5
+    BG_2 = 6
+    DONE = 7
+    # extra
+    WAITING = 8
+
+
 class Observation:
     """
     Superclass for each of the three types of observation you might encounter on your Pokemon journey
@@ -40,7 +53,7 @@ class Observation:
         # Will be set accordingly in each state.
         self.freq = self.cal_freq
 
-        self.state = self.State.OFF
+        self.state = State.OFF
 
         # Info
         self.start_RA = None
@@ -110,102 +123,103 @@ class Observation:
                     tobeepornottobeep = True
             return Comm.BEEP if tobeepornottobeep else Comm.NO_ACTION
 
-        if self.state == self.State.OFF:
+        if self.state == State.OFF:
             if timestamp < user_start_time:
                 # A 30 second buffer for user actions
                 return no_action(timestamp)
             else:
                 return Comm.START_CAL
-        elif self.state == self.State.CAL_1:
+        elif self.state == State.CAL_1:
             if timestamp - self.cal_start < self.cal_dur:
                 self.write_data(data_point)
                 return no_action(timestamp)
             else:
                 return Comm.STOP_CAL
-        elif self.state == self.State.BG_1:
+        elif self.state == State.BG_1:
             if timestamp - self.bg_start < self.bg_dur:
                 self.write_data(data_point)
                 return no_action(timestamp)
             else:
                 return Comm.NEXT
-        elif self.state == self.State.DATA:
+        elif self.state == State.WAITING:
+            if timestamp < self.start_RA:
+                return no_action(timestamp)
+            else:
+                return Comm.NEXT
+        elif self.state == State.DATA:
             if timestamp < self.start_RA:
                 return no_action(timestamp)
             elif timestamp < self.end_RA:
                 return self.data_logic(data_point)
             else:
                 return Comm.START_CAL
-        elif self.state == self.State.CAL_2:
+        elif self.state == State.CAL_2:
             if timestamp - self.cal_start < self.cal_dur:
                 self.write_data(data_point)
                 return no_action(timestamp)
             else:
                 return Comm.STOP_CAL
-        elif self.state == self.State.BG_2:
+        elif self.state == State.BG_2:
             if timestamp - self.bg_start < self.bg_dur:
                 self.write_data(data_point)
                 return no_action(timestamp)
             else:
                 return Comm.FINISHED
-        elif self.state == self.State.DONE:
+        elif self.state == State.DONE:
             return Comm.FINISHED
 
     # This is the action API
     def next(self):
-        if self.state == self.State.OFF:
+        if self.state == State.OFF:
             self.start_calibration_1()
-        elif self.state == self.State.CAL_1:
+        elif self.state == State.CAL_1:
             self.end_calibration_1()
-        elif self.state == self.State.BG_1:
+        elif self.state == State.BG_1:
             self.end_background_1()
-        elif self.state == self.State.DATA:
+        elif self.state == State.WAITING:
+            self.start_data()
+        elif self.state == State.DATA:
             self.start_calibration_2()
-        elif self.state == self.State.CAL_2:
+        elif self.state == State.CAL_2:
             self.end_calibration_2()
-        elif self.state == self.State.BG_2:
+        elif self.state == State.BG_2:
             self.stop()
         else:
             pass  # state == DONE, do nothing
-
-    # State machine
-    class State(Enum):
-        OFF = 1
-        CAL_1 = 2
-        BG_1 = 3
-        DATA = 4
-        CAL_2 = 5
-        BG_2 = 6
-        DONE = 7
+        return self.state
 
     def start_calibration_1(self):
-        self.state = self.State.CAL_1
+        self.state = State.CAL_1
         self.start_time = time.time()
         self.cal_start = time.time()
         self.freq = self.cal_freq
 
     def end_calibration_1(self):
-        self.state = self.State.BG_1
+        self.state = State.BG_1
         self.write("*")
         self.bg_start = time.time()
 
     def end_background_1(self):
-        self.state = self.State.DATA
+        self.state = State.WAITING
+
+    def start_data(self):
+        self.state = State.DATA
         self.write("*")
         self.freq = self.data_freq
 
     def start_calibration_2(self):
-        self.state = self.State.CAL_2
+        self.state = State.CAL_2
         self.write("*")
         self.cal_start = time.time()
         self.freq = self.cal_freq
 
     def end_calibration_2(self):
-        self.state = self.State.BG_2
+        self.state = State.BG_2
         self.write("*")
         self.bg_start = time.time()
 
     def stop(self):
-        self.state = self.State.DONE
+        self.state = State.DONE
         self.end_time = time.time()
         self.write("*")
         self.write("*")

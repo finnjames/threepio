@@ -14,7 +14,17 @@ from PyQt5 import QtChart, QtCore, QtGui, QtWidgets, QtMultimedia
 
 from dialogs import AlertDialog, CreditsDialog, DecDialog, ObsDialog, RADialog
 from layouts import threepio_ui, quit_ui
-from tools import Comm, DataPoint, Survey, Scan, Spectrum, SuperClock, Tars, discovery
+from tools import (
+    Comm,
+    DataPoint,
+    Survey,
+    Scan,
+    Spectrum,
+    SuperClock,
+    Tars,
+    discovery,
+    State,
+)
 
 
 class Threepio(QtWidgets.QMainWindow):
@@ -251,6 +261,8 @@ class Threepio(QtWidgets.QMainWindow):
 
                 self.update_stripchart()
 
+                obs_type = self.observation.obs_type
+
                 # This is a mess, but I think it should be fine for now
                 # TODO: at least move this to its own method
                 if self.transmission == Comm.START_CAL:
@@ -264,10 +276,12 @@ class Threepio(QtWidgets.QMainWindow):
                     self.observation.next()
                     self.message("Taking background data!!!")
                 elif self.transmission == Comm.NEXT:
-                    self.observation.next()
+                    current_state = self.observation.next()
+                    if current_state == State.WAITING:
+                        self.message(f"Waiting for {obs_type} to begin...")
                 elif self.transmission == Comm.FINISHED:
                     self.observation.next()
-                    self.message("Observation complete!")
+                    self.message(f"{obs_type} complete!!!")
                 elif self.transmission == Comm.BEEP:
                     self.beep()
                 elif self.transmission == Comm.NO_ACTION:
@@ -275,7 +289,7 @@ class Threepio(QtWidgets.QMainWindow):
 
                 time_until_start = self.observation.start_RA - current_time
                 if time_until_start <= 0 < (self.observation.end_RA - current_time):
-                    self.message("Taking observation data!!!")
+                    self.message(f"Taking {obs_type} data!!!")
 
         self.update_gui()  # the GUI handles its own timingO
 
