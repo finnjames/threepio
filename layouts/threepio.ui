@@ -831,6 +831,7 @@
     </property>
     <addaction name="actionNormal"/>
     <addaction name="actionTesting"/>
+    <addaction name="separator"/>
     <addaction name="actionLegacy"/>
    </widget>
    <widget class="QMenu" name="menuObservation">

@@ -296,12 +296,10 @@ class Threepio(QtWidgets.QMainWindow):
 
     def toggle_state_legacy(self):
         """lol"""
-        if self.legacy_mode:
-            self.setStyleSheet("")
-            self.legacy_mode = False
-        else:
-            self.setStyleSheet("background-color:#00ff00; color: #ff0000")
-            self.legacy_mode = True
+        self.legacy_mode = not self.legacy_mode
+        self.setStyleSheet(
+            "background-color:#00ff00; color:#ff0000" if self.legacy_mode else ""
+        )
         self.ui.actionLegacy.setChecked(self.legacy_mode)
 
     @staticmethod

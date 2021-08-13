@@ -438,6 +438,7 @@ class Ui_MainWindow(object):
         self.menuFile.addAction(self.actionQuit)
         self.menuMode.addAction(self.actionNormal)
         self.menuMode.addAction(self.actionTesting)
+        self.menuMode.addSeparator()
         self.menuMode.addAction(self.actionLegacy)
         self.menuObservation.addAction(self.actionScan)
         self.menuObservation.addAction(self.actionSurvey)
