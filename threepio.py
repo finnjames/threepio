@@ -265,6 +265,8 @@ class Threepio(QtWidgets.QMainWindow):
                 # This is a mess, but I think it should be fine for now
                 # TODO: at least move this to its own method
                 if self.transmission == Comm.START_CAL:
+                    if self.observation.obs_type == "Spectrum":
+                        self.alert("Set frequency to 455.42THz")
                     self.alert("Set calibration switches to ON", "Okay")
                     self.alert("Are the calibration switches on?", "Yes")
                     self.observation.next()
