@@ -311,7 +311,7 @@ class Survey(Observation):
     def data_logic(self, data_point):
         # print(self.min_dec, data_point.dec, self.max_dec)
         # print(data_point.dec < self.min_dec, data_point.dec > self.max_dec)
-        if data_point.dec < self.min_dec or data_point.dec > self.max_dec:
+        if data_point.dec < (self.min_dec - 2) or data_point.dec > (self.max_dec + 2):
             if self.outside:
                 return Comm.BEEP
             else:
