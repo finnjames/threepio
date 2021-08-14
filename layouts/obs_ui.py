@@ -146,7 +146,7 @@ class Ui_Dialog(object):
         self.start_dec_label.setText(_translate("Dialog", "Minimum Declination"))
         self.end_dec_label.setText(_translate("Dialog", "Maximum Declination"))
         self.end_label.setText(_translate("Dialog", "Ending RA"))
-        self.accept_button.setText(_translate("Dialog", "Start Observation"))
+        self.accept_button.setText(_translate("Dialog", "Next"))
         self.cancel_button.setText(_translate("Dialog", "Cancel"))
         self.file_name_label.setText(_translate("Dialog", "File name"))
         self.error_label.setText(_translate("Dialog", "Error creating observation"))

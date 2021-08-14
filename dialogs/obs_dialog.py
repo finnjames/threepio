@@ -16,6 +16,8 @@ class ObsDialog(QtWidgets.QDialog):
             QtCore.Qt.Window | QtCore.Qt.WindowTitleHint | QtCore.Qt.CustomizeWindowHint
         )
 
+        self.confirmed = False
+
         self.observation = observation
         self.clock = clock
 
@@ -51,13 +53,25 @@ class ObsDialog(QtWidgets.QDialog):
 
     def accept(self):
         exit_code = self.set_observation()
-        if exit_code == 0:  # set_observation() executed successfully
+        if self.confirmed and exit_code == 0:
             self.parent_window.observation = None
             self.parent_window.observation = self.observation
             self.close()
             self.parent_window.alert(
                 f"Set declination to {self.observation.min_dec - 5}°", "Okay"
             )
+        elif exit_code == 0:  # set_observation() executed successfully
+            for i in [
+                self.ui.start_time,
+                self.ui.end_time,
+                self.ui.starting_dec,
+                self.ui.ending_dec,
+                self.ui.file_name_value,
+                self.ui.data_acquisition_rate_value,
+            ]:
+                i.setEnabled(False)
+            self.confirmed = True
+            self.ui.accept_button.setText("Start Observation")
         else:
             self.ui.error_label.show()
 

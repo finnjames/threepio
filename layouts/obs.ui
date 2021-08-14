@@ -173,7 +173,7 @@
       <item row="0" column="2">
        <widget class="QPushButton" name="accept_button">
         <property name="text">
-         <string>Start Observation</string>
+         <string>Next</string>
         </property>
        </widget>
       </item>
