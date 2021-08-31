@@ -623,7 +623,7 @@
           </sizepolicy>
          </property>
          <property name="title">
-          <string>Declination</string>
+          <string>Declinometer</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_9">
           <item row="0" column="0" rowspan="2">
