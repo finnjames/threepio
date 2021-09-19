@@ -65,10 +65,11 @@ class Observation:
 
         # alerts before start of observation
         beeplist = (
-            [300]
-            + list(range(60, 300, 60))
-            + list(range(10, 60, 10))
-            + list(range(1, 10))
+            # [300]
+            # + list(range(60, 300, 60))
+            # + list(range(10, 60, 10))
+            # + list(range(1, 10))
+            []
         )
         self.beeptimes = [[j, False] for j in beeplist]
 
@@ -104,10 +105,10 @@ class Observation:
 
         def no_action(timestamp):  # TODO: move this to Threepio
             tobeepornottobeep = False
-            for i in self.beeptimes:
-                if (not i[1]) and timestamp > user_start_time - (i[0]):
-                    i[1] = True
-                    tobeepornottobeep = True
+            # for i in self.beeptimes:
+            #     if (not i[1]) and timestamp > user_start_time - (i[0]):
+            #         i[1] = True
+            #         tobeepornottobeep = True
             return Comm.BEEP if tobeepornottobeep else Comm.NO_ACTION
 
         if self.state == self.State.OFF:

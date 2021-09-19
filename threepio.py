@@ -107,7 +107,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.stripchart_series_a.setPen(pen)
         pen.setColor(QtGui.QColor(self.RED))
         self.stripchart_series_b.setPen(pen)
-        self.initialize_stripchart()
+        self.initialize_stripchart()  # should this include more of the above?
 
         self.update_speed()
 
@@ -120,6 +120,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.ui.actionScan.triggered.connect(self.handle_scan)
         self.ui.actionSurvey.triggered.connect(self.handle_survey)
         self.ui.actionSpectrum.triggered.connect(self.handle_spectrum)
+        self.ui.actionGetInfo.triggered.connect(self.handle_get_info)
 
         self.ui.actionDec.triggered.connect(self.dec_calibration)
         self.ui.actionRA.triggered.connect(self.ra_calibration)
@@ -144,9 +145,11 @@ class Threepio(QtWidgets.QMainWindow):
         self.click_sound.setVolume(0.5)
         # self.click_sound.play()
         self.last_beep_time = 0.0
+        self.tobeepornottobeep = False
 
         # establish observation
         self.observation = None
+        self.obs_complete = False
 
         # establish data array & most recent dec
         self.data = []
@@ -158,7 +161,7 @@ class Threepio(QtWidgets.QMainWindow):
         # alert user
         self.message("Ready!!!")
 
-        # refresh timer
+        # data timer
         self.timer = QtCore.QTimer(self)
         self.timer.timeout.connect(self.tick)  # do everything
         self.timer.start(self.BASE_PERIOD)  # set refresh rate
@@ -178,6 +181,12 @@ class Threepio(QtWidgets.QMainWindow):
         self.dec_scene = QtWidgets.QGraphicsScene()
         self.ui.dec_view.setScene(self.dec_scene)
         self.update_dec_view()
+
+        # once-a-second timer
+        self.second_timer = QtCore.QTimer(self)
+        self.second_timer.timerType = 0  # precise timer
+        self.second_timer.timeout.connect(self.update_gui)
+        self.second_timer.start(int(1000 * SuperClock.SIDEREAL))
 
     def tick(self):  # primary controller for each clock tick
 
@@ -203,7 +212,9 @@ class Threepio(QtWidgets.QMainWindow):
 
             period = self.BASE_PERIOD * 0.001  # ms -> s
 
-            if (current_time - self.tick_time) > (period * self.timing_margin):
+            if (current_time - self.clock.starting_time) > (
+                period * self.timing_margin
+            ):
                 self.tick_time = current_time
 
                 try:
@@ -222,8 +233,6 @@ class Threepio(QtWidgets.QMainWindow):
                 except TypeError:
                     pass
 
-                # self.update_gui()  # update gui except voltage and stripchart
-
         else:
 
             # can't reset RA/Dec after loading obs; TODO: move this elsewhere
@@ -235,8 +244,11 @@ class Threepio(QtWidgets.QMainWindow):
                 self.ui.actionSpectrum,
             ]:
                 a.setDisabled(True)
+            self.ui.actionGetInfo.setDisabled(False)
 
             period = 1 / self.observation.freq
+
+            self.update_stripchart()
 
             if (current_time - self.tick_time) > (period * self.timing_margin):
 
@@ -257,8 +269,6 @@ class Threepio(QtWidgets.QMainWindow):
                 self.transmission = self.observation.communicate(
                     data_point, time.time()
                 )
-
-                self.update_stripchart()
 
                 obs_type = self.observation.obs_type
 
@@ -284,7 +294,11 @@ class Threepio(QtWidgets.QMainWindow):
                     self.message(f"Taking {obs_type.lower()} data!!!")
                 elif self.transmission == Comm.FINISHED:
                     self.observation.next()
-                    self.message(f"{obs_type} complete!!!")
+                    # this is where all the extra beeps come from lol
+                    # TODO: un-bodge this
+                    if not self.obs_complete:
+                        self.message(f"{obs_type} complete!!!")
+                        self.obs_complete = True
                     if self.stop_tel_alert and self.observation.obs_type == "Survey":
                         self.alert("STOP the telescope", "Okay")
                         self.alert("Has the telescope been stopped?", "Yes")
@@ -294,7 +308,7 @@ class Threepio(QtWidgets.QMainWindow):
                 elif self.transmission == Comm.SEND_TEL_SOUTH:
                     self.alert("Send telescope SOUTH at maximum speed!!!", "Okay")
                 elif self.transmission == Comm.BEEP:
-                    self.beep()
+                    self.tobeepornottobeep = True
                 elif self.transmission == Comm.NEXT:
                     self.observation.next()
                 elif self.transmission == Comm.NO_ACTION:
@@ -303,8 +317,6 @@ class Threepio(QtWidgets.QMainWindow):
                 # time_until_start = self.observation.start_RA - current_time
                 # if time_until_start <= 0 < (self.observation.end_RA - current_time):
                 #     self.message(f"Taking {obs_type} data!!!")
-
-        self.update_gui()  # the GUI handles its own timingO
 
     def set_state_normal(self):
         self.ui.actionNormal.setChecked(True)
@@ -359,7 +371,10 @@ class Threepio(QtWidgets.QMainWindow):
         )
 
     def update_gui(self):
-        current_time = self.clock.get_time()
+        # current_time = self.clock.get_time()
+        if self.tobeepornottobeep:
+            self.beep(message="update_gui")
+            self.tobeepornottobeep = False
 
         self.ui.ra_value.setText(self.clock.get_sidereal_time())  # show RA
         self.ui.dec_value.setText("%.4f°" % self.current_dec)  # show dec
@@ -368,12 +383,12 @@ class Threepio(QtWidgets.QMainWindow):
         self.update_dec_view()
         self.update_console()
 
-        if self.time_since_last_voltage_update >= self.VOLTAGE_PERIOD * 0.001:
-            self.update_voltage()
-            self.time_of_last_voltage_update = current_time
-        if self.time_since_last_stripchart_update >= self.STRIPCHART_PERIOD * 0.001:
-            self.update_stripchart()
-            self.time_of_last_stripchart_update = current_time
+        # if self.time_since_last_voltage_update >= self.VOLTAGE_PERIOD * 0.001:
+        self.update_voltage()
+        # self.time_of_last_voltage_update = current_time
+        # if self.time_since_last_stripchart_update >= self.STRIPCHART_PERIOD * 0.001:
+        self.update_stripchart()
+        # self.time_of_last_stripchart_update = current_time
 
     def update_progress_bar(self):
         # T=start_RA
@@ -514,6 +529,10 @@ class Threepio(QtWidgets.QMainWindow):
         dialog.exec_()
         self.stop_tel_alert = True
 
+    def handle_get_info(self):
+        if self.observation is not None:
+            pass
+
     def dec_calibration(self):
         dialog = DecDialog(self.tars, self)
         if self.mode == "testing":
@@ -574,7 +593,7 @@ class Threepio(QtWidgets.QMainWindow):
         if log:
             self.log(message)
         if beep:
-            self.beep()
+            self.beep(message="message")
         self.ui.message_label.setText(message)
 
     def log(self, message, allowDups=False):
@@ -594,15 +613,15 @@ class Threepio(QtWidgets.QMainWindow):
     def alert(self, message, button_message="Close"):
         self.log(message)
         alert = AlertDialog(message, button_message)
-        self.beep()
+        self.beep(message="alert")
         alert.show()
         alert.exec_()
 
-    def beep(self):
+    def beep(self, message=""):
         if time.time() - self.last_beep_time > 1.0:
             self.click_sound.play()
             self.last_beep_time = time.time()
-        print("beep! ", time.time())
+        print("beep! ", message, time.time())
 
     def closeEvent(self, event):
         """override quit action to confirm before closing"""

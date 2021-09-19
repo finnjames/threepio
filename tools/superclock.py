@@ -12,6 +12,7 @@ class SuperClock:
     def __init__(self):
         self.starting_time = time.time()
         self.starting_sidereal_time = (
+            # TODO: is this still used?
             0  # number of seconds since last sidereal midnight
         )
 
