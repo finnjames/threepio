@@ -274,6 +274,9 @@
   <tabstop>starting_dec</tabstop>
   <tabstop>ending_dec</tabstop>
   <tabstop>data_acquisition_rate_value</tabstop>
+  <tabstop>file_name_value</tabstop>
+  <tabstop>accept_button</tabstop>
+  <tabstop>cancel_button</tabstop>
  </tabstops>
  <resources/>
  <connections>

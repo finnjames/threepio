@@ -135,6 +135,9 @@ class Ui_Dialog(object):
         Dialog.setTabOrder(self.end_time, self.starting_dec)
         Dialog.setTabOrder(self.starting_dec, self.ending_dec)
         Dialog.setTabOrder(self.ending_dec, self.data_acquisition_rate_value)
+        Dialog.setTabOrder(self.data_acquisition_rate_value, self.file_name_value)
+        Dialog.setTabOrder(self.file_name_value, self.accept_button)
+        Dialog.setTabOrder(self.accept_button, self.cancel_button)
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate

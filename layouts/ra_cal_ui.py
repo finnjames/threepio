@@ -51,6 +51,8 @@ class Ui_Dialog(object):
         self.cancel_button.clicked.connect(Dialog.reject)
         self.ok_button.clicked.connect(Dialog.accept)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
+        Dialog.setTabOrder(self.sidereal_value, self.ok_button)
+        Dialog.setTabOrder(self.ok_button, self.cancel_button)
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate

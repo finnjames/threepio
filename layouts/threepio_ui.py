@@ -453,6 +453,14 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         self.actionQuit.triggered.connect(MainWindow.close)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        MainWindow.setTabOrder(self.stripchart_speed_slider, self.chart_clear_button)
+        MainWindow.setTabOrder(self.chart_clear_button, self.dec_view)
+        MainWindow.setTabOrder(self.dec_view, self.stripchart)
+        MainWindow.setTabOrder(self.stripchart, self.variance_dial)
+        MainWindow.setTabOrder(self.variance_dial, self.polarization_dial)
+        MainWindow.setTabOrder(self.polarization_dial, self.noise_dial)
+        MainWindow.setTabOrder(self.noise_dial, self.calibration_check_box)
+        MainWindow.setTabOrder(self.calibration_check_box, self.declination_slider)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -475,7 +483,7 @@ class Ui_MainWindow(object):
         self.refresh_value.setText(_translate("MainWindow", "0.00Hz"))
         self.message_label.setText(_translate("MainWindow", "..."))
         self.console_label.setText(_translate("MainWindow", ">>>"))
-        self.dec_group_box.setTitle(_translate("MainWindow", "Declination"))
+        self.dec_group_box.setTitle(_translate("MainWindow", "Declinometer"))
         self.south_label.setText(_translate("MainWindow", "-"))
         self.north_label.setText(_translate("MainWindow", "+"))
         self.signal_group_box.setTitle(_translate("MainWindow", "Signal"))

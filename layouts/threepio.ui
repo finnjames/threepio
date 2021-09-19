@@ -947,6 +947,17 @@
    <header>PyQt5.QtChart</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>stripchart_speed_slider</tabstop>
+  <tabstop>chart_clear_button</tabstop>
+  <tabstop>dec_view</tabstop>
+  <tabstop>stripchart</tabstop>
+  <tabstop>variance_dial</tabstop>
+  <tabstop>polarization_dial</tabstop>
+  <tabstop>noise_dial</tabstop>
+  <tabstop>calibration_check_box</tabstop>
+  <tabstop>declination_slider</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

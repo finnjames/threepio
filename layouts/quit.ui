@@ -81,6 +81,7 @@
   </layout>
  </widget>
  <tabstops>
+  <tabstop>cancel_button</tabstop>
   <tabstop>ok_button</tabstop>
  </tabstops>
  <resources/>
