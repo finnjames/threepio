@@ -622,7 +622,7 @@ class Threepio(QtWidgets.QMainWindow):
         # if time.time() - self.last_beep_time > 1.0:
         self.click_sound.play()
         self.last_beep_time = time.time()
-        print("beep! ", message, time.time())
+        print("beep!", message, time.time())
 
     def closeEvent(self, event):
         """override quit action to confirm before closing"""
