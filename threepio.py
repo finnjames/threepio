@@ -618,9 +618,10 @@ class Threepio(QtWidgets.QMainWindow):
         alert.exec_()
 
     def beep(self, message=""):
-        if time.time() - self.last_beep_time > 1.0:
-            self.click_sound.play()
-            self.last_beep_time = time.time()
+        """message is for debugging"""
+        # if time.time() - self.last_beep_time > 1.0:
+        self.click_sound.play()
+        self.last_beep_time = time.time()
         print("beep! ", message, time.time())
 
     def closeEvent(self, event):
