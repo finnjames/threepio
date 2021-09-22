@@ -277,13 +277,13 @@ class Threepio(QtWidgets.QMainWindow):
                 if self.transmission == Comm.START_CAL:
                     if self.observation.obs_type == "Spectrum":
                         self.alert("Set frequency to 1319.5MHz")
-                    self.alert("Set calibration switches to ON", "Okay")
-                    self.alert("Are the calibration switches on?", "Yes")
+                    self.alert("Turn the calibration switches ON", "Okay")
+                    self.alert("Are the calibration switches ON?", "Yes")
                     self.observation.next()
                     self.message("Taking calibration data!!!")
                 elif self.transmission == Comm.STOP_CAL:
-                    self.alert("Set calibration switches to OFF", "Okay")
-                    self.alert("Are the calibration switches off?", "Yes")
+                    self.alert("Turn the calibration switches OFF", "Okay")
+                    self.alert("Are the calibration switches OFF?", "Yes")
                     self.observation.next()
                     self.message("Taking background data!!!")
                 elif self.transmission == Comm.START_WAIT:
