@@ -77,6 +77,8 @@ class ObsDialog(QtWidgets.QDialog):
                 i.setEnabled(False)
             self.confirmed = True
             self.ui.accept_button.setText("Start Observation")
+            self.ui.error_label.hide()
+            self.adjustSize()
         else:
             self.ui.error_label.show()
 
