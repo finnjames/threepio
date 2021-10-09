@@ -9,12 +9,47 @@ class SuperClock:
     SIDEREAL = 1.00273790935  # the number of sidereal seconds per second
     LONGITUDE = 38.437235
 
+    class Timer:
+        def __init__(self, period, callback):
+            """
+            :param period: in milliseconds
+            :param callback: function to call when the timer runs
+            """
+            self.period = period
+            self.times_run = 0
+            self.callback = callback
+
+        def run(self):
+            self.callback()
+
+        def run_if_appropriate(self, starting_time):
+            if time.time() >= starting_time + (self.period / 1000) * self.times_run:
+                self.run()
+                self.times_run += 1
+                return True
+            return False
+
+        def __repr__(self):
+            return f"Timer({self.period}ms, {self.callback})"
+
     def __init__(self):
         self.starting_time = time.time()
         self.starting_sidereal_time = (
             # TODO: is this still used?
             0  # number of seconds since last sidereal midnight
         )
+
+        self.timers = []
+
+    def run_timers(self):
+        """run all timers"""
+        for timer in self.timers:
+            timer.run_if_appropriate(self.starting_time)
+
+    def add_timer(self, period, callback):
+        """set a timer to call a function periodically"""
+        self.timers += [SuperClock.Timer(period, callback)]
+        print(repr(self.timers[0]))
 
     def get_time(self):
         return time.time()

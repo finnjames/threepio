@@ -31,8 +31,9 @@ class Threepio(QtWidgets.QMainWindow):
 
     # basic time
     BASE_PERIOD = 10  # ms
-    STRIPCHART_PERIOD = 16.7  # ms
-    VOLTAGE_PERIOD = 1000  # ms
+    GUI_UPDATE_PERIOD = 1000  # ms
+    STRIPCHART_PERIOD = 16.7  # ms = 60Hz
+    VOLTAGE_PERIOD = 1000  # ms TODO: this should not be necessary
     # how many data points to draw to stripchart
     stripchart_display_seconds = 8
     should_clear_stripchart = False
@@ -89,18 +90,15 @@ class Threepio(QtWidgets.QMainWindow):
         self.update_console()
 
         # clock
-        self.clock = None
+        self.clock = SuperClock()
         self.set_time()
 
         # initialize stripchart
         self.log("Initializing stripchart...")
         self.stripchart_series_a = QtChart.QLineSeries()
         self.stripchart_series_b = QtChart.QLineSeries()
-        # self.stripchart_series_a.setUseOpenGL(True)
-        # self.stripchart_series_b.setUseOpenGL(True)
         self.axis_y = QtChart.QValueAxis()
         self.chart = QtChart.QChart()
-        # comment this for better performance
         self.ui.stripchart.setRenderHint(QtGui.QPainter.Antialiasing)
         pen = QtGui.QPen(QtGui.QColor(self.BLUE))
         pen.setWidth(1)
@@ -109,11 +107,13 @@ class Threepio(QtWidgets.QMainWindow):
         self.stripchart_series_b.setPen(pen)
         self.initialize_stripchart()  # should this include more of the above?
 
-        self.update_speed()
+        self.update_stripchart_speed()
 
         self.log("Initializing buttons...")
         # connect buttons
-        self.ui.stripchart_speed_slider.valueChanged.connect(self.update_speed)
+        self.ui.stripchart_speed_slider.valueChanged.connect(
+            self.update_stripchart_speed
+        )
 
         self.ui.actionInfo.triggered.connect(self.handle_credits)
 
@@ -131,7 +131,7 @@ class Threepio(QtWidgets.QMainWindow):
 
         self.ui.chart_clear_button.clicked.connect(self.clear_stripchart)
 
-        # Tars/DATAQ stuff
+        # Tars/DATAQ
         device = discovery()
         self.tars = Tars(parent=self, device=device)
         self.tars.setup()
@@ -155,52 +155,58 @@ class Threepio(QtWidgets.QMainWindow):
         self.data = []
         self.current_dec = 0.0
 
+        # telescope visualization
+        self.dec_scene = QtWidgets.QGraphicsScene()
+        self.ui.dec_view.setScene(self.dec_scene)
+        self.update_dec_view()
+
         # run initial calibration
         self.load_dec_cal()
 
         # alert user
         self.message("Ready!!!")
 
-        # data timer
+        # timers
         self.timer = QtCore.QTimer(self)
         self.timer.timeout.connect(self.tick)  # do everything
         self.timer.start(self.BASE_PERIOD)  # set refresh rate
+        self.clock.add_timer(1000, self.update_gui)
 
-        # used for measuring refresh rate
-        self.time_since_last_tick = 0
-        self.time_since_last_stripchart_update = 0
-        self.time_since_last_voltage_update = 0
-        # TODO: do I need both of these type checks?
+        # TODO: obsolete?
         # noinspection PyUnresolvedReferences
         self.time_of_last_tick = self.clock.get_time()  # type: ignore
         self.time_of_last_refresh_update = self.time_of_last_tick
         self.time_of_last_voltage_update = self.time_of_last_tick
         self.time_of_last_stripchart_update = self.time_of_last_tick
 
-        # QGraphicsView TODO: move this into its own method
-        self.dec_scene = QtWidgets.QGraphicsScene()
-        self.ui.dec_view.setScene(self.dec_scene)
-        self.update_dec_view()
+        # TESTING
+        # measure refresh rate
+        self.time_since_last_tick = 0
+        self.time_since_last_stripchart_update = 0
+        self.time_since_last_voltage_update = 0
 
-        # once-a-second timer
-        self.second_timer = QtCore.QTimer(self)
-        self.second_timer.timerType = 0  # precise timer
-        self.second_timer.timeout.connect(self.update_gui)
-        self.second_timer.start(int(1000 * SuperClock.SIDEREAL))
+    def tick(self):
+        """primary controller for each clock tick"""
+        self.clock.run_timers()
 
-    def tick(self):  # primary controller for each clock tick
-
+    def old_tick(self):
         # update all of the timing vars
         current_time = self.clock.get_time()
+
         self.time_since_last_tick = current_time - self.time_of_last_tick
         self.time_since_last_stripchart_update = (
             current_time - self.time_of_last_stripchart_update
         )
+
         self.time_since_last_voltage_update = (
             current_time - self.time_of_last_voltage_update
         )
 
         self.time_of_last_tick = current_time
+
+        self.update_gui()
+
+        self.beep()
 
         if current_time - self.time_of_last_refresh_update > 1:
             self.ui.refresh_value.setText("%.2fHz" % self.get_refresh_rate())
@@ -353,19 +359,11 @@ class Threepio(QtWidgets.QMainWindow):
         dialog.exec_()
 
     def set_time(self):
-        if self.clock is None:
-            new_clock = SuperClock()
-        else:
-            new_clock = self.clock
-
-        # TODO: abstract this better
-        dialog = RADialog(self, new_clock)
+        dialog = RADialog(self, self.clock)
         dialog.show()
         dialog.exec_()
 
-        self.clock = new_clock
-
-    def update_speed(self):
+    def update_stripchart_speed(self):
         self.stripchart_display_seconds = 120 - (
             (110 / 6) * self.ui.stripchart_speed_slider.value()
         )
@@ -463,42 +461,45 @@ class Threepio(QtWidgets.QMainWindow):
         self.ui.stripchart.setChart(self.chart)
 
     def update_stripchart(self):
-        # get new data point
-        new_a = self.data[len(self.data) - 1].a
-        new_b = self.data[len(self.data) - 1].b
-        new_ra = self.data[len(self.data) - 1].timestamp
+        try:
+            # get new data point
+            new_a = self.data[len(self.data) - 1].a
+            new_b = self.data[len(self.data) - 1].b
+            new_ra = self.data[len(self.data) - 1].timestamp
 
-        # add new data point to both series
-        self.stripchart_series_a.append(new_a, new_ra)
-        self.stripchart_series_b.append(new_b, new_ra)
+            # add new data point to both series
+            self.stripchart_series_a.append(new_a, new_ra)
+            self.stripchart_series_b.append(new_b, new_ra)
 
-        # we use these value several times
-        current_sideral_seconds = self.clock.get_sidereal_seconds()
-        oldest_y = current_sideral_seconds - self.stripchart_display_seconds
+            # we use these value several times
+            current_sideral_seconds = self.clock.get_sidereal_seconds()
+            oldest_y = current_sideral_seconds - self.stripchart_display_seconds
 
-        # remove the trailing end of the series
-        clear_it = self.should_clear_stripchart  # prevents a race hazard?
-        for i in [self.stripchart_series_a, self.stripchart_series_b]:
-            if clear_it:
-                i.clear()
-            elif i.count() > 2 and i.at(1).y() < oldest_y:
-                i.removePoints(0, 2)
-        self.should_clear_stripchart = False
+            # remove the trailing end of the series
+            clear_it = self.should_clear_stripchart  # prevents a race hazard?
+            for i in [self.stripchart_series_a, self.stripchart_series_b]:
+                if clear_it:
+                    i.clear()
+                elif i.count() > 2 and i.at(1).y() < oldest_y:
+                    i.removePoints(0, 2)
+            self.should_clear_stripchart = False
 
-        # These lines are required to prevent a Qt error
-        self.chart.removeSeries(self.stripchart_series_b)
-        self.chart.removeSeries(self.stripchart_series_a)
-        self.chart.addSeries(self.stripchart_series_b)
-        self.chart.addSeries(self.stripchart_series_a)
+            # These lines are required to prevent a Qt error
+            self.chart.removeSeries(self.stripchart_series_b)
+            self.chart.removeSeries(self.stripchart_series_a)
+            self.chart.addSeries(self.stripchart_series_b)
+            self.chart.addSeries(self.stripchart_series_a)
 
-        axis_y = QtChart.QValueAxis()
-        axis_y.setMin(oldest_y)
-        axis_y.setMax(current_sideral_seconds)
-        axis_y.setVisible(False)
+            axis_y = QtChart.QValueAxis()
+            axis_y.setMin(oldest_y)
+            axis_y.setMax(current_sideral_seconds)
+            axis_y.setVisible(False)
 
-        self.chart.setAxisY(axis_y)
-        self.stripchart_series_a.attachAxis(axis_y)
-        self.stripchart_series_b.attachAxis(axis_y)
+            self.chart.setAxisY(axis_y)
+            self.stripchart_series_a.attachAxis(axis_y)
+            self.stripchart_series_b.attachAxis(axis_y)
+        except IndexError:
+            pass
 
     def clear_stripchart(self):
         self.should_clear_stripchart = True
@@ -619,7 +620,6 @@ class Threepio(QtWidgets.QMainWindow):
 
     def beep(self, message=""):
         """message is for debugging"""
-        # if time.time() - self.last_beep_time > 1.0:
         self.click_sound.play()
         self.last_beep_time = time.time()
         print("beep!", message, time.time())
