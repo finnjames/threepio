@@ -429,7 +429,7 @@ class Threepio(QtWidgets.QMainWindow):
             current_time - self.time_of_last_stripchart_update
         )
         self.time_of_last_tick = current_time
-        if current_time - self.time_of_last_refresh_update > 1:
+        if current_time - self.time_of_last_refresh_update >= 1:
             self.ui.refresh_value.setText("%.2fHz" % self.get_refresh_rate())
             self.time_of_last_refresh_update = current_time
 
