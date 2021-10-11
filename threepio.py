@@ -171,6 +171,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.timer.timeout.connect(self.tick)  # do everything
         self.timer.start(self.BASE_PERIOD)  # set refresh rate
         self.clock.add_timer(1000, self.update_gui)
+        self.data_timer = self.clock.add_timer(1000, self.update_data)
 
         # TODO: obsolete?
         # noinspection PyUnresolvedReferences
@@ -189,59 +190,53 @@ class Threepio(QtWidgets.QMainWindow):
         """primary controller for each clock tick"""
         self.clock.run_timers()
 
-    def old_tick(self):
-        # update all of the timing vars
+        # measure refresh rate
         current_time = self.clock.get_time()
-
         self.time_since_last_tick = current_time - self.time_of_last_tick
         self.time_since_last_stripchart_update = (
             current_time - self.time_of_last_stripchart_update
         )
-
-        self.time_since_last_voltage_update = (
-            current_time - self.time_of_last_voltage_update
-        )
-
         self.time_of_last_tick = current_time
-
-        self.update_gui()
-
-        self.beep()
-
         if current_time - self.time_of_last_refresh_update > 1:
             self.ui.refresh_value.setText("%.2fHz" % self.get_refresh_rate())
             self.time_of_last_refresh_update = current_time
 
+    def update_data(self):
+        # update all of the timing vars
+
+        current_time = self.clock.get_time()
+        # self.time_since_last_voltage_update = (
+        #     current_time - self.time_of_last_voltage_update
+        # )
+
+        # self.update_gui()
+
+        self.beep()
+
         # TODO: clean up main clock loop
-
         if self.observation is None:
+            # period = self.BASE_PERIOD * 0.001  # ms -> s
 
-            period = self.BASE_PERIOD * 0.001  # ms -> s
-
-            if (current_time - self.clock.starting_time) > (
-                period * self.timing_margin
-            ):
-                self.tick_time = current_time
-
-                try:
-                    tars_data = self.tars.read_latest()  # get data from DAQ
-
-                    self.current_dec = self.calculate_declination(tars_data[2][1])
-
-                    data_point = DataPoint(
-                        self.clock.get_sidereal_seconds(),  # ra
-                        self.current_dec,  # dec
-                        tars_data[0][1],  # channel a
-                        tars_data[1][1],  # channel b
-                    )
-
-                    self.data.append(data_point)
-                except TypeError:
-                    pass
-
+            # if (current_time - self.clock.starting_time) > (
+            #     period * self.timing_margin
+            # ):
+            # self.tick_time = current_time
+            try:
+                tars_data = self.tars.read_latest()  # get data from DAQ
+                self.current_dec = self.calculate_declination(
+                    tars_data[2][1]
+                )  # get dec
+                data_point = DataPoint(  # create data point
+                    self.clock.get_sidereal_seconds(),  # ra
+                    self.current_dec,  # dec
+                    tars_data[0][1],  # channel a
+                    tars_data[1][1],  # channel b
+                )
+                self.data.append(data_point)  # add to data array
+            except TypeError:
+                pass
         else:
-
-            # can't reset RA/Dec after loading obs; TODO: move this elsewhere
+            # disable resetting RA/Dec after loading obs; TODO: move this elsewhere
             for a in [
                 self.ui.actionRA,
                 self.ui.actionDec,
@@ -252,77 +247,78 @@ class Threepio(QtWidgets.QMainWindow):
                 a.setDisabled(True)
             self.ui.actionGetInfo.setDisabled(False)
 
-            period = 1 / self.observation.freq
+            period = 1000 / (self.observation.freq)  # Hz -> ms
+            self.data_timer.set_period(period)
 
             self.update_stripchart()
 
-            if (current_time - self.tick_time) > (period * self.timing_margin):
+            # if (current_time - self.tick_time) > (period * self.timing_margin):
 
-                self.tick_time = current_time
+            self.tick_time = current_time
 
-                tars_data = self.tars.read_latest()  # get data from DAQ
+            tars_data = self.tars.read_latest()  # get data from DAQ
 
-                self.current_dec = self.calculate_declination(tars_data[2][1])
-                data_point = DataPoint(
-                    self.clock.get_sidereal_seconds(),
-                    self.current_dec,
-                    tars_data[0][1],
-                    tars_data[1][1],
-                )
+            self.current_dec = self.calculate_declination(tars_data[2][1])
+            data_point = DataPoint(
+                self.clock.get_sidereal_seconds(),
+                self.current_dec,
+                tars_data[0][1],
+                tars_data[1][1],
+            )
 
-                self.data.append(data_point)
-                self.old_transmission = self.transmission
-                self.transmission = self.observation.communicate(
-                    data_point, time.time()
-                )
+            self.data.append(data_point)
+            self.old_transmission = self.transmission
+            self.transmission = self.observation.communicate(
+                data_point, self.clock.get_time()
+            )
 
-                obs_type = self.observation.obs_type
+            obs_type = self.observation.obs_type
 
-                # This is a mess, but I think it should be fine for now
-                # TODO: at least move this to its own method
-                if self.transmission == Comm.START_CAL:
-                    if self.observation.obs_type == "Spectrum":
-                        self.alert("Set frequency to 1319.5MHz")
-                    self.alert("Turn the calibration switches ON", "Okay")
-                    self.alert("Are the calibration switches ON?", "Yes")
-                    self.observation.next()
-                    self.message("Taking calibration data!!!")
-                elif self.transmission == Comm.STOP_CAL:
-                    self.alert("Turn the calibration switches OFF", "Okay")
-                    self.alert("Are the calibration switches OFF?", "Yes")
-                    self.observation.next()
-                    self.message("Taking background data!!!")
-                elif self.transmission == Comm.START_WAIT:
-                    self.observation.next()
-                    self.message(f"Waiting for {obs_type.lower()} to begin...")
-                elif self.transmission == Comm.START_DATA:
-                    self.observation.next()
-                    self.message(f"Taking {obs_type.lower()} data!!!")
-                elif self.transmission == Comm.FINISHED:
-                    self.observation.next()
-                    # this is where all the extra beeps come from lol
-                    # TODO: un-bodge this
-                    if not self.obs_complete:
-                        self.message(f"{obs_type} complete!!!")
-                        self.obs_complete = True
-                    if self.stop_tel_alert and self.observation.obs_type == "Survey":
-                        self.alert("STOP the telescope", "Okay")
-                        self.alert("Has the telescope been stopped?", "Yes")
-                        self.stop_tel_alert = False
-                elif self.transmission == Comm.SEND_TEL_NORTH:
-                    self.alert("Send telescope NORTH at maximum speed!!!", "Okay")
-                elif self.transmission == Comm.SEND_TEL_SOUTH:
-                    self.alert("Send telescope SOUTH at maximum speed!!!", "Okay")
-                elif self.transmission == Comm.BEEP:
-                    self.tobeepornottobeep = True
-                elif self.transmission == Comm.NEXT:
-                    self.observation.next()
-                elif self.transmission == Comm.NO_ACTION:
-                    pass
+            # This is a mess, but I think it should be fine for now
+            # TODO: at least move this to its own method
+            if self.transmission == Comm.START_CAL:
+                if obs_type == "Spectrum":
+                    self.alert("Set frequency to 1319.5MHz")
+                self.alert("Turn the calibration switches ON", "Okay")
+                self.alert("Are the calibration switches ON?", "Yes")
+                self.observation.next()
+                self.message("Taking calibration data!!!")
+            elif self.transmission == Comm.STOP_CAL:
+                self.alert("Turn the calibration switches OFF", "Okay")
+                self.alert("Are the calibration switches OFF?", "Yes")
+                self.observation.next()
+                self.message("Taking background data!!!")
+            elif self.transmission == Comm.START_WAIT:
+                self.observation.next()
+                self.message(f"Waiting for {obs_type.lower()} to begin...")
+            elif self.transmission == Comm.START_DATA:
+                self.observation.next()
+                self.message(f"Taking {obs_type.lower()} data!!!")
+            elif self.transmission == Comm.FINISHED:
+                self.observation.next()
+                # this is where all the extra beeps come from lol
+                # TODO: un-bodge this
+                if not self.obs_complete:
+                    self.message(f"{obs_type} complete!!!")
+                    self.obs_complete = True
+                if self.stop_tel_alert and self.observation.obs_type == "Survey":
+                    self.alert("STOP the telescope", "Okay")
+                    self.alert("Has the telescope been stopped?", "Yes")
+                    self.stop_tel_alert = False
+            elif self.transmission == Comm.SEND_TEL_NORTH:
+                self.alert("Send telescope NORTH at maximum speed!!!", "Okay")
+            elif self.transmission == Comm.SEND_TEL_SOUTH:
+                self.alert("Send telescope SOUTH at maximum speed!!!", "Okay")
+            elif self.transmission == Comm.BEEP:
+                self.tobeepornottobeep = True
+            elif self.transmission == Comm.NEXT:
+                self.observation.next()
+            elif self.transmission == Comm.NO_ACTION:
+                pass
 
-                # time_until_start = self.observation.start_RA - current_time
-                # if time_until_start <= 0 < (self.observation.end_RA - current_time):
-                #     self.message(f"Taking {obs_type} data!!!")
+            # time_until_start = self.observation.start_RA - current_time
+            # if time_until_start <= 0 < (self.observation.end_RA - current_time):
+            #     self.message(f"Taking {obs_type} data!!!")
 
     def set_state_normal(self):
         self.ui.actionNormal.setChecked(True)

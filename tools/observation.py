@@ -111,6 +111,12 @@ class Observation:
             #         tobeepornottobeep = True
             return Comm.BEEP if tobeepornottobeep else Comm.NO_ACTION
 
+        def write_and_round_if_appropriate(data_point):
+            if self.obs_type == "Spectrum":
+                self.write_data(data_point)
+            else:
+                self.write_data(data_point.with_int_time())
+
         if self.state == self.State.OFF:
             if timestamp < user_start_time:  # A 30 second buffer for user actions
                 return no_action(timestamp)
@@ -118,13 +124,13 @@ class Observation:
                 return Comm.START_CAL
         elif self.state == self.State.CAL_1:
             if timestamp - self.cal_start < self.cal_dur:
-                self.write_data(data_point)
+                write_and_round_if_appropriate(data_point)
                 return Comm.NO_ACTION
             else:
                 return Comm.STOP_CAL
         elif self.state == self.State.BG_1:
             if timestamp - self.bg_start < self.bg_dur:
-                self.write_data(data_point)
+                write_and_round_if_appropriate(data_point)
                 return Comm.NO_ACTION
             else:
                 return Comm.START_WAIT
@@ -142,13 +148,13 @@ class Observation:
                 return Comm.START_CAL
         elif self.state == self.State.CAL_2:
             if timestamp - self.cal_start < self.cal_dur:
-                self.write_data(data_point)
+                write_and_round_if_appropriate(data_point)
                 return Comm.NO_ACTION
             else:
                 return Comm.STOP_CAL
         elif self.state == self.State.BG_2:
             if timestamp - self.bg_start < self.bg_dur:
-                self.write_data(data_point)
+                write_and_round_if_appropriate(data_point)
                 return Comm.NO_ACTION
             else:
                 return Comm.FINISHED

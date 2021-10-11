@@ -12,8 +12,9 @@ class SuperClock:
     class Timer:
         def __init__(self, period, callback):
             """
-            :param period: in milliseconds
-            :param callback: function to call when the timer runs
+            Args:
+                period (int): in milliseconds
+                callback (function): function to call when the timer runs
             """
             self.period = period
             self.times_run = 0
@@ -23,11 +24,24 @@ class SuperClock:
             self.callback()
 
         def run_if_appropriate(self, starting_time):
-            if time.time() >= starting_time + (self.period / 1000) * self.times_run:
+            if (
+                self.period > 0
+                and time.time() >= starting_time + (self.period / 1000) * self.times_run
+            ):
                 self.run()
                 self.times_run += 1
                 return True
             return False
+
+        def set_period(self, new_period):
+            """
+            Args:
+                new_period (int): in milliseconds
+            """
+            self.period = new_period
+
+        def cancel(self):
+            self.period = 0
 
         def __repr__(self):
             return f"Timer({self.period}ms, {self.callback})"
@@ -48,8 +62,9 @@ class SuperClock:
 
     def add_timer(self, period, callback):
         """set a timer to call a function periodically"""
-        self.timers += [SuperClock.Timer(period, callback)]
-        print(repr(self.timers[0]))
+        new_timer = SuperClock.Timer(period, callback)
+        self.timers.append(new_timer)
+        return new_timer
 
     def get_time(self):
         return time.time()
