@@ -15,21 +15,28 @@ class SuperClock:
             Args:
                 period (int): in milliseconds
                 callback (function): function to call when the timer runs
+
+            Attributes:
+                offset (int): the number of times the timer has run
             """
             self.period = period
-            self.times_run = 0
+            self.offset = 0
             self.callback = callback
 
         def run(self):
             self.callback()
 
         def run_if_appropriate(self, starting_time):
-            if (
-                self.period > 0
-                and time.time() >= starting_time + (self.period / 1000) * self.times_run
+            while time.time() > (
+                starting_time + (self.period / 1000) * (self.offset + 1)
+            ):
+                self.offset += 1
+
+            if self.period > 0 and (
+                time.time() >= (starting_time + (self.period / 1000) * self.offset)
             ):
                 self.run()
-                self.times_run += 1
+                self.offset += 1
                 return True
             return False
 
