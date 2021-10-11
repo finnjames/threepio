@@ -154,6 +154,7 @@ class Threepio(QtWidgets.QMainWindow):
         # establish data array & most recent dec
         self.data = []
         self.current_dec = 0.0
+        self.current_data_point = None
 
         # telescope visualization
         self.dec_scene = QtWidgets.QGraphicsScene()
@@ -193,13 +194,13 @@ class Threepio(QtWidgets.QMainWindow):
         try:
             tars_data = self.tars.read_latest()  # get data from DAQ
             self.current_dec = self.calculate_declination(tars_data[2][1])  # get dec
-            data_point = DataPoint(  # create data point
+            self.current_data_point = DataPoint(  # create data point
                 self.clock.get_sidereal_seconds(),  # ra
                 self.current_dec,  # dec
                 tars_data[0][1],  # channel a
                 tars_data[1][1],  # channel b
             )
-            self.data.append(data_point)  # add to data array
+            self.data.append(self.current_data_point)  # add to data array
         except TypeError:
             pass
 
@@ -219,28 +220,17 @@ class Threepio(QtWidgets.QMainWindow):
             period = 1000 / (self.observation.freq)  # Hz -> ms
             self.data_timer.set_period(period)
 
+            # TODO: update this to new timer architecture
             self.tick_time = current_time
 
-            tars_data = self.tars.read_latest()  # get data from DAQ
-
-            self.current_dec = self.calculate_declination(tars_data[2][1])
-            data_point = DataPoint(
-                self.clock.get_sidereal_seconds(),
-                self.current_dec,
-                tars_data[0][1],
-                tars_data[1][1],
-            )
-
-            self.data.append(data_point)
             self.old_transmission = self.transmission
             self.transmission = self.observation.communicate(
-                data_point, self.clock.get_time()
+                self.current_data_point, self.clock.get_time()
             )
 
             obs_type = self.observation.obs_type
 
-            # This is a mess, but I think it should be fine for now
-            # TODO: at least move this to its own method
+            # TODO: clean this up
             if self.transmission == Comm.START_CAL:
                 if obs_type == "Spectrum":
                     self.alert("Set frequency to 1319.5MHz")
