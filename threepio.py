@@ -250,6 +250,7 @@ class Threepio(QtWidgets.QMainWindow):
             period = 1000 / (self.observation.freq)  # Hz -> ms
             self.data_timer.set_period(period)
 
+            # TODO: does this belong here?
             self.update_stripchart()
 
             # if (current_time - self.tick_time) > (period * self.timing_margin):
