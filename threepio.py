@@ -188,6 +188,21 @@ class Threepio(QtWidgets.QMainWindow):
 
     def tick(self):
         """primary controller for each clock tick"""
+
+        # grab the latest data point on every tick; it won't always be saved
+        try:
+            tars_data = self.tars.read_latest()  # get data from DAQ
+            self.current_dec = self.calculate_declination(tars_data[2][1])  # get dec
+            data_point = DataPoint(  # create data point
+                self.clock.get_sidereal_seconds(),  # ra
+                self.current_dec,  # dec
+                tars_data[0][1],  # channel a
+                tars_data[1][1],  # channel b
+            )
+            self.data.append(data_point)  # add to data array
+        except TypeError:
+            pass
+
         self.clock.run_timers()
 
         # measure refresh rate
@@ -202,50 +217,11 @@ class Threepio(QtWidgets.QMainWindow):
             self.time_of_last_refresh_update = current_time
 
     def update_data(self):
-        # update all of the timing vars
-
         current_time = self.clock.get_time()
-        # self.time_since_last_voltage_update = (
-        #     current_time - self.time_of_last_voltage_update
-        # )
-
-        # self.update_gui()
-
-        # self.beep()
 
         # TODO: clean up main clock loop
-        if self.observation is None:
-            # period = self.BASE_PERIOD * 0.001  # ms -> s
-
-            # if (current_time - self.clock.starting_time) > (
-            #     period * self.timing_margin
-            # ):
-            # self.tick_time = current_time
-            try:
-                tars_data = self.tars.read_latest()  # get data from DAQ
-                self.current_dec = self.calculate_declination(
-                    tars_data[2][1]
-                )  # get dec
-                data_point = DataPoint(  # create data point
-                    self.clock.get_sidereal_seconds(),  # ra
-                    self.current_dec,  # dec
-                    tars_data[0][1],  # channel a
-                    tars_data[1][1],  # channel b
-                )
-                self.data.append(data_point)  # add to data array
-            except TypeError:
-                pass
-        else:
-            # disable resetting RA/Dec after loading obs; TODO: move this elsewhere
-            for a in [
-                self.ui.actionRA,
-                self.ui.actionDec,
-                self.ui.actionSurvey,
-                self.ui.actionScan,
-                self.ui.actionSpectrum,
-            ]:
-                a.setDisabled(True)
-            self.ui.actionGetInfo.setDisabled(False)
+        if self.observation is not None:
+            self.set_state_observation_loaded()  # TODO: only do this once
 
             period = 1000 / (self.observation.freq)  # Hz -> ms
             self.data_timer.set_period(period)
@@ -349,6 +325,18 @@ class Threepio(QtWidgets.QMainWindow):
             )
         )
         self.ui.actionLegacy.setChecked(self.legacy_mode)
+
+    def set_state_observation_loaded(self, reenable=False):
+        # disable resetting RA/Dec after loading obs; TODO: move this elsewhere
+        for a in [
+            self.ui.actionRA,
+            self.ui.actionDec,
+            self.ui.actionSurvey,
+            self.ui.actionScan,
+            self.ui.actionSpectrum,
+        ]:
+            a.setEnabled(reenable)
+        self.ui.actionGetInfo.setDisabled(not reenable)
 
     @staticmethod
     def handle_credits():
