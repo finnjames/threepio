@@ -184,8 +184,7 @@ class Observation:
         CAL_2 = 5
         BG_2 = 6
         DONE = 7
-        # extra
-        WAITING = 8
+        WAITING = 8  # extra
 
     def start_calibration_1(self):
         self.state = self.State.CAL_1
