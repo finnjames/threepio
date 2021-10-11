@@ -211,7 +211,7 @@ class Threepio(QtWidgets.QMainWindow):
 
         # self.update_gui()
 
-        self.beep()
+        # self.beep()
 
         # TODO: clean up main clock loop
         if self.observation is None:
