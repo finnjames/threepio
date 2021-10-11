@@ -53,7 +53,7 @@ class ObsDialog(QtWidgets.QDialog):
 
     def accept(self):
         exit_code = self.set_observation()
-        if self.confirmed and exit_code == 0:
+        if self.confirmed and exit_code == 0:  # set observation and close
             self.parent_window.observation = None
             self.parent_window.observation = self.observation
             self.close()
