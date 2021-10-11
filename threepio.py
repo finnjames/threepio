@@ -203,18 +203,11 @@ class Threepio(QtWidgets.QMainWindow):
         except TypeError:
             pass
 
+        self.update_stripchart()
+
         self.clock.run_timers()
 
-        # measure refresh rate
-        current_time = self.clock.get_time()
-        self.time_since_last_tick = current_time - self.time_of_last_tick
-        self.time_since_last_stripchart_update = (
-            current_time - self.time_of_last_stripchart_update
-        )
-        self.time_of_last_tick = current_time
-        if current_time - self.time_of_last_refresh_update > 1:
-            self.ui.refresh_value.setText("%.2fHz" % self.get_refresh_rate())
-            self.time_of_last_refresh_update = current_time
+        self.update_fps()
 
     def update_data(self):
         current_time = self.clock.get_time()
@@ -225,11 +218,6 @@ class Threepio(QtWidgets.QMainWindow):
 
             period = 1000 / (self.observation.freq)  # Hz -> ms
             self.data_timer.set_period(period)
-
-            # TODO: does this belong here?
-            self.update_stripchart()
-
-            # if (current_time - self.tick_time) > (period * self.timing_margin):
 
             self.tick_time = current_time
 
@@ -433,6 +421,17 @@ class Threepio(QtWidgets.QMainWindow):
         self.dec_scene.clear()
         for i in [dish, base]:
             self.dec_scene.addItem(i)
+
+    def update_fps(self):
+        current_time = self.clock.get_time()
+        self.time_since_last_tick = current_time - self.time_of_last_tick
+        self.time_since_last_stripchart_update = (
+            current_time - self.time_of_last_stripchart_update
+        )
+        self.time_of_last_tick = current_time
+        if current_time - self.time_of_last_refresh_update > 1:
+            self.ui.refresh_value.setText("%.2fHz" % self.get_refresh_rate())
+            self.time_of_last_refresh_update = current_time
 
     def display_info(self, message):
         self.ui.message_label.setText(message)
