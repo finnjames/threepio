@@ -194,10 +194,12 @@ class Threepio(QtWidgets.QMainWindow):
         """primary controller for each clock tick"""
 
         # grab the latest data point on every tick; it won't always be saved
-        try:
-            tars_data = self.tars.read_latest()  # get data from DAQ
-            minitars_data = self.minitars.read_latest()  # get data from Arduino
-            print(minitars_data)
+        # try:
+        tars_data = self.tars.read_latest()  # get data from DAQ
+        minitars_data = self.minitars.read_latest()  # get data from Arduino
+
+        # grab more data if it's available
+        if tars_data is not None and minitars_data is not None:
             self.current_dec = self.calculate_declination(minitars_data)  # get dec
             self.current_data_point = DataPoint(  # create data point
                 self.clock.get_sidereal_seconds(),  # ra
@@ -206,8 +208,6 @@ class Threepio(QtWidgets.QMainWindow):
                 tars_data[1][1],  # channel b
             )
             self.data.append(self.current_data_point)  # add to data array
-        except TypeError:
-            pass
 
         self.update_stripchart()
 
@@ -348,7 +348,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.ui.dec_value.setText("%.4f°" % self.current_dec)  # show dec
         self.update_progress_bar()
 
-        self.update_dec_view()
+        # self.update_dec_view()  # TODO: should I do this here or in tick()?
         self.update_console()
 
         # if self.time_since_last_voltage_update >= self.VOLTAGE_PERIOD * 0.001:
@@ -443,7 +443,8 @@ class Threepio(QtWidgets.QMainWindow):
 
     def update_stripchart(self):
         try:
-            # get new data point
+            # parse latest data point
+            # TODO: will this duplicate points if one fails to read?
             new_a = self.data[len(self.data) - 1].a
             new_b = self.data[len(self.data) - 1].b
             new_ra = self.data[len(self.data) - 1].timestamp
@@ -479,7 +480,7 @@ class Threepio(QtWidgets.QMainWindow):
             self.chart.setAxisY(axis_y)
             self.stripchart_series_a.attachAxis(axis_y)
             self.stripchart_series_b.attachAxis(axis_y)
-        except IndexError:
+        except IndexError:  # no data yet
             pass
 
     def clear_stripchart(self):
@@ -605,7 +606,7 @@ class Threepio(QtWidgets.QMainWindow):
         """message is for debugging"""
         self.click_sound.play()
         self.last_beep_time = time.time()
-        print("beep!", message, time.time())
+        # print("beep!", message, time.time())
 
     def closeEvent(self, event):
         """override quit action to confirm before closing"""

@@ -50,12 +50,11 @@ class MiniTars:
                 return None
             line = self.ser.readline()  # read a byte string
             self.ser.flushInput()
-            print(line)
             if line:
                 try:
-                    string = (
-                        line.decode().strip()
-                    )  # convert byte string to unicode string and remove trailing newline
+                    # convert byte string to unicode string and remove trailing newline
+                    string = line.decode().strip()
+                    # split values apart and parse as floats
                     data = tuple([float(i) for i in string.split(",")])
 
                     # check format of data
@@ -66,10 +65,10 @@ class MiniTars:
                     ]:
                         return data
 
-                except UnicodeDecodeError:
+                except (UnicodeDecodeError, ValueError) as e:
                     pass
-                except ValueError:
-                    pass
+
+            return None  # if no/invalid data was read, return None
         else:
             return self.random_data()
 
