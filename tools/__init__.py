@@ -5,3 +5,4 @@ from .observation import Observation, Survey, Scan, Spectrum
 from .precious import MyPrecious
 from .superclock import SuperClock
 from .tars import Tars, discovery
+from .minitars import MiniTars

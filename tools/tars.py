@@ -17,11 +17,15 @@ def discovery() -> str:
     # Get a list of active com ports to scan for possible DATAQ Instruments devices
     available_ports = serial.tools.list_ports.comports()
 
+    dataq = None
+    arduino = None
     for p in available_ports:
         if "VID:PID=0683:4109" in p.hwid:
-            return p.device
+            dataq = p.device
+        if "VID:PID=2341:0043" in p.hwid:
+            arduino = p.device
 
-    return None
+    return (dataq, arduino)
 
 
 def convert(buffer: list, volt: int) -> float:

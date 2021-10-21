@@ -22,6 +22,7 @@ from tools import (
     Spectrum,
     SuperClock,
     Tars,
+    MiniTars,
     discovery,
 )
 
@@ -132,10 +133,12 @@ class Threepio(QtWidgets.QMainWindow):
         self.ui.chart_clear_button.clicked.connect(self.clear_stripchart)
 
         # Tars/DATAQ
-        device = discovery()
-        self.tars = Tars(parent=self, device=device)
-        self.tars.setup()
+        dataq, arduino = discovery()
+        self.tars = Tars(parent=self, device=dataq)
+        self.tars.setup()  # TODO: is this necessary?
         self.tars.start()
+        self.minitars = MiniTars(parent=self, device=arduino)
+        self.minitars.start()
 
         # bleeps and bloops
         self.log("Initializing audio...")
@@ -193,7 +196,9 @@ class Threepio(QtWidgets.QMainWindow):
         # grab the latest data point on every tick; it won't always be saved
         try:
             tars_data = self.tars.read_latest()  # get data from DAQ
-            self.current_dec = self.calculate_declination(tars_data[2][1])  # get dec
+            minitars_data = self.minitars.read_latest()  # get data from Arduino
+            print(minitars_data)
+            self.current_dec = self.calculate_declination(minitars_data)  # get dec
             self.current_data_point = DataPoint(  # create data point
                 self.clock.get_sidereal_seconds(),  # ra
                 self.current_dec,  # dec
@@ -209,6 +214,8 @@ class Threepio(QtWidgets.QMainWindow):
         self.clock.run_timers()
 
         self.update_fps()
+
+        self.update_dec_view()  # TODO: felt cute, might delete later
 
     def update_data(self):
         current_time = self.clock.get_time()
@@ -531,34 +538,36 @@ class Threepio(QtWidgets.QMainWindow):
             for i in c:
                 self.x.append(float(i))
 
-    def calculate_declination(self, input_dec: float):
+    def calculate_declination(self, input_xyz: tuple[float, float, float]):
         """calculate the true dec from declinometer input and calibration data"""
 
+        raw_dec = input_xyz[1]  # TODO: this needs some work
+
         # input is below data
-        if input_dec < self.x[0]:  # TODO: use minimum, not first
+        if raw_dec < self.x[0]:  # TODO: use minimum, not first
             return (
                 (self.y[1] - self.y[0])
                 / (self.x[1] - self.x[0])
-                * (input_dec - self.x[0])
+                * (raw_dec - self.x[0])
             ) + self.y[0]
 
         # input is above data
-        if input_dec > self.x[-1]:  # TODO: use maximum, not last
+        if raw_dec > self.x[-1]:  # TODO: use maximum, not last
             return (
                 (self.y[-1] - self.y[-2])
                 / (self.x[-1] - self.x[-2])
-                * (input_dec - self.x[-1])
+                * (raw_dec - self.x[-1])
             ) + self.y[-1]
 
         # input is within data
         for i in range(len(self.x)):
-            if input_dec <= self.x[i + 1]:
-                if input_dec >= self.x[i]:
+            if raw_dec <= self.x[i + 1]:
+                if raw_dec >= self.x[i]:
                     # (dy/dx)x + y_0
                     return (
                         (self.y[i + 1] - self.y[i])
                         / (self.x[i + 1] - self.x[i])
-                        * (input_dec - self.x[i])
+                        * (raw_dec - self.x[i])
                     ) + self.y[i]
 
     def ra_calibration(self):
