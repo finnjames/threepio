@@ -60,9 +60,6 @@ class Threepio(QtWidgets.QMainWindow):
     BLUE = 0x2196F3
     RED = 0xFF5252
 
-    # green bank coords
-    GB_LATITUDE = 38.4339
-
     # tars communication interpretation
     transmission = None
     old_transmission = None
@@ -194,19 +191,11 @@ class Threepio(QtWidgets.QMainWindow):
         """primary controller for each clock tick"""
 
         # grab the latest data point on every tick; it won't always be saved
-        # try:
         tars_data = self.tars.read_latest()  # get data from DAQ
         minitars_data = self.minitars.read_latest()  # get data from Arduino
         sidereal_timestamp = self.clock.get_sidereal_seconds()
 
         # grab more data if it's available
-        # try:
-        #     print(
-        #         f"Tars: {tars_data[0][1]:.6f}, {tars_data[1][1]:.6f};  MiniTars: {minitars_data: 2.2f}"
-        #     )
-        # except TypeError:
-        #     pass
-
         if tars_data is not None and minitars_data is not None:
             self.current_dec = self.calculate_declination(minitars_data)  # get dec
             self.current_data_point = DataPoint(  # create data point
@@ -401,7 +390,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.ui.progressBar.setValue(0)
 
     def update_dec_view(self):
-        angle = self.current_dec - self.GB_LATITUDE
+        angle = self.current_dec - self.clock.GB_LATITUDE
 
         # telescope dish
         dish = QtGui.QPixmap("assets/dish.png")
