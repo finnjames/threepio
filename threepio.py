@@ -197,6 +197,7 @@ class Threepio(QtWidgets.QMainWindow):
         # try:
         tars_data = self.tars.read_latest()  # get data from DAQ
         minitars_data = self.minitars.read_latest()  # get data from Arduino
+        sidereal_timestamp = self.clock.get_sidereal_seconds()
 
         # grab more data if it's available
         # try:
@@ -209,12 +210,12 @@ class Threepio(QtWidgets.QMainWindow):
         if tars_data is not None and minitars_data is not None:
             self.current_dec = self.calculate_declination(minitars_data)  # get dec
             self.current_data_point = DataPoint(  # create data point
-                self.clock.get_sidereal_seconds(),  # ra
+                sidereal_timestamp,  # ra
                 self.current_dec,  # dec
                 tars_data[0][1],  # channel a
                 tars_data[1][1],  # channel b
             )
-            self.data.append(self.current_data_point)  # add to data array
+            self.data.append(self.current_data_point)  # add to data list
 
         self.clock.run_timers()
 
