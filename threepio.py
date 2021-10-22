@@ -28,7 +28,10 @@ from tools import (
 
 
 class Threepio(QtWidgets.QMainWindow):
-    """main class for the app"""
+    """
+    Green Bank Observatory's 40 Foot Telescope's very own data acquisition system.
+    Extends Qt's QMainWindow class and is the main window of the application.
+    """
 
     # basic time
     BASE_PERIOD = 10  # ms
@@ -514,6 +517,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.load_dec_cal()
 
     def load_dec_cal(self):
+        """read the true"""
         # create y array
         self.y = []
         i = DecDialog.south_dec
