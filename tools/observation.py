@@ -45,7 +45,7 @@ class Observation:
         # Info
         self.start_RA = None
         self.end_RA = None
-        self.max_dec = None  # if only one dec, this is it
+        self.max_dec = None  # if only one dec, this is it TODO: switch this
         self.min_dec = None
 
         self.start_time = None

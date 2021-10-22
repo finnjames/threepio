@@ -28,11 +28,13 @@ class SuperClock:
             self.callback()
 
         def run_if_appropriate(self, starting_time: float) -> bool:
+            # TODO: this is why things stop at calibration
             while time.time() > (
                 starting_time + (self.period / 1000) * (self.offset + 1)
             ):
                 self.offset += 1
 
+            # TODO: does offset need to update when period updates?
             if self.period > 0 and (
                 time.time() >= (starting_time + (self.period / 1000) * self.offset)
             ):
