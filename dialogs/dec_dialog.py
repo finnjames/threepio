@@ -41,8 +41,6 @@ class DecDialog(QtWidgets.QDialog):
 
         self.confirmed = False
 
-        # self.handle_next()
-
     def switch_direction(self):
         if self.ui.north_or_south_combo_box.currentIndex() == 0:
             self.current_dec = self.south_dec
@@ -53,6 +51,8 @@ class DecDialog(QtWidgets.QDialog):
         self.update_label()
 
     def handle_next(self):
+
+        self.parent.beep()
 
         if not self.confirmed:
             self.ui.set_dec_label.setText("Are you sure?")
