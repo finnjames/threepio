@@ -10,7 +10,7 @@ class SuperClock:
     LONGITUDE = 38.437235
 
     class Timer:
-        def __init__(self, period, callback):
+        def __init__(self, period: float, callback):
             """
             Args:
                 period (int): in milliseconds
@@ -19,7 +19,7 @@ class SuperClock:
             Attributes:
                 offset (int): the number of times the timer has run
             """
-            self.period = period
+            self.period = float(period)
             self.offset = 0
             self.callback = callback
 

@@ -209,12 +209,10 @@ class Threepio(QtWidgets.QMainWindow):
             )
             self.data.append(self.current_data_point)  # add to data array
 
-        self.update_stripchart()
-
         self.clock.run_timers()
 
+        self.update_stripchart()
         self.update_fps()
-
         self.update_dec_view()  # TODO: felt cute, might delete later
 
     def update_data(self):
@@ -351,12 +349,7 @@ class Threepio(QtWidgets.QMainWindow):
         # self.update_dec_view()  # TODO: should I do this here or in tick()?
         self.update_console()
 
-        # if self.time_since_last_voltage_update >= self.VOLTAGE_PERIOD * 0.001:
         self.update_voltage()
-        # self.time_of_last_voltage_update = current_time
-        # if self.time_since_last_stripchart_update >= self.STRIPCHART_PERIOD * 0.001:
-        self.update_stripchart()
-        # self.time_of_last_stripchart_update = current_time
 
     def update_progress_bar(self):
         # T=start_RA
