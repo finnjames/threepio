@@ -3,6 +3,7 @@ Small version of Tars, meant to be used with the Arduino declinometer as opposed
 """
 
 import serial
+from .myserial import MySerial
 import serial.tools.list_ports
 
 import time
@@ -30,7 +31,7 @@ class MiniTars:
         self.acquiring = False
         if device is not None:
             self.testing = False
-            self.ser = serial.Serial(device)
+            self.ser = MySerial(device)
 
     def start(self):
         if not self.testing:
