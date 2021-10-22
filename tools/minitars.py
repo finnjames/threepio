@@ -10,7 +10,7 @@ import math
 import random as r
 
 
-def discovery() -> str:
+def discovery():
     """only use for minitars testing"""
     # Get a list of active com ports to scan for possible DATAQ Instruments devices
     available_ports = serial.tools.list_ports.comports()
@@ -38,47 +38,32 @@ class MiniTars:
 
     def stop(self):
         if not self.testing:
-            self.ser.close()
+            self.ser.reset_input_buffer()
             self.acquiring = False
 
-    def read_one(self) -> list:
+    def read_one(self) -> float:
         """
         This reads one datapoint from the buffer.
         """
         if not self.testing:
             if self.in_waiting() < 1:
                 return None
-            line = self.ser.readline()  # read a byte string
-            self.ser.flushInput()
-            if line:
-                try:
-                    # convert byte string to unicode string and remove trailing newline
-                    string = line.decode().strip()
-                    # split values apart and parse as floats
-                    data = tuple([float(i) for i in string.split(",")])
-
-                    # check format of data
-                    if isinstance(data, tuple) and list(map(type, data)) == [
-                        float,
-                        float,
-                        float,
-                    ]:
-                        return data
-
-                except (UnicodeDecodeError, ValueError) as e:
-                    pass
-
-            return None  # if no/invalid data was read, return None
+            return self.buffer_read()
         else:
             return self.random_data()
 
-    def read_latest(self) -> list:
+    def read_latest(self) -> float:
         """
         This function reads the last datapoint from the buffer and clears the buffer.
         Use this as a real-time sampling method.
         """
         if not self.testing:
-            return self.read_one()
+            current = self.read_one()
+            latest = None
+            while current is not None:
+                latest = current
+                current = self.read_one()
+            return latest
         else:
             return self.random_data()
 
@@ -88,27 +73,26 @@ class MiniTars:
         if not self.testing:
             return self.ser.in_waiting
 
+    def buffer_read(self) -> float:
+        """read angle from serial buffer"""
+        if not self.testing:
+            if self.in_waiting() < 1:
+                return None
+            line = self.ser.readline()  # read a byte string
+            try:
+                return float(line.decode())
+            except (UnicodeDecodeError, ValueError):
+                pass
+            return None
+
     # Testing
 
-    def random_data(self):
+    def random_data(self) -> float:
         """for testing"""
         t = time.time() / 8
+        y = math.sin(4 * t)
 
-        n = r.choice([-0.2, 1]) / (64 * (r.random() + 0.02))
-        try:
-            n *= 0.08 * self.parent.ui.noise_dial.value() ** 2
-        except AttributeError:
-            pass
-
-        fx = math.sin(4 * t)
-        fy = math.sin(4 * t + (2 * math.pi / 3))
-        fz = math.sin(4 * t + (4 * math.pi / 3))
-
-        x = fx + n
-        y = fy + n
-        z = fz + n
-
-        return (x, y, z)
+        return y
 
 
 def main():

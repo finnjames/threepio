@@ -107,43 +107,6 @@ class Tars:
         else:
             return self.random_data()
 
-    def random_data(self):
-        """sometimes it's not worth asking"""
-        x = time.time() / 8
-
-        n = r.choice([-0.2, 1]) / (64 * (r.random() + 0.02))
-        n *= 0.08 * self.parent.ui.noise_dial.value() ** 2
-
-        v = self.parent.ui.variance_dial.value()
-
-        c = 1 if self.parent.ui.calibration_check_box.isChecked() else 0
-
-        f = 0
-        # f = math.sin(4 * x)
-
-        g = (
-            2.6 / (math.sin(2 * x) + 1.4)
-            + 0.4 * math.sin(8 * x)
-            - 0.8 * math.sin(4 * x)
-            + (1 / (math.sin(8 * x) + 1.4))
-        )
-
-        a = f + g * v + n + c
-        b = a - 0.1 * self.parent.ui.polarization_dial.value() * g * (v / 2 + 1)
-
-        def normalize_kinda(x):
-            return x / 272 + c + 1
-
-        a = normalize_kinda(a)
-        b = normalize_kinda(b)
-
-        # a, b, dec
-        return [
-            (0, a),
-            (1, b),
-            (2, float(self.parent.ui.declination_slider.value()) / 100),
-        ]
-
     # Helpers
 
     def send(self, command: str):
@@ -186,6 +149,45 @@ class Tars:
                 * int.from_bytes(buffer, byteorder="little", signed=True)
                 / 32768
             )
+    
+    # Testing
+
+    def random_data(self):
+        """sometimes it's not worth asking"""
+        x = time.time() / 8
+
+        n = r.choice([-0.2, 1]) / (64 * (r.random() + 0.02))
+        n *= 0.08 * self.parent.ui.noise_dial.value() ** 2
+
+        v = self.parent.ui.variance_dial.value()
+
+        c = 1 if self.parent.ui.calibration_check_box.isChecked() else 0
+
+        f = 0
+        # f = math.sin(4 * x)
+
+        g = (
+            2.6 / (math.sin(2 * x) + 1.4)
+            + 0.4 * math.sin(8 * x)
+            - 0.8 * math.sin(4 * x)
+            + (1 / (math.sin(8 * x) + 1.4))
+        )
+
+        a = f + g * v + n + c
+        b = a - 0.1 * self.parent.ui.polarization_dial.value() * g * (v / 2 + 1)
+
+        def normalize_kinda(x):
+            return x / 272 + c + 1
+
+        a = normalize_kinda(a)
+        b = normalize_kinda(b)
+
+        # a, b, dec
+        return [
+            (0, a),
+            (1, b),
+            (2, float(self.parent.ui.declination_slider.value()) / 100),
+        ]
 
 
 def main():
