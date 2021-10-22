@@ -491,6 +491,7 @@
             <property name="font">
              <font>
               <family>Iosevka Aile</family>
+              <pointsize>16</pointsize>
              </font>
             </property>
             <property name="alignment">

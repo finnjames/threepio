@@ -242,6 +242,7 @@ class Ui_MainWindow(object):
         self.progressBar.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
         font.setFamily("Iosevka Aile")
+        font.setPointSize(16)
         self.progressBar.setFont(font)
         self.progressBar.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
         self.progressBar.setInvertedAppearance(False)
