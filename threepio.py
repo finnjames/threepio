@@ -518,7 +518,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.load_dec_cal()
 
     def load_dec_cal(self):
-        """read the true"""
+        """read the dec calibration from file and store it in memory"""
         # create y array
         self.y = []
         i = DecDialog.south_dec
