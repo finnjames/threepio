@@ -506,7 +506,7 @@ class Threepio(QtWidgets.QMainWindow):
             pass
 
     def dec_calibration(self):
-        dialog = DecDialog(self.tars, self)
+        dialog = DecDialog(self.minitars, self)
         if self.mode == "testing":
             dialog.show()
         dialog.exec_()

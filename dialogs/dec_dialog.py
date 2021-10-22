@@ -13,7 +13,7 @@ class DecDialog(QtWidgets.QDialog):
     CAL_FILENAME = "dec-cal.txt"
     CAL_BACKUP_FILENAME = "dec-cal-backup.txt"
 
-    def __init__(self, tars, parent):
+    def __init__(self, minitars, parent):
         QtWidgets.QWidget.__init__(self)
         self.ui = dec_cal_ui.Ui_Dialog()
         self.ui.setupUi(self)
@@ -29,7 +29,7 @@ class DecDialog(QtWidgets.QDialog):
         self.current_dec = self.south_dec
         self.update_label()
 
-        self.tars = tars
+        self.minitars = minitars
         self.parent = parent
 
         # connect buttons
@@ -60,7 +60,9 @@ class DecDialog(QtWidgets.QDialog):
             self.confirmed = True
         else:
             # read just the declination value
-            new_dec = self.tars.read_latest()[2][1]
+            new_dec = None
+            while new_dec is None:  # TODO: should minitars ever return None?
+                new_dec = self.minitars.read_latest()
             if (
                 len(self.data) >= 2
                 and (new_dec - self.data[-1]) * (self.data[-1] - self.data[-2]) <= 0

@@ -5,7 +5,9 @@ the DATAQ device connected via a USB serial connection. The module also includes
 a few helper functions relevant to the tasks.
 """
 
+from re import I
 import serial
+from .myserial import MySerial
 import serial.tools.list_ports
 import time
 
@@ -46,7 +48,7 @@ class Tars:
         if device is not None:
             self.testing = False
 
-            self.ser = serial.Serial(device)
+            self.ser = MySerial(device)
             self.channels = [
                 0x0100,  # channel 0, telescope channel A, ±5 V range
                 0x0101,  # channel 1, telescope channel B, ±5 V range
