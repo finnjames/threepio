@@ -45,8 +45,8 @@ class Observation:
         # Info
         self.start_RA = None
         self.end_RA = None
-        self.max_dec = None  # if only one dec, this is it TODO: switch this
-        self.min_dec = None
+        self.min_dec = None  # if only one dec, this is it TODO: switch this
+        self.max_dec = None
 
         self.start_time = None
         self.end_time = None
@@ -81,9 +81,9 @@ class Observation:
         self.start_RA = start_ra
         self.end_RA = end_ra
 
-    def set_dec(self, max_dec, min_dec=None):
-        self.max_dec = max_dec
+    def set_dec(self, min_dec, max_dec=None):
         self.min_dec = min_dec
+        self.max_dec = max_dec
 
     def set_data_time(self, data_start, data_end):
         self.data_start = data_start
@@ -309,8 +309,6 @@ class Survey(Observation):
         self.file_comp = MyPrecious(self.name + "_comp.md2")
 
     def data_logic(self, data_point):
-        # print(self.min_dec, data_point.dec, self.max_dec)
-        # print(data_point.dec < self.min_dec, data_point.dec > self.max_dec)
         if data_point.dec < (self.min_dec - 2) or data_point.dec > (self.max_dec + 2):
             if self.outside:
                 return Comm.BEEP

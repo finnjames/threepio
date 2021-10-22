@@ -30,10 +30,10 @@ class ObsDialog(QtWidgets.QDialog):
 
         # If a scan or spectrum, only one Dec needed
         if self.observation.obs_type in ["Scan", "Spectrum"]:
-            for i in [self.ui.starting_dec, self.ui.start_dec_label]:
+            for i in [self.ui.ending_dec, self.ui.end_dec_label]:
                 i.hide()
-            self.ui.starting_dec.setText("0")
-            self.ui.end_dec_label.setText("Declination")
+            self.ui.ending_dec.setText("0")
+            self.ui.start_dec_label.setText("Declination")
         if self.observation.obs_type == "Spectrum":
             for i in [self.ui.end_label, self.ui.end_time]:
                 i.hide()
@@ -120,7 +120,7 @@ class ObsDialog(QtWidgets.QDialog):
         try:
             self.observation.set_ra(start_time, end_time)
             self.observation.set_dec(
-                int(self.ui.ending_dec.text()), int(self.ui.starting_dec.text())
+                int(self.ui.starting_dec.text()), int(self.ui.ending_dec.text())
             )
             self.observation.set_data_freq(
                 int(self.ui.data_acquisition_rate_value.text())
