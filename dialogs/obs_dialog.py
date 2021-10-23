@@ -4,11 +4,13 @@ from PyQt5 import QtWidgets, QtCore
 from layouts import obs_ui  # compiled PyQt dialogue ui
 import time
 
+from tools.observation import Observation
+
 
 class ObsDialog(QtWidgets.QDialog):
     """New observation dialogue window"""
 
-    def __init__(self, parent_window, observation, clock, info=False):
+    def __init__(self, parent_window, observation: Observation, clock, info=False):
         QtWidgets.QWidget.__init__(self)
         self.ui = obs_ui.Ui_Dialog()
         self.ui.setupUi(self)
@@ -34,18 +36,17 @@ class ObsDialog(QtWidgets.QDialog):
                 i.hide()
             self.ui.ending_dec.setText("0")
             self.ui.start_dec_label.setText("Declination")
-        if self.observation.obs_type == "Spectrum":
-            for i in [self.ui.end_label, self.ui.end_time]:
-                i.hide()
-        if self.observation.obs_type == "Survey":
+        if self.observation.obs_type in ["Spectrum", "Survey"]:
             for i in [
                 self.ui.data_acquisition_rate_label,
                 self.ui.data_acquisition_rate_value,
             ]:
                 i.hide()
-            self.ui.data_acquisition_rate_value.setValue(
-                6
-            )  # all surveys have a rate of 6
+            # all spectra and surveys have data acquisition rates of 6
+            self.ui.data_acquisition_rate_value.setValue(6)
+        if self.observation.obs_type == "Spectrum":
+            for i in [self.ui.end_label, self.ui.end_time]:
+                i.hide()
         self.adjustSize()
 
         # store parent window

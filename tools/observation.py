@@ -141,7 +141,6 @@ class Observation:
             else:
                 return Comm.START_CAL
         elif self.state == self.State.CAL_2:
-            print(f"timestamp: {timestamp}, val: {timestamp}, end_RA: {self.end_RA}")
             if timestamp - self.cal_start < self.cal_dur:
                 self.write_data(data_point)
                 return Comm.NO_ACTION

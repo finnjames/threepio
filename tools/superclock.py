@@ -20,7 +20,7 @@ class SuperClock:
             Attributes:
                 offset (int): the number of times the timer has run
             """
-            self.period = float(period)
+            self.period = float(period)  # ms
             self.offset = 0
             self.callback = callback
 
