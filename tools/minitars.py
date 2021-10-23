@@ -90,11 +90,11 @@ class MiniTars:
 
     def random_data(self) -> float:
         """for testing"""
-        t = time.time() / 8
-        y = math.sin(4 * t)
-
-        return y
-
+        if self.parent.ui.dec_auto_check_box.isChecked():
+            t = time.time() / 8
+            y = math.sin(4 * t)
+            return y
+        return float(self.parent.ui.declination_slider.value()) / 100
 
 def main():
     arduino = discovery()
