@@ -72,11 +72,20 @@ class SuperClock:
         for timer in self.timers:
             timer.run_if_appropriate(self.starting_time)
 
+    def reset_timers(self) -> None:
+        """reset all timers"""
+        for timer in self.timers:
+            timer.offset = 0
+
     def add_timer(self, period, callback) -> None:
         """set a timer to call a function periodically"""
         new_timer = SuperClock.Timer(period, callback)
         self.timers.append(new_timer)
         return new_timer
+
+    def set_starting_time(self, new_time: float) -> None:
+        self.starting_time = new_time
+        self.reset_timers()
 
     def get_time(self) -> float:
         return time.time()
