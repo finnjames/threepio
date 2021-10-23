@@ -150,6 +150,9 @@ class Threepio(QtWidgets.QMainWindow):
         self.last_beep_time = 0.0
         self.tobeepornottobeep = False
 
+        # alerts
+        self.open_alert = None
+
         # establish observation
         self.observation = None
         self.obs_complete = False
@@ -266,9 +269,19 @@ class Threepio(QtWidgets.QMainWindow):
                     self.alert("Has the telescope been stopped?", "Yes")
                     self.stop_tel_alert = False
             elif self.transmission == Comm.SEND_TEL_NORTH:
-                self.alert("Send telescope NORTH at maximum speed!!!", "Okay")
+                self.message(
+                    "Send telescope NORTH at max speed!!!", beep=False, log=False
+                )
+                self.tobeepornottobeep = True
             elif self.transmission == Comm.SEND_TEL_SOUTH:
-                self.alert("Send telescope SOUTH at maximum speed!!!", "Okay")
+                self.message(
+                    "Send telescope SOUTH at max speed!!!", beep=False, log=False
+                )
+                self.tobeepornottobeep = True
+            elif self.transmission == Comm.END_SEND_TEL:
+                self.message(
+                    f"Taking {obs_type.lower()} data!!!", beep=False, log=False
+                )
             elif self.transmission == Comm.BEEP:
                 self.tobeepornottobeep = True
             elif self.transmission == Comm.NEXT:
@@ -422,9 +435,6 @@ class Threepio(QtWidgets.QMainWindow):
         if current_time - self.time_of_last_refresh_update >= 1:
             self.ui.refresh_value.setText("%.2fHz" % self.get_refresh_rate())
             self.time_of_last_refresh_update = current_time
-
-    def display_info(self, message):
-        self.ui.message_label.setText(message)
 
     def initialize_stripchart(self):
         self.chart.addSeries(self.stripchart_series_b)

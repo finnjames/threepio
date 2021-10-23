@@ -13,3 +13,4 @@ class Comm(Enum):
     START_DATA = 7
     SEND_TEL_NORTH = 8
     SEND_TEL_SOUTH = 9
+    END_SEND_TEL = 10
