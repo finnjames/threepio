@@ -301,7 +301,7 @@ class Survey(Observation):
         self.obs_type = "Survey"
 
         self.data_freq = 1
-        self.outside = False
+        self.outside = True
 
     def set_files(self):
         self.file_a = MyPrecious(self.name + "_a.md2")
@@ -309,17 +309,23 @@ class Survey(Observation):
         self.file_comp = MyPrecious(self.name + "_comp.md2")
 
     def data_logic(self, data_point):
+        print(f"data logic: {data_point} {data_point.dec}")
         if data_point.dec < (self.min_dec - 2) or data_point.dec > (self.max_dec + 2):
-            self.write("*")
+            print("outside")
+            if not self.outside:
+                self.write("*")
             self.outside = True
             if data_point.dec < self.min_dec:
                 return Comm.SEND_TEL_NORTH
             elif data_point.dec > self.max_dec:
                 return Comm.SEND_TEL_SOUTH
         else:
+            print("inside")
             if self.outside:
+                print("end_send_tel")
+                self.outside = False
                 return Comm.END_SEND_TEL
-            self.outside = False
+            print("write data")
             self.write_data(data_point)
             return Comm.NO_ACTION
 
