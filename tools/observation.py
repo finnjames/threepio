@@ -35,7 +35,7 @@ class Observation:
         #   frequency. Only the data frequency is user-editable. When running the program, the sampling
         #   frequency is automatically set by the current state and is stored in 'self.freq'.
         self.cal_freq = 1
-        self.data_freq = 1
+        self.data_freq = 6
 
         # Will be set accordingly in each state.
         self.freq = self.cal_freq
@@ -141,10 +141,12 @@ class Observation:
             else:
                 return Comm.START_CAL
         elif self.state == self.State.CAL_2:
+            print(f"timestamp: {timestamp}, val: {timestamp}, end_RA: {self.end_RA}")
             if timestamp - self.cal_start < self.cal_dur:
                 self.write_data(data_point)
                 return Comm.NO_ACTION
             else:
+                print("stop cal")
                 return Comm.STOP_CAL
         elif self.state == self.State.BG_2:
             if timestamp - self.bg_start < self.bg_dur:
@@ -247,6 +249,7 @@ class Observation:
             self.file_b.write(string)
 
     def write_data(self, point: DataPoint):
+        print(f"{point.timestamp}, dec: {point.dec}")
         self.write("%.2f" % point.timestamp)
         self.write("%.2f" % point.dec)
         if self.composite:
@@ -270,9 +273,6 @@ class Observation:
             self.file_a.close()
             self.file_b.close()
 
-    # def get_last_data(self):
-    #     return self.data[len(self.data) - 1]
-
 
 class Scan(Observation):
     """Set a start and end RA"""
@@ -280,8 +280,6 @@ class Scan(Observation):
     def __init__(self):
         super().__init__()
         self.obs_type = "Scan"
-
-        self.data_freq = 1
 
     def set_files(self):
         self.file_a = MyPrecious(self.name + "_a.md1")
@@ -300,7 +298,6 @@ class Survey(Observation):
         super().__init__()
         self.obs_type = "Survey"
 
-        self.data_freq = 1
         self.outside = True
 
     def set_files(self):

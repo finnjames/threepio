@@ -48,6 +48,8 @@ class SuperClock:
             Args:
                 new_period (int): in milliseconds
             """
+            if self.period != new_period:
+                self.offset = 0
             self.period = new_period
 
         def cancel(self) -> None:

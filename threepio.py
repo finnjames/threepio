@@ -47,7 +47,7 @@ class Threepio(QtWidgets.QMainWindow):
     other_ticker = 0
     foo = 0.0
 
-    # speed measurement
+    # speed measurement TODO: no longer necessary
     tick_time = 0.0
     timing_margin = 0.97
 
@@ -156,6 +156,7 @@ class Threepio(QtWidgets.QMainWindow):
         # establish observation
         self.observation = None
         self.obs_complete = False
+        self.stop_tel_alert = False
 
         # establish data array & most recent dec
         self.data = []
