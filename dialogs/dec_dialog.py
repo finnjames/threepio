@@ -61,7 +61,7 @@ class DecDialog(QtWidgets.QDialog):
         else:
             # read just the declination value
             new_dec = None
-            while new_dec is None:  # TODO: should minitars ever return None?
+            while new_dec is None:
                 new_dec = self.minitars.read_latest()
             if (
                 len(self.data) >= 2

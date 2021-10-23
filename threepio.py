@@ -214,14 +214,14 @@ class Threepio(QtWidgets.QMainWindow):
         self.clock.run_timers()  # run all timers that are due
 
         self.update_stripchart()
-        self.update_dec_view()  # TODO: felt cute, might delete later
+
+        self.update_dec_view()
 
         self.ticks_since_last_fps_update += 1  # for measuring fps
 
     def update_data(self):
         current_time = self.clock.get_time()
 
-        # TODO: clean up main clock loop
         if self.observation is not None:
             self.set_state_observation_loaded()  # TODO: only do this once
 
@@ -235,7 +235,7 @@ class Threepio(QtWidgets.QMainWindow):
 
             obs_type = self.observation.obs_type
 
-            # TODO: clean this up
+            # TODO: switch to 3.10 match
             if self.transmission == Comm.START_CAL:
                 if obs_type == "Spectrum":
                     self.alert("Set frequency to 1319.5MHz")

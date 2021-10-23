@@ -45,7 +45,7 @@ class Observation:
         # Info
         self.start_RA = None
         self.end_RA = None
-        self.min_dec = None  # if only one dec, this is it TODO: switch this
+        self.min_dec = None  # if only one dec, this is it
         self.max_dec = None
 
         self.start_time = None
@@ -62,19 +62,6 @@ class Observation:
 
         self.data_start = None
         self.data_end = None
-
-        # alerts before start of observation
-        beeplist = (
-            # [300]
-            # + list(range(60, 300, 60))
-            # + list(range(10, 60, 10))
-            # + list(range(1, 10))
-            []
-        )
-        self.beeptimes = [[j, False] for j in beeplist]
-
-        # # The data list, for backup
-        # self.data       = []
 
     # Settings API
     def set_ra(self, start_ra, end_ra):
@@ -103,17 +90,9 @@ class Observation:
 
         user_start_time = self.start_RA - (self.bg_dur + self.cal_dur + 30)
 
-        def no_action(timestamp):  # TODO: move this to Threepio
-            tobeepornottobeep = False
-            # for i in self.beeptimes:
-            #     if (not i[1]) and timestamp > user_start_time - (i[0]):
-            #         i[1] = True
-            #         tobeepornottobeep = True
-            return Comm.BEEP if tobeepornottobeep else Comm.NO_ACTION
-
         if self.state == self.State.OFF:
             if timestamp < user_start_time:  # A 30 second buffer for user actions
-                return no_action(timestamp)
+                return Comm.NO_ACTION
             else:
                 return Comm.START_CAL
         elif self.state == self.State.CAL_1:
