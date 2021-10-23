@@ -309,9 +309,7 @@ class Survey(Observation):
         self.file_comp = MyPrecious(self.name + "_comp.md2")
 
     def data_logic(self, data_point):
-        print(f"data logic: {data_point} {data_point.dec}")
         if data_point.dec < (self.min_dec - 2) or data_point.dec > (self.max_dec + 2):
-            print("outside")
             if not self.outside:
                 self.write("*")
             self.outside = True
@@ -320,12 +318,9 @@ class Survey(Observation):
             elif data_point.dec > self.max_dec:
                 return Comm.SEND_TEL_SOUTH
         else:
-            print("inside")
             if self.outside:
-                print("end_send_tel")
                 self.outside = False
                 return Comm.END_SEND_TEL
-            print("write data")
             self.write_data(data_point)
             return Comm.NO_ACTION
 
