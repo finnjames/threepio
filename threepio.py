@@ -9,6 +9,7 @@ r"""
 
 import time, math
 from functools import reduce
+from typing import Callable
 
 from PyQt5 import QtChart, QtCore, QtGui, QtWidgets, QtMultimedia
 
@@ -24,6 +25,7 @@ from tools import (
     Tars,
     MiniTars,
     discovery,
+    LogTask,
 )
 
 
@@ -82,7 +84,8 @@ class Threepio(QtWidgets.QMainWindow):
         self.mode = "normal"
 
         # "console" output
-        self.message_log = [">>> THREEPIO"]
+        self.message_log: LogTask = []
+        self.log(">>> THREEPIO")
         self.update_console()
 
         # clock
@@ -90,7 +93,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.set_time()
 
         # initialize stripchart
-        self.log("Initializing stripchart...")
+        stripchart_log_task = self.log("Initializing stripchart...")
         self.stripchart_series_a = QtChart.QLineSeries()
         self.stripchart_series_b = QtChart.QLineSeries()
         self.axis_y = QtChart.QValueAxis()
@@ -102,10 +105,11 @@ class Threepio(QtWidgets.QMainWindow):
         pen.setColor(QtGui.QColor(self.RED))
         self.stripchart_series_b.setPen(pen)
         self.initialize_stripchart()  # should this include more of the above?
+        stripchart_log_task.set_status(0)
 
         self.update_stripchart_speed()
 
-        self.log("Initializing buttons...")
+        stripchart_log_task = self.log("Initializing buttons...")
         # connect buttons
         self.ui.stripchart_speed_slider.valueChanged.connect(
             self.update_stripchart_speed
@@ -126,6 +130,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.ui.actionLegacy.triggered.connect(self.toggle_state_legacy)
 
         self.ui.chart_clear_button.clicked.connect(self.clear_stripchart)
+        stripchart_log_task.set_status(0)
 
         # Tars/DATAQ
         dataq, arduino = discovery()
@@ -135,7 +140,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.minitars.start()
 
         # bleeps and bloops
-        self.log("Initializing audio...")
+        stripchart_log_task = self.log("Initializing audio...")
         self.click_sound = QtMultimedia.QSoundEffect()
         url = QtCore.QUrl()
         self.click_sound.setSource(url.fromLocalFile("assets/beep3.wav"))
@@ -143,6 +148,7 @@ class Threepio(QtWidgets.QMainWindow):
         # self.click_sound.play()
         self.last_beep_time = 0.0
         self.tobeepornottobeep = False
+        stripchart_log_task.set_status(0)
 
         # alerts
         self.open_alert = None
@@ -166,13 +172,14 @@ class Threepio(QtWidgets.QMainWindow):
         self.load_dec_cal()
 
         # primary clock
-        self.log("Initializing clock...")
+        stripchart_log_task = self.log("Initializing clock...")
         self.timer = QtCore.QTimer(self)
         self.timer.timeout.connect(self.tick)  # do everything
         self.timer.start(self.BASE_PERIOD)  # set refresh rate
         # assign timers to functions meant to fire periodically
         self.clock.add_timer(1000, self.update_gui)
         self.data_timer = self.clock.add_timer(1000, self.update_data)
+        stripchart_log_task.set_status(0)
 
         # measure refresh rate
         self.time_of_last_fps_update = self.clock.get_time()
@@ -221,9 +228,6 @@ class Threepio(QtWidgets.QMainWindow):
             period = 1000 / (self.observation.freq)  # Hz -> ms
             self.data_timer.set_period(period)
 
-            # TODO: update this to new timer architecture
-            self.tick_time = current_time
-
             self.old_transmission = self.transmission
             self.transmission = self.observation.communicate(
                 self.current_data_point, self.clock.get_time()
@@ -256,9 +260,7 @@ class Threepio(QtWidgets.QMainWindow):
                 self.message(f"Taking {obs_type.lower()} data!!!")
             elif self.transmission == Comm.FINISHED:
                 self.observation.next()
-                # this is where all the extra beeps come from lol
-                # TODO: un-bodge this
-                if not self.obs_complete:
+                if not self.obs_complete:  # only do this once
                     self.message(f"{obs_type} complete!!!")
                     self.obs_complete = True
             elif self.transmission == Comm.SEND_TEL_NORTH:
@@ -316,7 +318,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.ui.actionLegacy.setChecked(self.legacy_mode)
 
     def set_state_observation_loaded(self, reenable=False):
-        # disable resetting RA/Dec after loading obs; TODO: move this elsewhere
+        # disable resetting RA/Dec after loading obs
         for a in [
             self.ui.actionRA,
             self.ui.actionDec,
@@ -354,7 +356,6 @@ class Threepio(QtWidgets.QMainWindow):
 
         self.update_fps()
 
-        # self.update_dec_view()  # TODO: should I do this here or in tick()?
         self.update_console()
 
         self.update_voltage()
@@ -544,7 +545,7 @@ class Threepio(QtWidgets.QMainWindow):
         """calculate the true dec from declinometer input and calibration data"""
 
         # input is below data
-        if input_dec < self.x[0]:  # TODO: use minimum, not first
+        if input_dec < self.x[0]:
             return (
                 (self.y[1] - self.y[0])
                 / (self.x[1] - self.x[0])
@@ -552,7 +553,7 @@ class Threepio(QtWidgets.QMainWindow):
             ) + self.y[0]
 
         # input is above data
-        if input_dec > self.x[-1]:  # TODO: use maximum, not last
+        if input_dec > self.x[-1]:
             return (
                 (self.y[-1] - self.y[-2])
                 / (self.x[-1] - self.x[-2])
@@ -580,18 +581,27 @@ class Threepio(QtWidgets.QMainWindow):
             self.beep(message="message")
         self.ui.message_label.setText(message)
 
-    def log(self, message, allowDups=False):
-        # TODO: add a way to signal that a task completed successfully (like returning
-        #  an object with "mark_done()" and "mark_failed" methods)
-        if allowDups or message != self.message_log[-1][11:]:
+    def log(self, message, allowDups=False) -> LogTask:
+        if (
+            len(self.message_log) == 0
+            or allowDups
+            or message != self.message_log[-1].message
+        ):
+            new_log_task = LogTask(message)
             try:
-                self.message_log.append(f"[{self.clock.get_sidereal_time()}] {message}")
+                new_log_task.set_sidereal_str(self.clock.get_sidereal_time())
             except AttributeError:
-                self.message_log.append(message)
+                pass
+            self.message_log.append(new_log_task)
+            return new_log_task
 
     def update_console(self):
+        """refresh console with latest statuses and last 7 logs"""
         self.ui.console_label.setText(
-            reduce(lambda c, a: c + "\n" + a, self.message_log[-7:])
+            reduce(
+                lambda c, a: c + "\n" + a,
+                [i.get_message() for i in self.message_log[-7:]],
+            )
         )
 
     def alert(self, message, button_message="Close"):
