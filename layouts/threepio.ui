@@ -893,10 +893,16 @@
    <property name="text">
     <string>RA...</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
+   </property>
   </action>
   <action name="actionDec">
    <property name="text">
     <string>Dec...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+D</string>
    </property>
   </action>
   <action name="actionSurvey">
