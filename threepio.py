@@ -37,7 +37,6 @@ class Threepio(QtWidgets.QMainWindow):
     BASE_PERIOD = 10  # ms
     GUI_UPDATE_PERIOD = 1000  # ms
     STRIPCHART_PERIOD = 16.7  # ms = 60Hz
-    VOLTAGE_PERIOD = 1000  # ms TODO: this should not be necessary
     # how many data points to draw to stripchart
     stripchart_display_seconds = 8
     should_clear_stripchart = False
@@ -46,10 +45,6 @@ class Threepio(QtWidgets.QMainWindow):
     ticker = 0
     other_ticker = 0
     foo = 0.0
-
-    # speed measurement TODO: no longer necessary
-    tick_time = 0.0
-    timing_margin = 0.97
 
     # stripchart
     stripchart_low = -1
@@ -87,7 +82,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.mode = "normal"
 
         # "console" output
-        self.message_log = ["Starting threepio!!!"]
+        self.message_log = [">>> THREEPIO"]
         self.update_console()
 
         # clock
@@ -135,7 +130,6 @@ class Threepio(QtWidgets.QMainWindow):
         # Tars/DATAQ
         dataq, arduino = discovery()
         self.tars = Tars(parent=self, device=dataq)
-        self.tars.setup()  # TODO: is this necessary?
         self.tars.start()
         self.minitars = MiniTars(parent=self, device=arduino)
         self.minitars.start()
@@ -171,31 +165,28 @@ class Threepio(QtWidgets.QMainWindow):
         # run initial calibration
         self.load_dec_cal()
 
-        # alert user
-        self.message("Ready!!!")
-
-        # timers
+        # primary clock
+        self.log("Initializing clock...")
         self.timer = QtCore.QTimer(self)
         self.timer.timeout.connect(self.tick)  # do everything
         self.timer.start(self.BASE_PERIOD)  # set refresh rate
+        # assign timers to functions meant to fire periodically
         self.clock.add_timer(1000, self.update_gui)
         self.data_timer = self.clock.add_timer(1000, self.update_data)
 
-        # TODO: obsolete?
-        # noinspection PyUnresolvedReferences
-        self.time_of_last_tick = self.clock.get_time()  # type: ignore
-        self.time_of_last_refresh_update = self.time_of_last_tick
-        self.time_of_last_voltage_update = self.time_of_last_tick
-        self.time_of_last_stripchart_update = self.time_of_last_tick
-
-        # TESTING
         # measure refresh rate
-        self.time_since_last_tick = 0
-        self.time_since_last_stripchart_update = 0
-        self.time_since_last_voltage_update = 0
+        self.time_of_last_fps_update = self.clock.get_time()
+        self.ticks_since_last_fps_update = 0
+
+        # alert user that threepio is done initializing
+        self.message("Ready!!!")
 
     def tick(self):
-        """primary controller for each clock tick"""
+        """
+        Primary controller for each clock tick. Fires as fast as possible up to 100Hz.
+        Anything meant to update as often as possible should be placed here. Everything
+        else should be assigned to a timer.
+        """
 
         # grab the latest data point on every tick; it won't always be saved
         tars_data = self.tars.read_latest()  # get data from DAQ
@@ -213,11 +204,12 @@ class Threepio(QtWidgets.QMainWindow):
             )
             self.data.append(self.current_data_point)  # add to data list
 
-        self.clock.run_timers()
+        self.clock.run_timers()  # run all timers that are due
 
         self.update_stripchart()
-        self.update_fps()
         self.update_dec_view()  # TODO: felt cute, might delete later
+
+        self.ticks_since_last_fps_update += 1  # for measuring fps
 
     def update_data(self):
         current_time = self.clock.get_time()
@@ -360,6 +352,8 @@ class Threepio(QtWidgets.QMainWindow):
         self.ui.dec_value.setText("%.4f°" % self.current_dec)  # show dec
         self.update_progress_bar()
 
+        self.update_fps()
+
         # self.update_dec_view()  # TODO: should I do this here or in tick()?
         self.update_console()
 
@@ -427,15 +421,20 @@ class Threepio(QtWidgets.QMainWindow):
             self.dec_scene.addItem(i)
 
     def update_fps(self):
+        """updates the fps counter to display current refresh rate"""
         current_time = self.clock.get_time()
-        self.time_since_last_tick = current_time - self.time_of_last_tick
-        self.time_since_last_stripchart_update = (
-            current_time - self.time_of_last_stripchart_update
-        )
-        self.time_of_last_tick = current_time
-        if current_time - self.time_of_last_refresh_update >= 1:
-            self.ui.refresh_value.setText("%.2fHz" % self.get_refresh_rate())
-            self.time_of_last_refresh_update = current_time
+        time_since_last_fps_update = current_time - self.time_of_last_fps_update
+
+        try:
+            new_fps = "%.2fHz" % (
+                self.ticks_since_last_fps_update / time_since_last_fps_update
+            )
+        except ZeroDivisionError:
+            new_fps = -1.0
+
+        self.ui.refresh_value.setText(new_fps)
+        self.time_of_last_fps_update = current_time
+        self.ticks_since_last_fps_update = 0
 
     def initialize_stripchart(self):
         self.chart.addSeries(self.stripchart_series_b)
@@ -494,9 +493,6 @@ class Threepio(QtWidgets.QMainWindow):
         if len(self.data) > 0:
             self.ui.channelA_value.setText("%.4fV" % self.data[len(self.data) - 1].a)
             self.ui.channelB_value.setText("%.4fV" % self.data[len(self.data) - 1].b)
-
-    def get_refresh_rate(self):
-        return 1 / self.time_since_last_tick if self.time_since_last_tick > 0 else -1.0
 
     def handle_survey(self):
         obs = Survey()
