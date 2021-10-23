@@ -242,6 +242,10 @@ class Threepio(QtWidgets.QMainWindow):
             if self.transmission == Comm.START_CAL:
                 if obs_type == "Spectrum":
                     self.alert("Set frequency to 1319.5MHz")
+                if self.stop_tel_alert and self.observation.obs_type == "Survey":
+                    self.alert("STOP the telescope", "Okay")
+                    self.alert("Has the telescope been stopped?", "Yes")
+                self.stop_tel_alert = True  # only alert on second cal
                 self.alert("Turn the calibration switches ON", "Okay")
                 self.alert("Are the calibration switches ON?", "Yes")
                 self.observation.next()
@@ -264,10 +268,6 @@ class Threepio(QtWidgets.QMainWindow):
                 if not self.obs_complete:
                     self.message(f"{obs_type} complete!!!")
                     self.obs_complete = True
-                if self.stop_tel_alert and self.observation.obs_type == "Survey":
-                    self.alert("STOP the telescope", "Okay")
-                    self.alert("Has the telescope been stopped?", "Yes")
-                    self.stop_tel_alert = False
             elif self.transmission == Comm.SEND_TEL_NORTH:
                 self.message(
                     "Send telescope NORTH at max speed!!!", beep=False, log=False
@@ -513,7 +513,7 @@ class Threepio(QtWidgets.QMainWindow):
         dialog = ObsDialog(self, obs, self.clock)
         dialog.setWindowTitle("New " + obs.obs_type)
         dialog.exec_()
-        self.stop_tel_alert = True
+        self.stop_tel_alert = False
 
     def handle_get_info(self):
         if self.observation is not None:
