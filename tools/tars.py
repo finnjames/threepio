@@ -151,7 +151,7 @@ class Tars:
                 * int.from_bytes(buffer, byteorder="little", signed=True)
                 / 32768
             )
-    
+
     # Testing
 
     def random_data(self):
