@@ -220,8 +220,9 @@ class Threepio(QtWidgets.QMainWindow):
         self.ticks_since_last_fps_update += 1  # for measuring fps
 
     def update_data(self):
-        current_time = self.clock.get_time()
-
+        print(
+            f"start: {self.clock.starting_time}, anchor: {self.clock.anchor_time}, current: {time.time()}"
+        )
         if self.observation is not None:
             self.set_state_observation_loaded()  # TODO: only do this once
 
@@ -245,11 +246,13 @@ class Threepio(QtWidgets.QMainWindow):
                 self.stop_tel_alert = True  # only alert on second cal
                 self.alert("Turn the calibration switches ON", "Okay")
                 self.alert("Are the calibration switches ON?", "Yes")
+                self.clock.reset_anchor_time()
                 self.observation.next()
                 self.message("Taking calibration data!!!")
-            elif self.transmission == Comm.STOP_CAL:
+            elif self.transmission == Comm.START_BG:
                 self.alert("Turn the calibration switches OFF", "Okay")
                 self.alert("Are the calibration switches OFF?", "Yes")
+                self.clock.reset_anchor_time()
                 self.observation.next()
                 self.message("Taking background data!!!")
             elif self.transmission == Comm.START_WAIT:

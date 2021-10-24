@@ -5,6 +5,7 @@
 
 import time
 from enum import Enum
+from math import floor
 
 from tools.comm import Comm
 from tools.datapoint import DataPoint
@@ -96,13 +97,15 @@ class Observation:
             else:
                 return Comm.START_CAL
         elif self.state == self.State.CAL_1:
-            if timestamp - self.cal_start < self.cal_dur:
+            if floor(timestamp - self.cal_start) <= self.cal_dur:
+                print(f"CAL_1: state: {self.state}, if {timestamp - self.cal_start}")
                 self.write_data(data_point)
                 return Comm.NO_ACTION
             else:
-                return Comm.STOP_CAL
+                return Comm.START_BG
         elif self.state == self.State.BG_1:
-            if timestamp - self.bg_start < self.bg_dur:
+            if floor(timestamp - self.bg_start) <= self.bg_dur:
+                print(f"BG_1: state: {self.state}, if {timestamp - self.bg_start}")
                 self.write_data(data_point)
                 return Comm.NO_ACTION
             else:
@@ -120,14 +123,13 @@ class Observation:
             else:
                 return Comm.START_CAL
         elif self.state == self.State.CAL_2:
-            if timestamp - self.cal_start < self.cal_dur:
+            if floor(timestamp - self.cal_start) <= self.cal_dur:
                 self.write_data(data_point)
                 return Comm.NO_ACTION
             else:
-                print("stop cal")
-                return Comm.STOP_CAL
+                return Comm.START_BG
         elif self.state == self.State.BG_2:
-            if timestamp - self.bg_start < self.bg_dur:
+            if floor(timestamp - self.bg_start) <= self.bg_dur:
                 self.write_data(data_point)
                 return Comm.NO_ACTION
             else:

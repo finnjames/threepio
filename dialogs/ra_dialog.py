@@ -23,7 +23,7 @@ class RADialog(QtWidgets.QDialog):
     def accept(self):
         # pattern = "%H:%M:%S"
 
-        self.superclock.set_starting_time(time.time())
+        self.superclock.reset_starting_time()
         u_time = self.ui.sidereal_value.text()
         self.superclock.starting_sidereal_time = (
             3600 * int(u_time[:2]) + 60 * int(u_time[3:5]) + int(u_time[6:])

@@ -27,14 +27,14 @@ class SuperClock:
         def run(self) -> None:
             self.callback()
 
-        def run_if_appropriate(self, starting_time: float) -> bool:
+        def run_if_appropriate(self, anchor_time: float) -> bool:
             while time.time() > (
-                starting_time + (self.period / 1000) * (self.offset + 1)
+                anchor_time + (self.period / 1000) * (self.offset + 1)
             ):
-                self.offset += 1
+                self.offset += 1  # can this be done in O(1)?
 
             if self.period > 0 and (
-                time.time() >= (starting_time + (self.period / 1000) * self.offset)
+                time.time() >= (anchor_time + (self.period / 1000) * self.offset)
             ):
                 self.run()
                 self.offset += 1
@@ -51,25 +51,28 @@ class SuperClock:
             self.period = new_period
 
         def cancel(self) -> None:
-            self.period = 0
+            self.period = 0.0
 
         def __repr__(self) -> str:
             return f"Timer({self.period}ms, {self.callback})"
 
     def __init__(self):
-        self.starting_time = time.time()
-        # number of seconds since last sidereal midnight
+        self.starting_time = self.anchor_time = time.time()
+        # number of seconds since last sidereal midnight, assigned when ra is set
         self.starting_sidereal_time = 0
 
         self.timers = []
 
+    def get_time(self) -> float:
+        return time.time()
+
     def run_timers(self) -> None:
         """run all timers"""
         for timer in self.timers:
-            timer.run_if_appropriate(self.starting_time)
+            timer.run_if_appropriate(self.anchor_time)
 
     def reset_timers(self) -> None:
-        """reset all timers"""
+        """set offset of all timers to 0"""
         for timer in self.timers:
             timer.offset = 0
 
@@ -79,12 +82,18 @@ class SuperClock:
         self.timers.append(new_timer)
         return new_timer
 
-    def set_starting_time(self, new_time: float) -> None:
-        self.starting_time = new_time
+    def reset_starting_time(self) -> None:
+        """set SuperClock starting time and anchor time to current time"""
+        self.starting_time = self.anchor_time = time.time()
         self.reset_timers()
 
-    def get_time(self) -> float:
-        return time.time()
+    def reset_anchor_time(self) -> None:
+        """set anchor time to current time"""
+        self.anchor_time = time.time()
+        self.reset_timers()
+
+    def get_local_time(self) -> time.struct_time:
+        return time.localtime(time.time())
 
     def get_time_slug(self) -> str:
         """get timestamp suitable for file naming"""
@@ -98,13 +107,10 @@ class SuperClock:
         """Positive means it already happened, negative means it will happen"""
         return time.time() - destination_time
 
-    def get_local_time(self) -> time.struct_time:
-        return time.localtime(time.time())
-
     def get_sidereal_seconds(self) -> float:
         """get time-stamp-able number of sidereal seconds since last sidereal midnight"""
-        sidereal_seconds = self.starting_sidereal_time + self.SIDEREAL * (
-            self.get_elapsed_time()
+        sidereal_seconds = (
+            self.starting_sidereal_time + self.SIDEREAL * self.get_elapsed_time()
         )
         return sidereal_seconds
 
