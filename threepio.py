@@ -220,9 +220,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.ticks_since_last_fps_update += 1  # for measuring fps
 
     def update_data(self):
-        print(
-            f"start: {self.clock.starting_time}, anchor: {self.clock.anchor_time}, current: {time.time()}"
-        )
+        # print(f"start: {self.clock.starting_time}, anchor: {self.clock.anchor_time}, current: {time.time()}")
         if self.observation is not None:
             self.set_state_observation_loaded()  # TODO: only do this once
 
