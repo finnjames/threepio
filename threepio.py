@@ -195,12 +195,12 @@ class Threepio(QtWidgets.QMainWindow):
         else should be assigned to a timer.
         """
 
-        # grab the latest data point on every tick; it won't always be saved
+        # attempt to grab latest data point; it won't always be saved
         tars_data = self.tars.read_latest()  # get data from DAQ
         minitars_data = self.minitars.read_latest()  # get data from Arduino
         sidereal_timestamp = self.clock.get_sidereal_seconds()
 
-        # grab more data if it's available
+        # if data was available above, store it
         if tars_data is not None and minitars_data is not None:
             self.current_dec = self.calculate_declination(minitars_data)  # get dec
             self.current_data_point = DataPoint(  # create data point
@@ -213,8 +213,8 @@ class Threepio(QtWidgets.QMainWindow):
 
         self.clock.run_timers()  # run all timers that are due
 
+        # update every tick
         self.update_stripchart()
-
         self.update_dec_view()
 
         self.ticks_since_last_fps_update += 1  # for measuring fps
@@ -234,7 +234,6 @@ class Threepio(QtWidgets.QMainWindow):
 
             obs_type = self.observation.obs_type
 
-            # TODO: switch to 3.10 match
             if self.transmission == Comm.START_CAL:
                 if obs_type == "Spectrum":
                     self.alert("Set frequency to 1319.5MHz")
@@ -449,7 +448,7 @@ class Threepio(QtWidgets.QMainWindow):
     def update_stripchart(self):
         try:
             # parse latest data point
-            # TODO: will this duplicate points if one fails to read?
+            # TODO: this will duplicate points if one fails to read
             new_a = self.data[len(self.data) - 1].a
             new_b = self.data[len(self.data) - 1].b
             new_ra = self.data[len(self.data) - 1].timestamp

@@ -1,8 +1,3 @@
-# TODO:
-# 1. Figure out a consistent way to deal with time
-#   DONE a) when time is used for starting/ending certain stages of the observation
-#   DONE b) when appending metadata about the observation such as start and end time and date.
-
 import time
 from enum import Enum
 from math import floor
