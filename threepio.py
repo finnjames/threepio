@@ -1,12 +1,3 @@
-r"""
-  __  __                    _
- / /_/ /  _______ ___ ___  (_)__    ___  __ __
-/ __/ _ \/ __/ -_) -_) _ \/ / _ \_ / _ \/ // /
-\__/_//_/_/  \__/\__/ .__/_/\___(_) .__/\_, /
-                   /_/           /_/   /___/
-
-"""
-
 import time, math
 from functools import reduce
 from typing import Callable
