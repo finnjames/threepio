@@ -9,11 +9,11 @@ from tools.precious import MyPrecious
 
 class Observation:
     """
-    Superclass for each of the three types of observation you might encounter on your Pokemon journey
+    Superclass for each of the three types of observation: Scan, Survey, and Spectrum
 
-    To interact with any type of the observation object (e.g an Oberservation object obs), first set
+    To interact with any type of the observation object (e.g. an Oberservation object obs), first set
     its properties using the three 'obs.set_xxx()' API. Then, call the method 'obs.communication()'
-    every 'obs.freq' seconds. Then when the comm method returns a message other than 'Comm.NO_ACTION',
+    every 'obs.freq' seconds. Then, when the comm method returns a message other than 'Comm.NO_ACTION',
     prompt user for the appropriate action and call 'obs.next()' once to proceed into next stage.
     An observation is finished when the 'communication()' method returns 'Comm.FINISHED'.
     """
@@ -87,7 +87,7 @@ class Observation:
         user_start_time = self.start_RA - (self.bg_dur + self.cal_dur + 30)
 
         if self.state == self.State.OFF:
-            if timestamp < user_start_time:  # A 30 second buffer for user actions
+            if timestamp < user_start_time:  # A 30-second buffer for user actions
                 return Comm.NO_ACTION
             else:
                 return Comm.START_CAL

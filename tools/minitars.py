@@ -1,6 +1,7 @@
 """
 Small version of Tars, meant to be used with the Arduino declinometer as opposed to the DataQ.
 """
+from typing import Optional
 
 import serial
 from .myserial import MySerial
@@ -8,12 +9,10 @@ import serial.tools.list_ports
 
 import time
 import math
-import random as r
 
 
 def discovery():
-    """only use for minitars testing"""
-    # Get a list of active com ports to scan for possible DATAQ Instruments devices
+    """Get a list of active com ports and scan for arduino"""
     available_ports = serial.tools.list_ports.comports()
 
     arduino = None
@@ -42,7 +41,7 @@ class MiniTars:
             self.ser.reset_input_buffer()
             self.acquiring = False
 
-    def read_one(self) -> float:
+    def read_one(self) -> Optional[float]:
         """
         This reads one datapoint from the buffer.
         """
@@ -74,7 +73,7 @@ class MiniTars:
         if not self.testing:
             return self.ser.in_waiting
 
-    def buffer_read(self) -> float:
+    def buffer_read(self) -> Optional[float]:
         """read angle from serial buffer"""
         if not self.testing:
             if self.in_waiting() < 1:
@@ -95,6 +94,7 @@ class MiniTars:
             y = math.sin(4 * t)
             return y
         return float(self.parent.ui.declination_slider.value()) / 100
+
 
 def main():
     arduino = discovery()

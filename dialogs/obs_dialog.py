@@ -18,6 +18,13 @@ class ObsDialog(QtWidgets.QDialog):
             QtCore.Qt.Window | QtCore.Qt.WindowTitleHint | QtCore.Qt.CustomizeWindowHint
         )
 
+        # just checking data
+        self.info = info
+        if self.info:
+            self.ui.accept_button.setText("Close")
+            self.ui.cancel_button.hide()
+            # TODO: show info about the observation
+
         self.confirmed = False
 
         self.observation = observation
@@ -53,17 +60,21 @@ class ObsDialog(QtWidgets.QDialog):
         self.parent_window = parent_window
 
     def accept(self):
+        if self.info:
+            self.close()
         exit_code = self.set_observation()
         if self.confirmed and exit_code == 0:  # set observation and close
             self.parent_window.observation = None
             self.parent_window.observation = self.observation
             self.close()
+
+            target_dec = self.observation.min_dec - (2 if (self.observation.obs_type == 'Survey') else 0)
             self.parent_window.alert(
-                f"Move the telescope to {self.observation.min_dec - (2 if (self.observation.obs_type == 'Survey') else 0)}° declination",
+                f"Move the telescope to {target_dec}° declination",
                 "Okay",
             )
             self.parent_window.alert(
-                f"Is the telescope at {self.observation.min_dec - (2 if (self.observation.obs_type == 'Survey') else 0)}° declination?",
+                f"Is the telescope at {target_dec}° declination?",
                 "Yes",
             )
         elif exit_code == 0:  # set_observation() executed successfully

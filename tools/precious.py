@@ -3,7 +3,6 @@ Functionalities needed for working with files.
 """
 
 import os
-from datetime import datetime
 
 
 class MyPrecious:

@@ -10,4 +10,3 @@ __pycache__/
 *.py[cod]
 *$py.class
 dist/
-.python-version

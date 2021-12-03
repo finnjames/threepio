@@ -1,6 +1,5 @@
-import time, math
+import time
 from functools import reduce
-from typing import Callable
 
 from PyQt5 import QtChart, QtCore, QtGui, QtWidgets, QtMultimedia
 
@@ -22,7 +21,7 @@ from tools import (
 
 class Threepio(QtWidgets.QMainWindow):
     """
-    Green Bank Observatory's 40 Foot Telescope's very own data acquisition system.
+    Green Bank Observatory's 40-Foot Telescope's very own data acquisition system.
     Extends Qt's QMainWindow class and is the main window of the application.
     """
 
@@ -75,7 +74,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.mode = "normal"
 
         # "console" output
-        self.message_log: LogTask = []
+        self.message_log: list[LogTask] = []
         self.log(">>> THREEPIO")
         self.update_console()
 
@@ -173,7 +172,7 @@ class Threepio(QtWidgets.QMainWindow):
         stripchart_log_task.set_status(0)
 
         # measure refresh rate
-        self.time_of_last_fps_update = self.clock.get_time()
+        self.time_of_last_fps_update = time.perf_counter()
         self.ticks_since_last_fps_update = 0
 
         # alert user that threepio is done initializing
@@ -186,12 +185,12 @@ class Threepio(QtWidgets.QMainWindow):
         else should be assigned to a timer.
         """
 
-        # attempt to grab latest data point; it won't always be saved
+        # attempt to grab latest data point; it won't always be stored
         tars_data = self.tars.read_latest()  # get data from DAQ
         minitars_data = self.minitars.read_latest()  # get data from Arduino
         sidereal_timestamp = self.clock.get_sidereal_seconds()
 
-        # if data was available above, store it
+        # if data was available above, save it
         if tars_data is not None and minitars_data is not None:
             self.current_dec = self.calculate_declination(minitars_data)  # get dec
             self.current_data_point = DataPoint(  # create data point
@@ -215,7 +214,7 @@ class Threepio(QtWidgets.QMainWindow):
         if self.observation is not None:
             self.set_state_observation_loaded()  # TODO: only do this once
 
-            period = 1000 / (self.observation.freq)  # Hz -> ms
+            period = 1000 / self.observation.freq  # Hz -> ms
             self.data_timer.set_period(period)
 
             self.old_transmission = self.transmission
@@ -318,7 +317,7 @@ class Threepio(QtWidgets.QMainWindow):
             self.ui.actionSpectrum,
         ]:
             a.setEnabled(reenable)
-        self.ui.actionGetInfo.setDisabled(not reenable)
+        self.ui.actionGetInfo.setDisabled(reenable)
 
     @staticmethod
     def handle_credits():
@@ -414,7 +413,7 @@ class Threepio(QtWidgets.QMainWindow):
 
     def update_fps(self):
         """updates the fps counter to display current refresh rate"""
-        current_time = self.clock.get_time()
+        current_time = time.perf_counter()
         time_since_last_fps_update = current_time - self.time_of_last_fps_update
 
         try:
@@ -507,6 +506,9 @@ class Threepio(QtWidgets.QMainWindow):
     def handle_get_info(self):
         if self.observation is not None:
             pass
+        dialog = ObsDialog(self, self.observation, self.clock, info=True)
+        dialog.setWindowTitle("Current " + self.observation.obs_type)
+        dialog.exec_()
 
     def dec_calibration(self):
         dialog = DecDialog(self.minitars, self)
@@ -572,10 +574,10 @@ class Threepio(QtWidgets.QMainWindow):
             self.beep(message="message")
         self.ui.message_label.setText(message)
 
-    def log(self, message, allowDups=False) -> LogTask:
+    def log(self, message, allow_dups=False) -> LogTask:
         if (
             len(self.message_log) == 0
-            or allowDups
+            or allow_dups
             or message != self.message_log[-1].message
         ):
             new_log_task = LogTask(message)
@@ -587,7 +589,7 @@ class Threepio(QtWidgets.QMainWindow):
             return new_log_task
 
     def update_console(self):
-        """refresh console with latest statuses and last 7 logs"""
+        """refresh console with the latest statuses and last 7 logs"""
         self.ui.console_label.setText(
             reduce(
                 lambda c, a: c + "\n" + a,
@@ -602,6 +604,7 @@ class Threepio(QtWidgets.QMainWindow):
         alert.show()
         alert.exec_()
 
+    # noinspection PyUnusedLocal
     def beep(self, message=""):
         """message is for debugging"""
         self.click_sound.play()

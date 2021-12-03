@@ -1,6 +1,7 @@
 """clock for keeping track of the time ;)"""
 
-import time, datetime
+import time
+import datetime
 from typing import Callable
 
 
@@ -11,18 +12,22 @@ class SuperClock:
     GB_LATITUDE = 38.437235
 
     class Timer:
+
+        """A timer for syncing things that run at different, variable rates
+
+        Attributes:
+            offset (int): the number of times the timer has run
+        """
+
         def __init__(self, period: float, callback: Callable[[], None]):
             """
             Args:
                 period (int): in milliseconds
                 callback (Callable): function to call when the timer runs
-
-            Attributes:
-                offset (int): the number of times the timer has run
             """
             self.period = float(period)  # ms
-            self.offset = 0
             self.callback = callback
+            self.offset = 0
 
         def run(self) -> None:
             self.callback()
@@ -63,7 +68,8 @@ class SuperClock:
 
         self.timers = []
 
-    def get_time(self) -> float:
+    @staticmethod
+    def get_time() -> float:
         return time.time()
 
     def run_timers(self) -> None:
@@ -76,7 +82,7 @@ class SuperClock:
         for timer in self.timers:
             timer.offset = 0
 
-    def add_timer(self, period, callback) -> None:
+    def add_timer(self, period, callback) -> Timer:
         """set a timer to call a function periodically"""
         new_timer = SuperClock.Timer(period, callback)
         self.timers.append(new_timer)
@@ -93,7 +99,7 @@ class SuperClock:
         self.reset_timers()
 
     def get_local_time(self) -> time.struct_time:
-        return time.localtime(time.time())
+        return time.localtime(self.get_time())
 
     def get_time_slug(self) -> str:
         """get timestamp suitable for file naming"""
@@ -105,7 +111,7 @@ class SuperClock:
 
     def get_time_until(self, destination_time) -> float:
         """Positive means it already happened, negative means it will happen"""
-        return time.time() - destination_time
+        return self.get_time() - destination_time
 
     def get_sidereal_seconds(self) -> float:
         """get time-stamp-able number of sidereal seconds since last sidereal midnight"""

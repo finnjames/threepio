@@ -5,7 +5,8 @@ the DATAQ device connected via a USB serial connection. The module also includes
 a few helper functions relevant to the tasks.
 """
 
-from re import I
+from typing import Optional
+
 import serial
 from .myserial import MySerial
 import serial.tools.list_ports
@@ -15,7 +16,7 @@ import random as r  # for testing
 import math
 
 
-def discovery() -> str:
+def discovery() -> tuple:
     # Get a list of active com ports to scan for possible DATAQ Instruments devices
     available_ports = serial.tools.list_ports.comports()
 
@@ -27,7 +28,7 @@ def discovery() -> str:
         if "VID:PID=2341:0043" in p.hwid:
             arduino = p.device
 
-    return (dataq, arduino)
+    return dataq, arduino
 
 
 def convert(buffer: list, volt: int) -> float:
@@ -75,7 +76,7 @@ class Tars:
             self.ser.reset_input_buffer()
             self.acquiring = False
 
-    def read_one(self) -> list:
+    def read_one(self) -> Optional[list]:
         """
         This reads one datapoint from the buffer. Each datapoint has three channels:
         channel 0: telescope channel A
@@ -136,7 +137,7 @@ class Tars:
         if not self.testing:
             return self.ser.in_waiting
 
-    def buffer_read(self, channel: int) -> float:
+    def buffer_read(self, channel: int) -> Optional[float]:
         """
         This function reads one value from the serial buffer. I.e. it will only read *one channel* at a time.
         Therefore, do not use this function by itself. If data is not always read in pairs of three there's no
@@ -178,11 +179,7 @@ class Tars:
         a = f + g * v + n + c
         b = a - 0.1 * self.parent.ui.polarization_dial.value() * g * (v / 2 + 1)
 
-        def normalize_kinda(x):
-            return x / 272 + c + 1
-
-        a = normalize_kinda(a)
-        b = normalize_kinda(b)
+        a, b = (i / 272 + c + 1 for i in (a, b))  # normalize, kinda
 
         # a, b, dec
         return [

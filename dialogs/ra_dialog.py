@@ -1,6 +1,5 @@
 from PyQt5 import QtWidgets, QtCore
 from layouts import ra_cal_ui  # compiled PyQt dialogue ui
-import time
 
 
 class RADialog(QtWidgets.QDialog):
