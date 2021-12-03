@@ -15,7 +15,7 @@ from tools import (
     Tars,
     MiniTars,
     discovery,
-    LogTask,
+    LogTask, Observation,
 )
 
 
@@ -26,8 +26,8 @@ class Threepio(QtWidgets.QMainWindow):
     """
 
     # basic time
-    BASE_PERIOD = 10  # ms
-    GUI_UPDATE_PERIOD = 1000  # ms
+    BASE_PERIOD = 10  # ms = 100Hz
+    GUI_UPDATE_PERIOD = 1000  # ms = 1Hz
     STRIPCHART_PERIOD = 16.7  # ms = 60Hz
     # how many data points to draw to stripchart
     stripchart_display_seconds = 8
@@ -145,7 +145,7 @@ class Threepio(QtWidgets.QMainWindow):
 
         # establish observation
         self.observation = None
-        self.obs_complete = False
+        self.observation_state = False
         self.stop_tel_alert = False
 
         # establish data array & most recent dec
@@ -209,74 +209,67 @@ class Threepio(QtWidgets.QMainWindow):
 
         self.ticks_since_last_fps_update += 1  # for measuring fps
 
-    def update_data(self):
+    def update_data(self) -> None:
         # print(f"start: {self.clock.starting_time}, anchor: {self.clock.anchor_time}, current: {time.time()}")
-        if self.observation is not None:
-            self.set_state_observation_loaded()  # TODO: only do this once
+        if not self.check_observation_state():
+            return
 
-            period = 1000 / self.observation.freq  # Hz -> ms
-            self.data_timer.set_period(period)
+        period = 1000 / self.observation.freq  # Hz -> ms
+        self.data_timer.set_period(period)
 
-            self.old_transmission = self.transmission
-            self.transmission = self.observation.communicate(
-                self.current_data_point, self.clock.get_time()
-            )
+        self.old_transmission = self.transmission
+        self.transmission = self.observation.communicate(
+            self.current_data_point, self.clock.get_time()
+        )
 
-            obs_type = self.observation.obs_type
+        obs_type = self.observation.obs_type
 
-            if self.transmission == Comm.START_CAL:
-                if obs_type == "Spectrum":
-                    self.alert("Set frequency to 1319.5MHz")
-                if self.stop_tel_alert and self.observation.obs_type == "Survey":
-                    self.alert("STOP the telescope", "Okay")
-                    self.alert("Has the telescope been stopped?", "Yes")
-                self.stop_tel_alert = True  # only alert on second cal
-                self.alert("Turn the calibration switches ON", "Okay")
-                self.alert("Are the calibration switches ON?", "Yes")
-                self.clock.reset_anchor_time()
-                self.observation.next()
-                self.message("Taking calibration data!!!")
-            elif self.transmission == Comm.START_BG:
-                self.alert("Turn the calibration switches OFF", "Okay")
-                self.alert("Are the calibration switches OFF?", "Yes")
-                self.clock.reset_anchor_time()
-                self.observation.next()
-                self.message("Taking background data!!!")
-            elif self.transmission == Comm.START_WAIT:
-                self.observation.next()
-                self.message(f"Waiting for {obs_type.lower()} to begin...")
-            elif self.transmission == Comm.START_DATA:
-                self.observation.next()
-                self.message(f"Taking {obs_type.lower()} data!!!")
-            elif self.transmission == Comm.FINISHED:
-                self.observation.next()
-                if not self.obs_complete:  # only do this once
-                    self.message(f"{obs_type} complete!!!")
-                    self.obs_complete = True
-            elif self.transmission == Comm.SEND_TEL_NORTH:
-                self.message(
-                    "Send telescope NORTH at max speed!!!", beep=False, log=False
-                )
-                self.tobeepornottobeep = True
-            elif self.transmission == Comm.SEND_TEL_SOUTH:
-                self.message(
-                    "Send telescope SOUTH at max speed!!!", beep=False, log=False
-                )
-                self.tobeepornottobeep = True
-            elif self.transmission == Comm.END_SEND_TEL:
-                self.message(
-                    f"Taking {obs_type.lower()} data!!!", beep=False, log=False
-                )
-            elif self.transmission == Comm.BEEP:
-                self.tobeepornottobeep = True
-            elif self.transmission == Comm.NEXT:
-                self.observation.next()
-            elif self.transmission == Comm.NO_ACTION:
-                pass
+        if self.transmission == Comm.START_CAL:
+            if obs_type == "Spectrum":
+                self.alert("Set frequency to 1319.5MHz")
+            if self.stop_tel_alert and self.observation.obs_type == "Survey":
+                self.alert("STOP the telescope", "Okay")
+                self.alert("Has the telescope been stopped?", "Yes")
+            self.stop_tel_alert = True  # only alert on second cal
+            self.alert("Turn the calibration switches ON", "Okay")
+            self.alert("Are the calibration switches ON?", "Yes")
+            self.clock.reset_anchor_time()
+            self.observation.next()
+            self.message("Taking calibration data!!!")
+        elif self.transmission == Comm.START_BG:
+            self.alert("Turn the calibration switches OFF", "Okay")
+            self.alert("Are the calibration switches OFF?", "Yes")
+            self.clock.reset_anchor_time()
+            self.observation.next()
+            self.message("Taking background data!!!")
+        elif self.transmission == Comm.START_WAIT:
+            self.observation.next()
+            self.message(f"Waiting for {obs_type.lower()} to begin...")
+        elif self.transmission == Comm.START_DATA:
+            self.observation.next()
+            self.message(f"Taking {obs_type.lower()} data!!!")
+        elif self.transmission == Comm.FINISHED:
+            self.observation.next()
+            self.message(f"{obs_type} complete!!!")
+            self.observation = None
+        elif self.transmission == Comm.SEND_TEL_NORTH:
+            self.message("Send telescope NORTH at max speed!!!", beep=False, log=False)
+            self.tobeepornottobeep = True
+        elif self.transmission == Comm.SEND_TEL_SOUTH:
+            self.message("Send telescope SOUTH at max speed!!!", beep=False, log=False)
+            self.tobeepornottobeep = True
+        elif self.transmission == Comm.END_SEND_TEL:
+            self.message(f"Taking {obs_type.lower()} data!!!", beep=False, log=False)
+        elif self.transmission == Comm.BEEP:
+            self.tobeepornottobeep = True
+        elif self.transmission == Comm.NEXT:
+            self.observation.next()
+        elif self.transmission == Comm.NO_ACTION:
+            pass
 
-            # time_until_start = self.observation.start_RA - current_time
-            # if time_until_start <= 0 < (self.observation.end_RA - current_time):
-            #     self.message(f"Taking {obs_type} data!!!")
+        # time_until_start = self.observation.start_RA - current_time
+        # if time_until_start <= 0 < (self.observation.end_RA - current_time):
+        #     self.message(f"Taking {obs_type} data!!!")
 
     def set_state_normal(self):
         self.ui.actionNormal.setChecked(True)
@@ -307,17 +300,29 @@ class Threepio(QtWidgets.QMainWindow):
         )
         self.ui.actionLegacy.setChecked(self.legacy_mode)
 
-    def set_state_observation_loaded(self, reenable=False):
+    def check_observation_state(self) -> bool:
+        if (
+            self.observation_state
+            and self.observation is None
+            or not self.observation_state
+            and self.observation is not None
+        ):
+            self.toggle_observation_state()
+
+        return self.observation_state
+
+    def toggle_observation_state(self) -> None:
         # disable resetting RA/Dec after loading obs
-        for a in [
+        self.observation_state = not self.observation_state
+        for a in (
             self.ui.actionRA,
             self.ui.actionDec,
             self.ui.actionSurvey,
             self.ui.actionScan,
             self.ui.actionSpectrum,
-        ]:
-            a.setEnabled(reenable)
-        self.ui.actionGetInfo.setDisabled(reenable)
+        ):
+            a.setDisabled(self.observation_state)
+        self.ui.actionGetInfo.setEnabled(self.observation_state)
 
     @staticmethod
     def handle_credits():
@@ -497,7 +502,7 @@ class Threepio(QtWidgets.QMainWindow):
         obs = Spectrum()
         self.new_observation(obs)
 
-    def new_observation(self, obs):
+    def new_observation(self, obs: Observation):
         dialog = ObsDialog(self, obs, self.clock)
         dialog.setWindowTitle("New " + obs.obs_type)
         dialog.exec_()
