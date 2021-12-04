@@ -47,6 +47,8 @@ class Observation:
         self.start_time = None
         self.end_time = None
 
+        self.sweeps = -1
+
         # File interface
         self.file_a = None
         self.file_b = None
@@ -272,6 +274,8 @@ class Survey(Observation):
     def __init__(self):
         super().__init__()
         self.obs_type = "Survey"
+
+        self.sweeps = 0
 
         self.outside = True
 

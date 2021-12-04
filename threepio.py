@@ -15,7 +15,8 @@ from tools import (
     Tars,
     MiniTars,
     discovery,
-    LogTask, Observation,
+    LogTask,
+    Observation,
 )
 
 
@@ -349,8 +350,13 @@ class Threepio(QtWidgets.QMainWindow):
             self.beep(message="update_gui")
             self.tobeepornottobeep = False
 
-        self.ui.ra_value.setText(self.clock.get_sidereal_time())  # show RA
-        self.ui.dec_value.setText("%.4f°" % self.current_dec)  # show dec
+        self.ui.ra_value.setText(self.clock.get_formatted_sidereal_time())  # RA
+        self.ui.dec_value.setText(f"{self.current_dec:.4f}°")  # dec
+        if self.observation is not None:
+            self.ui.sweep_value.setText(
+                f"{self.observation.sweeps if self.observation.sweeps != -1 else 'n/a'}"
+            )  # sweep number
+
         self.update_progress_bar()
 
         self.update_fps()
