@@ -107,7 +107,7 @@ class SuperClock:
         return "{:%Y.%m.%d-%H.%M}".format(datetime.datetime(*gmtime[:5]))
 
     def get_elapsed_time(self) -> float:
-        return time.time() - self.starting_time
+        return self.get_time() - self.starting_time
 
     def get_time_until(self, destination_time) -> float:
         """Positive means it already happened, negative means it will happen"""
@@ -120,11 +120,10 @@ class SuperClock:
         )
         return sidereal_seconds
 
-    def get_sidereal_time(self) -> str:
+    def get_formatted_sidereal_time(self) -> str:
         """return a string of formatted local sidereal time"""
         current_sidereal_time = self.get_sidereal_seconds()
         minutes, seconds = divmod(current_sidereal_time, 60)
         hours, minutes = divmod(minutes, 60)
         hours = hours % 24
-        sidereal = "%02d:%02d:%02d" % (hours, minutes, seconds)
-        return sidereal
+        return f"{hours:02.0f}:{minutes:02.0f}:{seconds:02.0f}"

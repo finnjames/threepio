@@ -210,7 +210,11 @@ class Threepio(QtWidgets.QMainWindow):
         self.ticks_since_last_fps_update += 1  # for measuring fps
 
     def update_data(self) -> None:
-        # print(f"start: {self.clock.starting_time}, anchor: {self.clock.anchor_time}, current: {time.time()}")
+        # print(
+        #     f"start: {self.clock.starting_time}, "
+        #     f"anchor: {self.clock.anchor_time}, "
+        #     f"current: {time.time()}"
+        # )
         if not self.check_observation_state():
             return
 
@@ -587,7 +591,7 @@ class Threepio(QtWidgets.QMainWindow):
         ):
             new_log_task = LogTask(message)
             try:
-                new_log_task.set_sidereal_str(self.clock.get_sidereal_time())
+                new_log_task.set_sidereal_str(self.clock.get_formatted_sidereal_time())
             except AttributeError:
                 pass
             self.message_log.append(new_log_task)
