@@ -358,11 +358,8 @@ class Threepio(QtWidgets.QMainWindow):
             )  # sweep number
 
         self.update_progress_bar()
-
         self.update_fps()
-
         self.update_console()
-
         self.update_voltage()
 
     def update_progress_bar(self):

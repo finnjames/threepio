@@ -3,7 +3,7 @@ from layouts import credits_ui
 
 
 class CreditsDialog(QtWidgets.QDialog):
-    """Credits dialogue window"""
+    """Credits dialog window"""
 
     def __init__(self):
         QtWidgets.QWidget.__init__(self)
