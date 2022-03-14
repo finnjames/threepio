@@ -1,10 +1,21 @@
 """dialogue box for keying in a new observation"""
+from dataclasses import dataclass
 
 from PyQt5 import QtWidgets, QtCore
 from layouts import obs_ui  # compiled PyQt dialogue ui
 import time
 
 from tools.observation import Observation
+
+
+@dataclass(frozen=True)
+class InputRecord:
+    start_time: QtCore.QTime
+    end_time: int
+    starting_dec: int
+    ending_dec: int
+    file_name_value: str
+    data_acquisition_rate_value: int
 
 
 class ObsDialog(QtWidgets.QDialog):
@@ -20,7 +31,20 @@ class ObsDialog(QtWidgets.QDialog):
 
         # just checking data
         self.info = info
+        self.records = None
         if self.info:
+            self.unwrap()
+            self.records = observation.input_record
+            for i in (
+                "start_time",
+                "end_time",
+                "starting_dec",
+                "ending_dec",
+                "file_name_value",
+                "data_acquisition_rate_value",
+            ):
+                self.ui[i].setText(observation.input_record[i])
+            self.ui.start_time.setTime()
             self.ui.accept_button.setText("Close")
             self.ui.cancel_button.hide()
             # TODO: show info about the observation
@@ -68,7 +92,9 @@ class ObsDialog(QtWidgets.QDialog):
             self.parent_window.observation = self.observation
             self.close()
 
-            target_dec = self.observation.min_dec - (2 if (self.observation.obs_type == 'Survey') else 0)
+            target_dec = self.observation.min_dec - (
+                2 if (self.observation.obs_type == "Survey") else 0
+            )
             self.parent_window.alert(
                 f"Move the telescope to {target_dec}° declination",
                 "Okay",
@@ -78,21 +104,44 @@ class ObsDialog(QtWidgets.QDialog):
                 "Yes",
             )
         elif exit_code == 0:  # set_observation() executed successfully
-            for i in [
-                self.ui.start_time,
-                self.ui.end_time,
-                self.ui.starting_dec,
-                self.ui.ending_dec,
-                self.ui.file_name_value,
-                self.ui.data_acquisition_rate_value,
-            ]:
-                i.setEnabled(False)
-            self.confirmed = True
+            self.wrap()
             self.ui.accept_button.setText("Start Observation")
             self.ui.error_label.hide()
             self.adjustSize()
+            self.confirmed = True
         else:
             self.ui.error_label.show()
+
+    def unwrap(self):
+        self.set_read_only()
+
+    def wrap(self):
+        self.set_read_only()
+        self.records = InputRecord(
+            *[
+                getattr(self.ui, name).text()
+                for name in (
+                    "start_time",
+                    "end_time",
+                    "starting_dec",
+                    "ending_dec",
+                    "file_name_value",
+                )
+            ],
+            getattr(self.ui, "data_acquisition_rate_value").value(),
+        )
+        print(self.records)
+
+    def set_read_only(self):
+        for i in [
+            self.ui.start_time,
+            self.ui.end_time,
+            self.ui.starting_dec,
+            self.ui.ending_dec,
+            self.ui.file_name_value,
+            self.ui.data_acquisition_rate_value,
+        ]:
+            i.setEnabled(False)
 
     def set_observation(self):
         """add all necessary info to the encapsulated observation; 1: error"""

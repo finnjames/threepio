@@ -54,6 +54,9 @@ class Observation:
         self.file_b = None
         self.file_comp = None
 
+        # Record keeping for later display/testing
+        self.input_record = None
+
         # Temporary bookkeeping
         self.cal_start = None
         self.bg_start = None
@@ -80,6 +83,9 @@ class Observation:
 
     def set_data_freq(self, data_freq):
         self.data_freq = data_freq
+
+    def set_input_record(self, input_record):
+        self.input_record = input_record
 
     # Communication API
     def communicate(self, data_point, timestamp=None):
