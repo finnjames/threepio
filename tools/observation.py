@@ -292,7 +292,7 @@ class Survey(Observation):
         self.file_comp = MyPrecious(self.name + "_comp.md2")
 
     def data_logic(self, data_point):
-        if data_point.dec < (self.min_dec - 2) or data_point.dec > (self.max_dec + 2):
+        if data_point.dec < (self.min_dec) or data_point.dec > (self.max_dec):
             if not self.outside:
                 self.write("*")
                 self.sweeps += 1
