@@ -1,21 +1,11 @@
 """dialogue box for keying in a new observation"""
-from dataclasses import dataclass
 
 from PyQt5 import QtWidgets, QtCore
 from layouts import obs_ui  # compiled PyQt dialogue ui
 import time
 
 from tools.observation import Observation
-
-
-@dataclass(frozen=True)
-class InputRecord:
-    start_time: QtCore.QTime
-    end_time: int
-    starting_dec: int
-    ending_dec: int
-    file_name_value: str
-    data_acquisition_rate_value: int
+from tools.inputrecord import InputRecord
 
 
 class ObsDialog(QtWidgets.QDialog):
@@ -29,30 +19,19 @@ class ObsDialog(QtWidgets.QDialog):
             QtCore.Qt.Window | QtCore.Qt.WindowTitleHint | QtCore.Qt.CustomizeWindowHint
         )
 
+        self.observation = observation
+        self.clock = clock
+
         # just checking data
         self.info = info
-        self.records = None
+        self.records: InputRecord = None
         if self.info:
-            self.unwrap()
-            self.records = observation.input_record
-            for i in (
-                "start_time",
-                "end_time",
-                "starting_dec",
-                "ending_dec",
-                "file_name_value",
-                "data_acquisition_rate_value",
-            ):
-                self.ui[i].setText(observation.input_record[i])
-            self.ui.start_time.setTime()
+            self.unwrap(observation.input_record)
             self.ui.accept_button.setText("Close")
             self.ui.cancel_button.hide()
             # TODO: show info about the observation
 
         self.confirmed = False
-
-        self.observation = observation
-        self.clock = clock
 
         # make default filename
         self.default_filename = self.clock.get_time_slug()
@@ -112,25 +91,32 @@ class ObsDialog(QtWidgets.QDialog):
         else:
             self.ui.error_label.show()
 
-    def unwrap(self):
-        self.set_read_only()
+    def get_filename(self):
+        if self.ui.file_name_value.text() == "":
+            return self.default_filename
+        return self.ui.file_name_value.text()
+
+    def unwrap(self, record: InputRecord):
+        self.ui.start_time.setTime(record.start_time)
+        self.ui.end_time.setTime(record.end_time)
+        self.ui.starting_dec.setText(record.starting_dec)
+        self.ui.ending_dec.setText(record.ending_dec)
+        self.ui.data_acquisition_rate_value.setValue(record.data_acquisition_rate_value)
+        self.ui.file_name_value.setText(record.file_name_value)
+        self.wrap()
 
     def wrap(self):
         self.set_read_only()
         self.records = InputRecord(
-            *[
-                getattr(self.ui, name).text()
-                for name in (
-                    "start_time",
-                    "end_time",
-                    "starting_dec",
-                    "ending_dec",
-                    "file_name_value",
-                )
-            ],
-            getattr(self.ui, "data_acquisition_rate_value").value(),
+            self.ui.start_time.time(),
+            self.ui.end_time.time(),
+            self.ui.starting_dec.text(),
+            self.ui.ending_dec.text(),
+            self.ui.data_acquisition_rate_value.value(),
+            self.get_filename(),
         )
         print(self.records)
+        self.observation.input_record = self.records
 
     def set_read_only(self):
         for i in [
@@ -177,7 +163,7 @@ class ObsDialog(QtWidgets.QDialog):
             filename = self.default_filename
         self.observation.set_name(filename)
 
-        # catch when the user doesn't bother to put in a declination or data frequency
+        # catch when the user doesn't put in a declination or data frequency
         try:
             self.observation.set_ra(start_time, end_time)
             self.observation.set_dec(
