@@ -354,7 +354,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.ui.dec_value.setText(f"{self.current_dec:.4f}°")  # dec
         if self.observation is not None:
             self.ui.sweep_value.setText(
-                f"{self.observation.sweeps if self.observation.sweeps != -1 else 'n/a'}"
+                str(self.observation.sweeps) if self.observation.sweeps != -1 else "n/a"
             )  # sweep number
 
         self.update_progress_bar()

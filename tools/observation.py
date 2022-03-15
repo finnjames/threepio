@@ -5,6 +5,7 @@ from math import floor
 from tools.comm import Comm
 from tools.datapoint import DataPoint
 from tools.precious import MyPrecious
+from tools.inputrecord import InputRecord
 
 
 class Observation:
@@ -55,7 +56,7 @@ class Observation:
         self.file_comp = None
 
         # Record keeping for later display/testing
-        self.input_record = None
+        self.input_record: InputRecord = None
 
         # Temporary bookkeeping
         self.cal_start = None
@@ -77,14 +78,14 @@ class Observation:
         self.data_start = data_start
         self.data_end = data_end
 
-    def set_name(self, name):
+    def set_name(self, name: str):
         self.name = name
         self.set_files()
 
     def set_data_freq(self, data_freq):
         self.data_freq = data_freq
 
-    def set_input_record(self, input_record):
+    def set_input_record(self, input_record: InputRecord):
         self.input_record = input_record
 
     # Communication API
@@ -294,6 +295,7 @@ class Survey(Observation):
         if data_point.dec < (self.min_dec - 2) or data_point.dec > (self.max_dec + 2):
             if not self.outside:
                 self.write("*")
+                self.sweeps += 1
             self.outside = True
             if data_point.dec < self.min_dec:
                 return Comm.SEND_TEL_NORTH
