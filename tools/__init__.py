@@ -8,3 +8,4 @@ from .tars import Tars, discovery
 from .logtask import LogTask
 from .minitars import MiniTars
 from .inputrecord import InputRecord
+from .alertmessage import AlertMessage

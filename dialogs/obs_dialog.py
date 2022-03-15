@@ -67,7 +67,6 @@ class ObsDialog(QtWidgets.QDialog):
             self.close()
         exit_code = self.set_observation()
         if self.confirmed and exit_code == 0:  # set observation and close
-            self.parent_window.observation = None
             self.parent_window.observation = self.observation
             self.close()
 
@@ -77,14 +76,16 @@ class ObsDialog(QtWidgets.QDialog):
             self.parent_window.alert(
                 f"Move the telescope to {target_dec}° declination",
                 "Okay",
-            )
-            self.parent_window.alert(
                 f"Is the telescope at {target_dec}° declination?",
                 "Yes",
             )
             if self.observation.obs_type == "Spectrum":
-                self.parent_window.alert("Set frequency to 1319.5MHz", "Okay")
-                self.parent_window.alert("Is the frequency set to 1319.5MHz?", "Yes")
+                self.parent_window.alert(
+                    "Set frequency to 1319.5MHz",
+                    "Okay",
+                    "Is the frequency set to 1319.5MHz?",
+                    "Yes",
+                )
         elif exit_code == 0:  # set_observation() executed successfully
             self.wrap()
             self.ui.accept_button.setText("Start Observation")
