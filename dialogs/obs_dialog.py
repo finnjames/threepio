@@ -115,7 +115,6 @@ class ObsDialog(QtWidgets.QDialog):
             self.ui.data_acquisition_rate_value.value(),
             self.get_filename(),
         )
-        print(self.records)
         self.observation.input_record = self.records
 
     def set_read_only(self):
