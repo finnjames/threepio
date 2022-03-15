@@ -230,8 +230,6 @@ class Threepio(QtWidgets.QMainWindow):
         obs_type = self.observation.obs_type
 
         if self.transmission == Comm.START_CAL:
-            if obs_type == "Spectrum":
-                self.alert("Set frequency to 1319.5MHz")
             if self.stop_tel_alert and self.observation.obs_type == "Survey":
                 self.alert("STOP the telescope", "Okay")
                 self.alert("Has the telescope been stopped?", "Yes")

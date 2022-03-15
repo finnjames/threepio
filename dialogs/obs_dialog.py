@@ -82,6 +82,9 @@ class ObsDialog(QtWidgets.QDialog):
                 f"Is the telescope at {target_dec}° declination?",
                 "Yes",
             )
+            if self.observation.obs_type == "Spectrum":
+                self.parent_window.alert("Set frequency to 1319.5MHz", "Okay")
+                self.parent_window.alert("Is the frequency set to 1319.5MHz?", "Yes")
         elif exit_code == 0:  # set_observation() executed successfully
             self.wrap()
             self.ui.accept_button.setText("Start Observation")
