@@ -10,6 +10,7 @@ class AlertDialog(QtWidgets.QDialog):
     def __init__(self, alert: str, button_text: str):
         QtWidgets.QWidget.__init__(self)
         self.ui = alert_ui.Ui_Dialog()
+        # self.setModal(False)
         self.ui.setupUi(self)
 
         # hide the close/minimize/fullscreen buttons and make window always on top
