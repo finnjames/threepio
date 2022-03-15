@@ -265,6 +265,8 @@ class Threepio(QtWidgets.QMainWindow):
             self.tobeepornottobeep = True
         elif self.transmission == Comm.END_SEND_TEL:
             self.message(f"Taking {obs_type.lower()} data!!!", beep=False, log=False)
+        elif self.transmission == Comm.FINISH_SWEEP:
+            self.message("Finishing last sweep!!!", beep=False, log=False)
         elif self.transmission == Comm.BEEP:
             self.tobeepornottobeep = True
         elif self.transmission == Comm.NEXT:

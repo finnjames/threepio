@@ -8,6 +8,19 @@ from tools.precious import MyPrecious
 from tools.inputrecord import InputRecord
 
 
+# State machine
+class State(Enum):
+    NO_STATE = 0  # do not use!
+    OFF = 1
+    CAL_1 = 2
+    BG_1 = 3
+    DATA = 4
+    CAL_2 = 5
+    BG_2 = 6
+    DONE = 7
+    WAITING = 8  # extra
+
+
 class Observation:
     """
     Superclass for each of the three types of observation: Scan, Survey, and Spectrum
@@ -37,7 +50,7 @@ class Observation:
         # Will be set accordingly in each state.
         self.freq = self.cal_freq
 
-        self.state = self.State.OFF
+        self.state = State.OFF
 
         # Info
         self.start_RA = None
@@ -95,115 +108,111 @@ class Observation:
 
         user_start_time = self.start_RA - (self.bg_dur + self.cal_dur + 30)
 
-        if self.state == self.State.OFF:
+        if self.state == State.OFF:
             if timestamp < user_start_time:  # A 30-second buffer for user actions
                 return Comm.NO_ACTION
             else:
                 return Comm.START_CAL
-        elif self.state == self.State.CAL_1:
+        elif self.state == State.CAL_1:
             if floor(timestamp - self.cal_start) <= self.cal_dur:
-                print(f"CAL_1: state: {self.state}, if {timestamp - self.cal_start}")
                 self.write_data(data_point)
                 return Comm.NO_ACTION
             else:
                 return Comm.START_BG
-        elif self.state == self.State.BG_1:
+        elif self.state == State.BG_1:
             if floor(timestamp - self.bg_start) <= self.bg_dur:
-                print(f"BG_1: state: {self.state}, if {timestamp - self.bg_start}")
                 self.write_data(data_point)
                 return Comm.NO_ACTION
             else:
                 return Comm.START_WAIT
-        elif self.state == self.State.WAITING:
+        elif self.state == State.WAITING:
             if timestamp < self.start_RA:
                 return Comm.NO_ACTION
             else:
                 return Comm.START_DATA
-        elif self.state == self.State.DATA:
+        elif self.state == State.DATA:
             if timestamp < self.start_RA:
                 return Comm.NO_ACTION
             elif timestamp < self.end_RA:
                 return self.data_logic(data_point)
+            # TODO: I hate this
+            elif self.obs_type == "Survey" and self.data_logic(data_point) not in [
+                Comm.SEND_TEL_NORTH,
+                Comm.SEND_TEL_SOUTH,
+            ]:
+                return Comm.FINISH_SWEEP
             else:
                 return Comm.START_CAL
-        elif self.state == self.State.CAL_2:
+        elif self.state == State.CAL_2:
             if floor(timestamp - self.cal_start) <= self.cal_dur:
                 self.write_data(data_point)
                 return Comm.NO_ACTION
             else:
                 return Comm.START_BG
-        elif self.state == self.State.BG_2:
+        elif self.state == State.BG_2:
             if floor(timestamp - self.bg_start) <= self.bg_dur:
                 self.write_data(data_point)
                 return Comm.NO_ACTION
             else:
                 return Comm.FINISHED
-        elif self.state == self.State.DONE:
+        elif self.state == State.DONE:
             return Comm.FINISHED
 
     # This is the action API
-    def next(self):
-        if self.state == self.State.OFF:
-            self.start_calibration_1()
-        elif self.state == self.State.CAL_1:
-            self.end_calibration_1()
-        elif self.state == self.State.BG_1:
-            self.end_background_1()
-        elif self.state == self.State.WAITING:
-            self.start_data()
-        elif self.state == self.State.DATA:
-            self.start_calibration_2()
-        elif self.state == self.State.CAL_2:
-            self.end_calibration_2()
-        elif self.state == self.State.BG_2:
-            self.stop()
+    def next(self, override=None):
+        if override is not None:
+            self.state = override
         else:
-            pass  # state == DONE, do nothing
+            if self.state == State.OFF:
+                self.start_calibration_1()
+            elif self.state == State.CAL_1:
+                self.end_calibration_1()
+            elif self.state == State.BG_1:
+                self.end_background_1()
+            elif self.state == State.WAITING:
+                self.start_data()
+            elif self.state == State.DATA:
+                self.start_calibration_2()
+            elif self.state == State.CAL_2:
+                self.end_calibration_2()
+            elif self.state == State.BG_2:
+                self.stop()
+            else:
+                pass  # state == DONE, do nothing
         return self.state
 
-    # State machine
-    class State(Enum):
-        OFF = 1
-        CAL_1 = 2
-        BG_1 = 3
-        DATA = 4
-        CAL_2 = 5
-        BG_2 = 6
-        DONE = 7
-        WAITING = 8  # extra
-
     def start_calibration_1(self):
-        self.state = self.State.CAL_1
+        self.state = State.CAL_1
         self.start_time = time.time()
         self.cal_start = time.time()
         self.freq = self.cal_freq
 
     def end_calibration_1(self):
-        self.state = self.State.BG_1
+        self.state = State.BG_1
         self.write("*")
         self.bg_start = time.time()
 
     def end_background_1(self):
-        self.state = self.State.WAITING
+        self.state = State.WAITING
 
     def start_data(self):
-        self.state = self.State.DATA
+        self.state = State.DATA
         self.write("*")
         self.freq = self.data_freq
 
     def start_calibration_2(self):
-        self.state = self.State.CAL_2
+        self.state = State.CAL_2
         self.write("*")
         self.cal_start = time.time()
         self.freq = self.cal_freq
 
     def end_calibration_2(self):
-        self.state = self.State.BG_2
+        self.state = State.BG_2
         self.write("*")
         self.bg_start = time.time()
 
     def stop(self):
-        self.state = self.State.DONE
+        self.state = State.DONE
         self.end_time = time.time()
         self.write("*")
         self.write("*")
@@ -233,7 +242,7 @@ class Observation:
             self.file_b.write(string)
 
     def write_data(self, point: DataPoint):
-        # print(f"{point.timestamp}, dec: {point.dec}")
+        print(f"{point.timestamp}, dec: {point.dec}")
         self.write("%.2f" % point.timestamp)
         self.write("%.2f" % point.dec)
         if self.composite:
