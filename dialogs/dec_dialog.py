@@ -5,9 +5,9 @@ from layouts import dec_cal_ui  # compiled PyQt dialogue ui
 class DecDialog(QtWidgets.QDialog):
     """New observation dialogue window"""
 
-    south_dec = -25
-    north_dec = 95
-    step = 10
+    SOUTH_DEC = -25
+    NORTH_DEC = 95
+    STEP = 10
 
     CAL_FILENAME = "dec-cal.txt"
     CAL_BACKUP_FILENAME = "dec-cal-backup.txt"
@@ -27,7 +27,7 @@ class DecDialog(QtWidgets.QDialog):
         )
 
         self.data = []
-        self.current_dec = self.south_dec
+        self.current_dec = self.SOUTH_DEC
         self.update_label()
 
         self.minitars = minitars
@@ -44,11 +44,11 @@ class DecDialog(QtWidgets.QDialog):
 
     def switch_direction(self):
         if self.ui.north_or_south_combo_box.currentIndex() == 0:
-            self.current_dec = self.south_dec
-            self.step = 10
+            self.current_dec = self.SOUTH_DEC
+            self.STEP = 10
         else:
-            self.current_dec = self.north_dec
-            self.step = -10
+            self.current_dec = self.NORTH_DEC
+            self.STEP = -10
         self.update_label()
 
     def handle_next(self):
@@ -73,15 +73,15 @@ class DecDialog(QtWidgets.QDialog):
 
             self.data.append(new_dec)
 
-            self.current_dec += self.step
+            self.current_dec += self.STEP
             self.ui.next_cal_button.setText("Next")
             self.ui.set_dec_label.setText("Set declination to")
 
-            if self.current_dec not in [self.south_dec, self.north_dec]:
+            if self.current_dec not in [self.SOUTH_DEC, self.NORTH_DEC]:
                 # disable N/S choice if not first
                 self.ui.north_or_south_combo_box.setDisabled(True)
             elif (
-                self.current_dec <= self.south_dec or self.current_dec >= self.north_dec
+                self.current_dec <= self.SOUTH_DEC or self.current_dec >= self.NORTH_DEC
             ):
                 self.ui.next_cal_button.setText("Save")
 
@@ -89,7 +89,7 @@ class DecDialog(QtWidgets.QDialog):
             self.confirmed = False
 
             # is calibration complete?
-            if self.current_dec > self.north_dec or self.current_dec < self.south_dec:
+            if self.current_dec > self.NORTH_DEC or self.current_dec < self.SOUTH_DEC:
                 # copy over the current file to the backup file
                 with open(self.CAL_FILENAME) as f, open(
                     self.CAL_BACKUP_FILENAME, "w"
@@ -100,7 +100,7 @@ class DecDialog(QtWidgets.QDialog):
                 open(self.CAL_FILENAME, "w").close()  # overwrite file
                 with open(self.CAL_FILENAME, "a") as f:
                     # reverse it if it's N -> S
-                    self.step < 0 and self.data.reverse()
+                    self.STEP < 0 and self.data.reverse()
 
                     f.write("\n".join(str(line) for line in self.data))
 

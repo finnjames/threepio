@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from enum import Enum
 import time
 from functools import reduce
 from tkinter import W
@@ -22,6 +23,7 @@ from tools import (
     Observation,
     Alert,
 )
+from tools.deccalc import DecCalc
 from tools.observation import ObsType
 
 
@@ -56,9 +58,9 @@ class Threepio(QtWidgets.QMainWindow):
     BLUE = 0x2196F3
     RED = 0xFF5252
 
-    # tars communication interpretation
-    transmission = None
-    old_transmission = None
+    class Mode(Enum):
+        NORMAL = 0
+        TESTING = 1
 
     def __init__(self):
         QtWidgets.QWidget.__init__(self)
@@ -77,7 +79,7 @@ class Threepio(QtWidgets.QMainWindow):
 
         # mode
         self.legacy_mode = False
-        self.mode = "normal"
+        self.mode = Threepio.Mode.NORMAL
 
         # "console" output
         self.message_log: list[LogTask] = []
@@ -160,13 +162,17 @@ class Threepio(QtWidgets.QMainWindow):
         self.current_dec = 0.0
         self.current_data_point = None
 
+        # tars communication interpretation
+        self.previous_transmission = None
+
         # telescope visualization
         self.dec_scene = QtWidgets.QGraphicsScene()
         self.ui.dec_view.setScene(self.dec_scene)
         self.update_dec_view()
 
         # run initial calibration
-        self.load_dec_cal()
+        self.dec_calc = DecCalc()
+        self.dec_calc.load_dec_cal()
 
         # primary clock
         stripchart_log_task = self.log("Initializing clock...")
@@ -199,7 +205,9 @@ class Threepio(QtWidgets.QMainWindow):
 
         # if data was available above, save it
         if tars_data is not None and minitars_data is not None:
-            self.current_dec = self.calculate_declination(minitars_data)  # get dec
+            self.current_dec = self.dec_calc.calculate_declination(
+                minitars_data
+            )  # get dec
             self.current_data_point = DataPoint(  # create data point
                 sidereal_timestamp,  # ra
                 self.current_dec,  # dec
@@ -223,15 +231,14 @@ class Threepio(QtWidgets.QMainWindow):
         period = 1000 / self.observation.freq  # Hz -> ms
         self.data_timer.set_period(period)
 
-        self.old_transmission = self.transmission
-        self.transmission = self.observation.communicate(
+        transmission = self.observation.communicate(
             self.current_data_point, self.clock.get_time()
         )
 
         obs_type = self.observation.obs_type
 
-        if self.transmission != self.old_transmission:  # TODO: should these be special?
-            if self.transmission == Comm.START_CAL:
+        if transmission != self.previous_transmission:  # TODO: should these be special?
+            if transmission is Comm.START_CAL:
                 alerts = [
                     Alert("STOP the telescope", "Okay"),
                     Alert("Has the telescope been stopped?", "Yes"),
@@ -250,7 +257,7 @@ class Threepio(QtWidgets.QMainWindow):
                 if self.observation.obs_type is ObsType.SURVEY:
                     self.stop_tel_alert = True  # only alert on second cal
 
-            elif self.transmission == Comm.START_BG:
+            elif transmission is Comm.START_BG:
 
                 def callback():
                     self.clock.reset_anchor_time()
@@ -263,38 +270,36 @@ class Threepio(QtWidgets.QMainWindow):
                     callback=callback,
                 )
 
-        if self.transmission == Comm.START_WAIT:
+        if transmission is Comm.START_WAIT:
             self.observation.next()
             self.message(f"Waiting for {obs_type.name.lower()} to begin...")
-        elif self.transmission == Comm.START_DATA:
+        elif transmission is Comm.START_DATA:
             self.observation.next()
             self.message(f"Taking {obs_type.name.lower()} data!!!")
-        elif self.transmission == Comm.FINISHED:
+        elif transmission is Comm.FINISHED:
             self.observation.next()
             self.message(f"{obs_type.name.capitalize()} complete!!!")
             self.observation = None
-        elif self.transmission == Comm.SEND_TEL_NORTH:
+        elif transmission is Comm.SEND_TEL_NORTH:
             self.message("Send telescope NORTH at max speed!!!", beep=False, log=False)
             self.tobeepornottobeep = True
-        elif self.transmission == Comm.SEND_TEL_SOUTH:
+        elif transmission is Comm.SEND_TEL_SOUTH:
             self.message("Send telescope SOUTH at max speed!!!", beep=False, log=False)
             self.tobeepornottobeep = True
-        elif self.transmission == Comm.END_SEND_TEL:
+        elif transmission is Comm.END_SEND_TEL:
             self.message(
                 f"Taking {obs_type.name.lower()} data!!!", beep=False, log=False
             )
-        elif self.transmission == Comm.FINISH_SWEEP:
+        elif transmission is Comm.FINISH_SWEEP:
             self.message("Finishing last sweep!!!", beep=False, log=False)
-        elif self.transmission == Comm.BEEP:
+        elif transmission is Comm.BEEP:
             self.tobeepornottobeep = True
-        elif self.transmission == Comm.NEXT:
+        elif transmission is Comm.NEXT:
             self.observation.next()
-        elif self.transmission == Comm.NO_ACTION:
+        elif transmission is Comm.NO_ACTION:
             pass
 
-        # time_until_start = self.observation.start_RA - current_time
-        # if time_until_start <= 0 < (self.observation.end_RA - current_time):
-        #     self.message(f"Taking {obs_type.name} data!!!")
+        self.previous_transmission = transmission
 
     def set_state_normal(self):
         self.ui.actionNormal.setChecked(True)
@@ -302,14 +307,14 @@ class Threepio(QtWidgets.QMainWindow):
         self.ui.testing_frame.hide()
         self.adjustSize()
         self.setFixedSize(800, 640)
-        self.mode = "normal"
+        self.mode = Threepio.Mode.NORMAL
 
     def set_state_testing(self):
         self.ui.actionNormal.setChecked(False)
         self.ui.actionTesting.setChecked(True)
         self.setFixedSize(800, 826)
         self.ui.testing_frame.show()
-        self.mode = "testing"
+        self.mode = Threepio.Mode.TESTING
 
     def toggle_state_legacy(self):
         """lol"""
@@ -544,57 +549,11 @@ class Threepio(QtWidgets.QMainWindow):
 
     def dec_calibration(self):
         dialog = DecDialog(self.minitars, self)
-        if self.mode == "testing":
+        if self.mode is Threepio.Mode.TESTING:
             dialog.show()
         dialog.exec_()
 
-        self.load_dec_cal()
-
-    def load_dec_cal(self):
-        """read the dec calibration from file and store it in memory"""
-        # create y array
-        self.y = []
-        i = DecDialog.south_dec
-        while i <= DecDialog.north_dec:
-            self.y.append(float(i))
-            i += abs(DecDialog.step)
-
-        # create x array
-        self.x = []
-        with open("dec-cal.txt", "r") as f:  # get data from file
-            c = f.read().splitlines()
-            for i in c:
-                self.x.append(float(i))
-
-    def calculate_declination(self, input_dec: float):
-        """calculate the true dec from declinometer input and calibration data"""
-
-        # input is below data
-        if input_dec < self.x[0]:
-            return (
-                (self.y[1] - self.y[0])
-                / (self.x[1] - self.x[0])
-                * (input_dec - self.x[0])
-            ) + self.y[0]
-
-        # input is above data
-        if input_dec > self.x[-1]:
-            return (
-                (self.y[-1] - self.y[-2])
-                / (self.x[-1] - self.x[-2])
-                * (input_dec - self.x[-1])
-            ) + self.y[-1]
-
-        # input is within data
-        for i in range(len(self.x)):
-            if input_dec <= self.x[i + 1]:
-                if input_dec >= self.x[i]:
-                    # (dy/dx)x + y_0
-                    return (
-                        (self.y[i + 1] - self.y[i])
-                        / (self.x[i + 1] - self.x[i])
-                        * (input_dec - self.x[i])
-                    ) + self.y[i]
+        self.dec_calc.load_dec_cal()
 
     def ra_calibration(self):
         self.set_time()

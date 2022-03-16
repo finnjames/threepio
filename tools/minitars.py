@@ -1,5 +1,6 @@
 """
-Small version of Tars, meant to be used with the Arduino declinometer as opposed to the DataQ.
+Small version of Tars, meant to be used with the Arduino declinometer as opposed to the
+DataQ.
 """
 from typing import Optional
 
