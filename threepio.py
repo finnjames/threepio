@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 import time
 from functools import reduce
+from tkinter import W
+from typing import Callable
 
 from PyQt5 import QtChart, QtCore, QtGui, QtWidgets, QtMultimedia
 
@@ -215,11 +217,6 @@ class Threepio(QtWidgets.QMainWindow):
         self.ticks_since_last_fps_update += 1  # for measuring fps
 
     def update_data(self) -> None:
-        # print(
-        #     f"start: {self.clock.starting_time}, "
-        #     f"anchor: {self.clock.anchor_time}, "
-        #     f"current: {time.time()}"
-        # )
         if not self.check_observation_state():
             return
 
@@ -233,29 +230,40 @@ class Threepio(QtWidgets.QMainWindow):
 
         obs_type = self.observation.obs_type
 
-        if self.transmission == Comm.START_CAL:
-            alerts = [
-                Alert("STOP the telescope", "Okay"),
-                Alert("Has the telescope been stopped?", "Yes"),
-                Alert("Turn the calibration switches ON", "Okay"),
-                Alert("Are the calibration switches ON?", "Yes"),
-            ]
-            self.alert(*alerts[(0 if self.stop_tel_alert else 2) :])
-            if self.observation.obs_type is ObsType.SURVEY:
-                self.stop_tel_alert = True  # only alert on second cal
+        if self.transmission != self.old_transmission:  # TODO: should these be special?
+            if self.transmission == Comm.START_CAL:
+                alerts = [
+                    Alert("STOP the telescope", "Okay"),
+                    Alert("Has the telescope been stopped?", "Yes"),
+                    Alert("Turn the calibration switches ON", "Okay"),
+                    Alert("Are the calibration switches ON?", "Yes"),
+                ]
 
-            self.clock.reset_anchor_time()
-            self.observation.next()
-            self.message("Taking calibration data!!!")
-        elif self.transmission == Comm.START_BG:
-            self.alert(
-                Alert("Turn the calibration switches OFF", "Okay"),
-                Alert("Are the calibration switches OFF?", "Yes"),
-            )
-            self.clock.reset_anchor_time()
-            self.observation.next()
-            self.message("Taking background data!!!")
-        elif self.transmission == Comm.START_WAIT:
+                def callback():
+                    self.clock.reset_anchor_time()
+                    self.observation.next()
+                    self.message("Taking calibration data!!!")
+
+                self.alert(
+                    *alerts[(0 if self.stop_tel_alert else 2) :], callback=callback
+                )
+                if self.observation.obs_type is ObsType.SURVEY:
+                    self.stop_tel_alert = True  # only alert on second cal
+
+            elif self.transmission == Comm.START_BG:
+
+                def callback():
+                    self.clock.reset_anchor_time()
+                    self.observation.next()
+                    self.message("Taking background data!!!")
+
+                self.alert(
+                    Alert("Turn the calibration switches OFF", "Okay"),
+                    Alert("Are the calibration switches OFF?", "Yes"),
+                    callback=callback,
+                )
+
+        if self.transmission == Comm.START_WAIT:
             self.observation.next()
             self.message(f"Waiting for {obs_type.name.lower()} to begin...")
         elif self.transmission == Comm.START_DATA:
@@ -610,6 +618,7 @@ class Threepio(QtWidgets.QMainWindow):
             except AttributeError:
                 pass
             self.message_log.append(new_log_task)
+            print(new_log_task.get_message())
             return new_log_task
 
     def update_console(self):
@@ -621,13 +630,13 @@ class Threepio(QtWidgets.QMainWindow):
             )
         )
 
-    def alert(self, *alerts):
+    def alert(self, *alerts, callback: Callable[[], None] = lambda: None):
         new_thread = QtCore.QThread()
         self.alert_thread.add(new_thread)
         self.worker = self.AlertWorker(self)
         self.worker.moveToThread(new_thread)
         # connect signals and slots
-        new_thread.started.connect(lambda: self.worker.run(*alerts))
+        new_thread.started.connect(lambda: self.worker.run(*alerts, callback=callback))
         self.worker.finished.connect(new_thread.quit)
         self.worker.finished.connect(self.worker.deleteLater)
 
@@ -647,9 +656,11 @@ class Threepio(QtWidgets.QMainWindow):
             super().__init__()
             self.threepio = threepio
 
-        def run(self, *alerts):
+        def run(self, *alerts, callback: Callable[[], None]):
             for alert in alerts:
                 self.threepio.alert_aux(alert.text, alert.button)
+            print("callback")
+            callback()
             self.finished.emit()
 
     def alert_aux(self, alert_text, button_text):

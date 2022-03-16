@@ -105,12 +105,14 @@ class ObsDialog(QtWidgets.QDialog):
                 self.adjustSize()
                 self.confirmed = True
             else:  # already confirmed -> set observation and close
-                self.parent_window.observation = self.observation
                 self.close()
 
                 target_dec = self.observation.min_dec - (
                     2 if (self.observation.obs_type is ObsType.SURVEY) else 0
                 )
+
+                def callback():
+                    self.parent_window.observation = self.observation
 
                 alerts = [
                     Alert(f"Move the telescope to {target_dec}° declination", "Okay"),
@@ -121,8 +123,10 @@ class ObsDialog(QtWidgets.QDialog):
                 self.parent_window.alert(
                     *alerts[
                         : (4 if self.observation.obs_type is ObsType.SPECTRUM else 2)
-                    ]
+                    ],
+                    callback=callback,
                 )
+
         except ValueError as err:
             self.show_error(str(err))
 
