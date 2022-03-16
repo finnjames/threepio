@@ -24,6 +24,32 @@ class ObsDialog(QtWidgets.QDialog):
         self.observation = observation
         self.clock: SuperClock = clock
 
+        # dictionary of fields and their get/set functions
+        self.fields = {
+            "start_time": (
+                self.ui.start_time,
+                self.ui.start_time.time,
+                self.ui.start_time.setTime,
+            ),
+            "end_time": (
+                self.ui.end_time,
+                self.ui.end_time.time,
+                self.ui.end_time.setTime,
+            ),
+            "min_dec": (self.ui.min_dec, self.ui.min_dec.text, self.ui.min_dec.setText),
+            "max_dec": (self.ui.max_dec, self.ui.max_dec.text, self.ui.max_dec.setText),
+            "data_acquisition_rate_value": (
+                self.ui.data_acquisition_rate_value,
+                self.ui.data_acquisition_rate_value.value,
+                self.ui.data_acquisition_rate_value.setValue,
+            ),
+            "file_name_value": (
+                self.ui.file_name_value,
+                self.get_filename,
+                self.ui.file_name_value.setText,
+            ),
+        }
+
         # just checking data
         self.info = info
         self.records: InputRecord = None
@@ -42,11 +68,11 @@ class ObsDialog(QtWidgets.QDialog):
         # hide error and warning labels to start
         self.clear_messages()
 
-        # If a scan or spectrum, only one Dec needed
+        # If a scan or spectrum, only one dec needed
         if self.observation.obs_type in ["Scan", "Spectrum"]:
             for i in [self.ui.max_dec, self.ui.end_dec_label]:
                 i.hide()
-            self.ui.max_dec.setText("65535")
+            self.ui.max_dec.setText("65535")  # TODO: change this?
             self.ui.start_dec_label.setText("Declination")
         if self.observation.obs_type in ["Spectrum", "Survey"]:
             for i in [
@@ -59,6 +85,7 @@ class ObsDialog(QtWidgets.QDialog):
         if self.observation.obs_type == "Spectrum":
             for i in [self.ui.end_label, self.ui.end_time]:
                 i.hide()
+            self.ui.end_time.setTime(QtCore.QTime(23, 59, 59))
         self.adjustSize()
 
         # store parent window
@@ -113,36 +140,20 @@ class ObsDialog(QtWidgets.QDialog):
         return self.ui.file_name_value.text()
 
     def unwrap(self, record: InputRecord):
-        self.ui.start_time.setTime(record.start_time)
-        self.ui.end_time.setTime(record.end_time)
-        self.ui.min_dec.setText(record.min_dec)
-        self.ui.max_dec.setText(record.max_dec)
-        self.ui.data_acquisition_rate_value.setValue(record.data_acquisition_rate_value)
-        self.ui.file_name_value.setText(record.file_name_value)
+        for name, (widget, getter, setter) in self.fields.items():
+            setter(getattr(record, name))
         self.wrap()
 
     def wrap(self):
         self.set_read_only()
         self.records = InputRecord(
-            self.ui.start_time.time(),
-            self.ui.end_time.time(),
-            self.ui.min_dec.text(),
-            self.ui.max_dec.text(),
-            self.ui.data_acquisition_rate_value.value(),
-            self.get_filename(),
+            **{name: getter() for name, (widget, getter, setter) in self.fields.items()}
         )
         self.observation.input_record = self.records
 
     def set_read_only(self):
-        for i in [
-            self.ui.start_time,
-            self.ui.end_time,
-            self.ui.min_dec,
-            self.ui.max_dec,
-            self.ui.file_name_value,
-            self.ui.data_acquisition_rate_value,
-        ]:
-            i.setEnabled(False)
+        for i in self.fields.values():
+            i[0].setDisabled(True)
 
     def set_observation(self):
         """add all necessary info to the encapsulated observation; 1: error"""
