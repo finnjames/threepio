@@ -4,6 +4,7 @@ from PyQt5 import QtWidgets, QtCore
 from layouts import obs_ui  # compiled PyQt dialogue ui
 import time
 from tools.alert import Alert
+from tools.superclock import SuperClock
 
 from tools.observation import Observation
 from tools.inputrecord import InputRecord
@@ -21,7 +22,7 @@ class ObsDialog(QtWidgets.QDialog):
         )
 
         self.observation = observation
-        self.clock = clock
+        self.clock: SuperClock = clock
 
         # just checking data
         self.info = info
@@ -38,8 +39,8 @@ class ObsDialog(QtWidgets.QDialog):
         self.default_filename = self.clock.get_time_slug()
         self.ui.file_name_value.setPlaceholderText(str(self.default_filename))
 
-        # hide error label to start
-        self.ui.error_label.hide()
+        # hide error and warning labels to start
+        self.clear_messages()
 
         # If a scan or spectrum, only one Dec needed
         if self.observation.obs_type in ["Scan", "Spectrum"]:
@@ -67,6 +68,7 @@ class ObsDialog(QtWidgets.QDialog):
         if self.info:
             self.close()
         try:
+            self.clear_messages()
             self.set_observation()
             if self.confirmed:  # set observation and close
                 self.parent_window.observation = self.observation
@@ -84,15 +86,26 @@ class ObsDialog(QtWidgets.QDialog):
                         Alert("Set frequency to 1319.5MHz", "Okay"),
                         Alert("Is the frequency set to 1319.5MHz?", "Yes"),
                     )
-            else:  # set_observation() executed successfully
+            else:  # confirmation
                 self.wrap()
                 self.ui.accept_button.setText("Start Observation")
                 self.ui.error_label.hide()
                 self.adjustSize()
                 self.confirmed = True
         except ValueError as err:
-            self.ui.error_label.setText(str(err))
-            self.ui.error_label.show()
+            self.show_error(str(err))
+
+    def show_error(self, message: str):
+        self.ui.error_label.setText(message)
+        self.ui.error_label.show()
+
+    def show_warning(self, message: str):
+        self.ui.warning_label.setText(message)
+        self.ui.warning_label.show()
+
+    def clear_messages(self):
+        for i in [self.ui.error_label, self.ui.warning_label]:
+            i.hide()
 
     def get_filename(self):
         if self.ui.file_name_value.text() == "":
@@ -147,6 +160,7 @@ class ObsDialog(QtWidgets.QDialog):
         )
         if ending_sidereal_time < starting_sidereal_time:
             ending_sidereal_time += 3600 * 24
+            self.show_warning("Assuming ending RA is the next day")
 
         start_time = (
             starting_sidereal_time - self.clock.get_sidereal_seconds() + time.time()
@@ -175,5 +189,3 @@ class ObsDialog(QtWidgets.QDialog):
         self.observation.set_dec(new_min_dec, new_max_dec)
 
         self.observation.set_data_freq(int(self.ui.data_acquisition_rate_value.text()))
-
-        return 0
