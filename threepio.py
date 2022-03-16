@@ -20,6 +20,7 @@ from tools import (
     Observation,
     Alert,
 )
+from tools.observation import ObsType
 
 
 class Threepio(QtWidgets.QMainWindow):
@@ -240,7 +241,7 @@ class Threepio(QtWidgets.QMainWindow):
                 Alert("Are the calibration switches ON?", "Yes"),
             ]
             self.alert(*alerts[(0 if self.stop_tel_alert else 2) :])
-            if self.observation.obs_type == "Survey":
+            if self.observation.obs_type is ObsType.SURVEY:
                 self.stop_tel_alert = True  # only alert on second cal
 
             self.clock.reset_anchor_time()
@@ -256,13 +257,13 @@ class Threepio(QtWidgets.QMainWindow):
             self.message("Taking background data!!!")
         elif self.transmission == Comm.START_WAIT:
             self.observation.next()
-            self.message(f"Waiting for {obs_type.lower()} to begin...")
+            self.message(f"Waiting for {obs_type.name.lower()} to begin...")
         elif self.transmission == Comm.START_DATA:
             self.observation.next()
-            self.message(f"Taking {obs_type.lower()} data!!!")
+            self.message(f"Taking {obs_type.name.lower()} data!!!")
         elif self.transmission == Comm.FINISHED:
             self.observation.next()
-            self.message(f"{obs_type} complete!!!")
+            self.message(f"{obs_type.name.capitalize()} complete!!!")
             self.observation = None
         elif self.transmission == Comm.SEND_TEL_NORTH:
             self.message("Send telescope NORTH at max speed!!!", beep=False, log=False)
@@ -271,7 +272,9 @@ class Threepio(QtWidgets.QMainWindow):
             self.message("Send telescope SOUTH at max speed!!!", beep=False, log=False)
             self.tobeepornottobeep = True
         elif self.transmission == Comm.END_SEND_TEL:
-            self.message(f"Taking {obs_type.lower()} data!!!", beep=False, log=False)
+            self.message(
+                f"Taking {obs_type.name.lower()} data!!!", beep=False, log=False
+            )
         elif self.transmission == Comm.FINISH_SWEEP:
             self.message("Finishing last sweep!!!", beep=False, log=False)
         elif self.transmission == Comm.BEEP:
@@ -283,7 +286,7 @@ class Threepio(QtWidgets.QMainWindow):
 
         # time_until_start = self.observation.start_RA - current_time
         # if time_until_start <= 0 < (self.observation.end_RA - current_time):
-        #     self.message(f"Taking {obs_type} data!!!")
+        #     self.message(f"Taking {obs_type.name} data!!!")
 
     def set_state_normal(self):
         self.ui.actionNormal.setChecked(True)
@@ -520,7 +523,7 @@ class Threepio(QtWidgets.QMainWindow):
 
     def new_observation(self, obs: Observation):
         dialog = ObsDialog(self, obs, self.clock)
-        dialog.setWindowTitle("New " + obs.obs_type)
+        dialog.setWindowTitle("New " + obs.obs_type.name.capitalize())
         dialog.exec_()
         self.stop_tel_alert = False
 
@@ -528,7 +531,7 @@ class Threepio(QtWidgets.QMainWindow):
         if self.observation is not None:
             pass
         dialog = ObsDialog(self, self.observation, self.clock, info=True)
-        dialog.setWindowTitle("Current " + self.observation.obs_type)
+        dialog.setWindowTitle("Current " + self.observation.obs_type.name.capitalize())
         dialog.exec_()
 
     def dec_calibration(self):

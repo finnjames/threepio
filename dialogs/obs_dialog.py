@@ -6,7 +6,7 @@ import time
 from tools.alert import Alert
 from tools.superclock import SuperClock
 
-from tools.observation import Observation
+from tools.observation import ObsType, Observation
 from tools.obsrecord import ObsRecord
 
 
@@ -69,12 +69,12 @@ class ObsDialog(QtWidgets.QDialog):
         self.clear_messages()
 
         # If a scan or spectrum, only one dec needed
-        if self.observation.obs_type in ["Scan", "Spectrum"]:
+        if self.observation.obs_type in [ObsType.SCAN, ObsType.SPECTRUM]:
             for i in [self.ui.max_dec, self.ui.end_dec_label]:
                 i.hide()
             self.ui.max_dec.setText("65535")  # TODO: change this?
             self.ui.start_dec_label.setText("Declination")
-        if self.observation.obs_type in ["Spectrum", "Survey"]:
+        if self.observation.obs_type in [ObsType.SPECTRUM, ObsType.SURVEY]:
             for i in [
                 self.ui.data_acquisition_rate_label,
                 self.ui.data_acquisition_rate_value,
@@ -82,7 +82,7 @@ class ObsDialog(QtWidgets.QDialog):
                 i.hide()
             # all spectra and surveys have data acquisition rates of 6
             self.ui.data_acquisition_rate_value.setValue(6)
-        if self.observation.obs_type == "Spectrum":
+        if self.observation.obs_type is ObsType.SPECTRUM:
             for i in [self.ui.end_label, self.ui.end_time]:
                 i.hide()
             self.ui.end_time.setTime(QtCore.QTime(23, 59, 59))
@@ -109,7 +109,7 @@ class ObsDialog(QtWidgets.QDialog):
                 self.close()
 
                 target_dec = self.observation.min_dec - (
-                    2 if (self.observation.obs_type == "Survey") else 0
+                    2 if (self.observation.obs_type is ObsType.SURVEY) else 0
                 )
 
                 alerts = [
@@ -119,7 +119,9 @@ class ObsDialog(QtWidgets.QDialog):
                     Alert("Is the frequency set to 1319.5MHz?", "Yes"),
                 ]
                 self.parent_window.alert(
-                    *alerts[: (2 if self.observation.obs_type == "Spectrum" else 4)]
+                    *alerts[
+                        : (2 if self.observation.obs_type is ObsType.SPECTRUM else 4)
+                    ]
                 )
         except ValueError as err:
             self.show_error(str(err))
@@ -177,7 +179,7 @@ class ObsDialog(QtWidgets.QDialog):
         start_time = solar + self.clock.sidereal_to_solar(starting_ra - sidereal)
         end_time = (
             (solar + self.clock.sidereal_to_solar(ending_ra - sidereal))
-            if self.observation.obs_type != "Spectrum"
+            if self.observation.obs_type is not ObsType.SPECTRUM
             else start_time + 180
         )
 

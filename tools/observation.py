@@ -8,6 +8,14 @@ from tools.precious import MyPrecious
 from tools.obsrecord import ObsRecord
 
 
+class ObsType(Enum):
+    """Observation type"""
+
+    SCAN = 0
+    SURVEY = 1
+    SPECTRUM = 2
+
+
 # State machine
 class State(Enum):
     NO_STATE = 0  # do not use!
@@ -140,7 +148,9 @@ class Observation:
             elif timestamp < self.end_RA:
                 return self.data_logic(data_point)
             # TODO: I hate this
-            elif self.obs_type == "Survey" and self.data_logic(data_point) not in [
+            elif self.obs_type is ObsType.SURVEY and self.data_logic(
+                data_point
+            ) not in [
                 Comm.SEND_TEL_NORTH,
                 Comm.SEND_TEL_SOUTH,
             ]:
@@ -276,7 +286,7 @@ class Scan(Observation):
 
     def __init__(self):
         super().__init__()
-        self.obs_type = "Scan"
+        self.obs_type = ObsType.SCAN
 
     def set_files(self):
         self.file_a = MyPrecious(self.name + "_a.md1")
@@ -293,7 +303,7 @@ class Survey(Observation):
 
     def __init__(self):
         super().__init__()
-        self.obs_type = "Survey"
+        self.obs_type = ObsType.SURVEY
 
         self.sweeps = 0
 
@@ -327,7 +337,7 @@ class Spectrum(Observation):
 
     def __init__(self):
         super().__init__()
-        self.obs_type = "Spectrum"
+        self.obs_type = ObsType.SPECTRUM
 
         self.cal_dur = 20
         self.bg_dur = 20
