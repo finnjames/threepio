@@ -120,7 +120,7 @@ class ObsDialog(QtWidgets.QDialog):
                 ]
                 self.parent_window.alert(
                     *alerts[
-                        : (2 if self.observation.obs_type is ObsType.SPECTRUM else 4)
+                        : (4 if self.observation.obs_type is ObsType.SPECTRUM else 2)
                     ]
                 )
         except ValueError as err:
