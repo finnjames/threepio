@@ -62,15 +62,22 @@ class SuperClock:
             return f"Timer({self.period}ms, {self.callback})"
 
     def __init__(self):
-        self.starting_time = self.anchor_time = time.time()
+        self.timers = []
+        self.reset_starting_time()
         # number of seconds since last sidereal midnight, assigned when ra is set
         self.starting_sidereal_time = 0
-
-        self.timers = []
 
     @staticmethod
     def get_time() -> float:
         return time.time()
+
+    @staticmethod
+    def solar_to_sidereal(solar_seconds: float) -> float:
+        return solar_seconds * SuperClock.SIDEREAL
+
+    @staticmethod
+    def sidereal_to_solar(sidereal_seconds: float) -> float:
+        return sidereal_seconds / SuperClock.SIDEREAL
 
     def run_timers(self) -> None:
         """run all timers"""
@@ -88,9 +95,15 @@ class SuperClock:
         self.timers.append(new_timer)
         return new_timer
 
+    def get_starting_time(self) -> float:
+        return self.starting_time
+
+    def set_starting_sidereal_time(self, sidereal_time: int) -> None:
+        self.starting_sidereal_time = sidereal_time
+
     def reset_starting_time(self) -> None:
         """set SuperClock starting time and anchor time to current time"""
-        self.starting_time = self.anchor_time = time.time()
+        self.starting_time = self.anchor_time = self.get_time()
         self.reset_timers()
 
     def reset_anchor_time(self) -> None:
@@ -106,19 +119,22 @@ class SuperClock:
         gmtime = self.get_local_time()
         return "{:%Y.%m.%d-%H.%M}".format(datetime.datetime(*gmtime[:5]))
 
-    def get_elapsed_time(self) -> float:
-        return self.get_time() - self.starting_time
-
     def get_time_until(self, destination_time) -> float:
         """Positive means it already happened, negative means it will happen"""
         return self.get_time() - destination_time
 
+    def get_elapsed_time(self) -> float:
+        return self.get_time() - self.starting_time
+
     def get_sidereal_seconds(self) -> float:
-        """get time-stamp-able number of sidereal seconds since last sidereal midnight"""
-        sidereal_seconds = (
-            self.starting_sidereal_time + self.SIDEREAL * self.get_elapsed_time()
+        """get timestamp-able number of sidereal seconds since last sidereal midnight"""
+        return (
+            self.starting_sidereal_time + SuperClock.SIDEREAL * self.get_elapsed_time()
         )
-        return sidereal_seconds
+
+    def get_solar_seconds(self) -> float:
+        """sidereal_to_solar(get_sidereal_seconds())"""
+        return self.sidereal_to_solar(self.get_sidereal_seconds())
 
     def get_formatted_sidereal_time(self) -> str:
         """return a string of formatted local sidereal time"""

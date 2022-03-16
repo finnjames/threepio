@@ -14,3 +14,4 @@ class Comm(Enum):
     SEND_TEL_NORTH = 8
     SEND_TEL_SOUTH = 9
     END_SEND_TEL = 10
+    FINISH_SWEEP = 11

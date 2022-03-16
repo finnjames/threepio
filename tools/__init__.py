@@ -7,3 +7,5 @@ from .superclock import SuperClock
 from .tars import Tars, discovery
 from .logtask import LogTask
 from .minitars import MiniTars
+from .obsrecord import ObsRecord
+from .alert import Alert

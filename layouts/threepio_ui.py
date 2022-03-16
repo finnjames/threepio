@@ -414,7 +414,7 @@ class Ui_MainWindow(object):
         self.gridLayout.addWidget(self.testing_frame, 1, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 24))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 43))
         self.menubar.setObjectName("menubar")
         self.menuCalibration = QtWidgets.QMenu(self.menubar)
         self.menuCalibration.setObjectName("menuCalibration")
@@ -541,4 +541,5 @@ class Ui_MainWindow(object):
         self.actionTesting.setShortcut(_translate("MainWindow", "Ctrl+T"))
         self.actionLegacy.setText(_translate("MainWindow", "Legacy"))
         self.actionGetInfo.setText(_translate("MainWindow", "Get Info..."))
+        self.actionGetInfo.setShortcut(_translate("MainWindow", "Ctrl+I"))
 from PyQt5.QtChart import QChartView

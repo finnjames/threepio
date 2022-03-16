@@ -1,5 +1,4 @@
 from PyQt5 import QtWidgets, QtCore
-
 from layouts import dec_cal_ui  # compiled PyQt dialogue ui
 
 
@@ -17,12 +16,14 @@ class DecDialog(QtWidgets.QDialog):
         QtWidgets.QWidget.__init__(self)
         self.ui = dec_cal_ui.Ui_Dialog()
         self.ui.setupUi(self)
-        self.setModal(False)
         self.setWindowTitle("Calibrate declination")
 
-        # hide the close/minimize/fullscreen buttons
+        # hide the close/minimize/fullscreen buttons and make window always on top
         self.setWindowFlags(
-            QtCore.Qt.Window | QtCore.Qt.WindowTitleHint | QtCore.Qt.CustomizeWindowHint
+            QtCore.Qt.Window
+            | QtCore.Qt.WindowTitleHint
+            | QtCore.Qt.CustomizeWindowHint
+            | QtCore.Qt.WindowStaysOnTopHint
         )
 
         self.data = []
