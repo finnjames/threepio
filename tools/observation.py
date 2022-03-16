@@ -84,6 +84,10 @@ class Observation:
         self.end_RA = end_ra
 
     def set_dec(self, min_dec, max_dec=None):
+        if min_dec is None:
+            raise ValueError("Min dec is not defined")
+        if max_dec is not None and max_dec < min_dec:
+            raise ValueError("Max dec must be greater min dec")
         self.min_dec = min_dec
         self.max_dec = max_dec
 

@@ -6,7 +6,7 @@ from PyQt5 import QtCore
 class InputRecord:
     start_time: QtCore.QTime
     end_time: QtCore.QTime
-    starting_dec: str
-    ending_dec: str
+    min_dec: str
+    max_dec: str
     data_acquisition_rate_value: int
     file_name_value: str

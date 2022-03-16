@@ -43,9 +43,9 @@ class ObsDialog(QtWidgets.QDialog):
 
         # If a scan or spectrum, only one Dec needed
         if self.observation.obs_type in ["Scan", "Spectrum"]:
-            for i in [self.ui.ending_dec, self.ui.end_dec_label]:
+            for i in [self.ui.max_dec, self.ui.end_dec_label]:
                 i.hide()
-            self.ui.ending_dec.setText("0")
+            self.ui.max_dec.setText("65535")
             self.ui.start_dec_label.setText("Declination")
         if self.observation.obs_type in ["Spectrum", "Survey"]:
             for i in [
@@ -66,30 +66,32 @@ class ObsDialog(QtWidgets.QDialog):
     def accept(self):
         if self.info:
             self.close()
-        exit_code = self.set_observation()
-        if self.confirmed and exit_code == 0:  # set observation and close
-            self.parent_window.observation = self.observation
-            self.close()
+        try:
+            self.set_observation()
+            if self.confirmed:  # set observation and close
+                self.parent_window.observation = self.observation
+                self.close()
 
-            target_dec = self.observation.min_dec - (
-                2 if (self.observation.obs_type == "Survey") else 0
-            )
-            self.parent_window.alert(
-                Alert(f"Move the telescope to {target_dec}° declination", "Okay"),
-                Alert(f"Is the telescope at {target_dec}° declination?", "Yes"),
-            )
-            if self.observation.obs_type == "Spectrum":
-                self.parent_window.alert(
-                    Alert("Set frequency to 1319.5MHz", "Okay"),
-                    Alert("Is the frequency set to 1319.5MHz?", "Yes"),
+                target_dec = self.observation.min_dec - (
+                    2 if (self.observation.obs_type == "Survey") else 0
                 )
-        elif exit_code == 0:  # set_observation() executed successfully
-            self.wrap()
-            self.ui.accept_button.setText("Start Observation")
-            self.ui.error_label.hide()
-            self.adjustSize()
-            self.confirmed = True
-        else:
+                self.parent_window.alert(
+                    Alert(f"Move the telescope to {target_dec}° declination", "Okay"),
+                    Alert(f"Is the telescope at {target_dec}° declination?", "Yes"),
+                )
+                if self.observation.obs_type == "Spectrum":
+                    self.parent_window.alert(
+                        Alert("Set frequency to 1319.5MHz", "Okay"),
+                        Alert("Is the frequency set to 1319.5MHz?", "Yes"),
+                    )
+            else:  # set_observation() executed successfully
+                self.wrap()
+                self.ui.accept_button.setText("Start Observation")
+                self.ui.error_label.hide()
+                self.adjustSize()
+                self.confirmed = True
+        except ValueError as err:
+            self.ui.error_label.setText(str(err))
             self.ui.error_label.show()
 
     def get_filename(self):
@@ -100,8 +102,8 @@ class ObsDialog(QtWidgets.QDialog):
     def unwrap(self, record: InputRecord):
         self.ui.start_time.setTime(record.start_time)
         self.ui.end_time.setTime(record.end_time)
-        self.ui.starting_dec.setText(record.starting_dec)
-        self.ui.ending_dec.setText(record.ending_dec)
+        self.ui.min_dec.setText(record.min_dec)
+        self.ui.max_dec.setText(record.max_dec)
         self.ui.data_acquisition_rate_value.setValue(record.data_acquisition_rate_value)
         self.ui.file_name_value.setText(record.file_name_value)
         self.wrap()
@@ -111,8 +113,8 @@ class ObsDialog(QtWidgets.QDialog):
         self.records = InputRecord(
             self.ui.start_time.time(),
             self.ui.end_time.time(),
-            self.ui.starting_dec.text(),
-            self.ui.ending_dec.text(),
+            self.ui.min_dec.text(),
+            self.ui.max_dec.text(),
             self.ui.data_acquisition_rate_value.value(),
             self.get_filename(),
         )
@@ -122,8 +124,8 @@ class ObsDialog(QtWidgets.QDialog):
         for i in [
             self.ui.start_time,
             self.ui.end_time,
-            self.ui.starting_dec,
-            self.ui.ending_dec,
+            self.ui.min_dec,
+            self.ui.max_dec,
             self.ui.file_name_value,
             self.ui.data_acquisition_rate_value,
         ]:
@@ -163,16 +165,15 @@ class ObsDialog(QtWidgets.QDialog):
             filename = self.default_filename
         self.observation.set_name(filename)
 
-        # catch when the user doesn't put in a declination or data frequency
+        # attempt to set data of observation
+        self.observation.set_ra(start_time, end_time)
         try:
-            self.observation.set_ra(start_time, end_time)
-            self.observation.set_dec(
-                int(self.ui.starting_dec.text()), int(self.ui.ending_dec.text())
-            )
-            self.observation.set_data_freq(
-                int(self.ui.data_acquisition_rate_value.text())
-            )
+            new_min_dec = int(self.ui.min_dec.text())
+            new_max_dec = int(self.ui.max_dec.text())
         except ValueError:
-            return 1
+            raise ValueError("Declination must be an integer")
+        self.observation.set_dec(new_min_dec, new_max_dec)
+
+        self.observation.set_data_freq(int(self.ui.data_acquisition_rate_value.text()))
 
         return 0
