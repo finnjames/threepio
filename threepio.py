@@ -1,8 +1,6 @@
-from dataclasses import dataclass
 from enum import Enum
 import time
 from functools import reduce
-from tkinter import W
 from typing import Callable
 
 from PyQt5 import QtChart, QtCore, QtGui, QtWidgets, QtMultimedia
@@ -137,6 +135,7 @@ class Threepio(QtWidgets.QMainWindow):
         # alerts
         self.open_alert = None
         self.alert_thread: set[QtCore.QThread] = set()
+        self.worker = None
 
         # establish observation
         self.observation = None
@@ -238,7 +237,7 @@ class Threepio(QtWidgets.QMainWindow):
                     self.message("Taking calibration data!!!")
 
                 self.alert(
-                    *alerts[(0 if self.stop_tel_alert else 2) :], callback=callback
+                    *alerts[(0 if self.stop_tel_alert else 2):], callback=callback
                 )
                 if self.observation.obs_type is ObsType.SURVEY:
                     self.stop_tel_alert = True  # only alert on second cal

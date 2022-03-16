@@ -1,6 +1,7 @@
 import time
 from enum import Enum
 from math import floor
+from typing import Optional
 
 from tools.comm import Comm
 from tools.datapoint import DataPoint
@@ -77,7 +78,7 @@ class Observation:
         self.file_comp = None
 
         # Record keeping for later display/testing
-        self.input_record: ObsRecord = None
+        self.input_record: Optional[ObsRecord] = None
 
         # Temporary bookkeeping
         self.cal_start = None
@@ -315,7 +316,7 @@ class Survey(Observation):
         self.file_comp = MyPrecious(self.name + "_comp.md2")
 
     def data_logic(self, data_point):
-        if data_point.dec < (self.min_dec) or data_point.dec > (self.max_dec):
+        if data_point.dec < self.min_dec or data_point.dec > self.max_dec:
             if not self.outside:
                 self.write("*")
                 self.sweeps += 1

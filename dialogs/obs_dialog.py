@@ -1,8 +1,8 @@
 """dialogue box for keying in a new observation"""
+from typing import Optional
 
 from PyQt5 import QtWidgets, QtCore
 from layouts import obs_ui  # compiled PyQt dialogue ui
-import time
 from tools.alert import Alert
 from tools.superclock import SuperClock
 
@@ -52,7 +52,7 @@ class ObsDialog(QtWidgets.QDialog):
 
         # just checking data
         self.info = info
-        self.records: ObsRecord = None
+        self.records: Optional[ObsRecord] = None
         if self.info:
             self.unwrap(observation.input_record)
             self.ui.accept_button.setText("Close")

@@ -12,4 +12,3 @@ __pycache__/
 *$py.class
 dist/
 .qt_for_python
-dec-cal*.txt
