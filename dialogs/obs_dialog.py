@@ -3,6 +3,7 @@
 from PyQt5 import QtWidgets, QtCore
 from layouts import obs_ui  # compiled PyQt dialogue ui
 import time
+from tools.alert import Alert
 
 from tools.observation import Observation
 from tools.inputrecord import InputRecord
@@ -74,17 +75,13 @@ class ObsDialog(QtWidgets.QDialog):
                 2 if (self.observation.obs_type == "Survey") else 0
             )
             self.parent_window.alert(
-                f"Move the telescope to {target_dec}° declination",
-                "Okay",
-                f"Is the telescope at {target_dec}° declination?",
-                "Yes",
+                Alert(f"Move the telescope to {target_dec}° declination", "Okay"),
+                Alert(f"Is the telescope at {target_dec}° declination?", "Yes"),
             )
             if self.observation.obs_type == "Spectrum":
                 self.parent_window.alert(
-                    "Set frequency to 1319.5MHz",
-                    "Okay",
-                    "Is the frequency set to 1319.5MHz?",
-                    "Yes",
+                    Alert("Set frequency to 1319.5MHz", "Okay"),
+                    Alert("Is the frequency set to 1319.5MHz?", "Yes"),
                 )
         elif exit_code == 0:  # set_observation() executed successfully
             self.wrap()
