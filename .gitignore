@@ -11,3 +11,5 @@ __pycache__/
 *.py[cod]
 *$py.class
 dist/
+.qt_for_python
+dec-cal*.txt
