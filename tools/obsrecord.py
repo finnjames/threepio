@@ -3,7 +3,7 @@ from PyQt5 import QtCore
 
 
 @dataclass(frozen=True)
-class InputRecord:
+class ObsRecord:
     start_time: QtCore.QTime
     end_time: QtCore.QTime
     min_dec: str

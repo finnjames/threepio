@@ -12,7 +12,7 @@ class RADialog(QtWidgets.QDialog):
 
         # store parent window and superclock
         self.parent_window = parent_window
-        self.superclock = superclock
+        self.clock = superclock
 
         # hide the close/minimize/fullscreen buttons
         self.setWindowFlags(
@@ -22,16 +22,15 @@ class RADialog(QtWidgets.QDialog):
     def accept(self):
         # pattern = "%H:%M:%S"
 
-        self.superclock.reset_starting_time()
-        u_time = self.ui.sidereal_value.text()
-        self.superclock.starting_sidereal_time = (
-            3600 * int(u_time[:2]) + 60 * int(u_time[3:5]) + int(u_time[6:])
+        ut = self.ui.sidereal_value.text()  # user time
+        self.clock.set_starting_sidereal_time(
+            3600 * int(ut[:2]) + 60 * int(ut[3:5]) + int(ut[6:])
         )
+        self.clock.reset_starting_time()
 
         try:
             self.parent_window.clear_stripchart()
         except AttributeError:
-            # when the stripchart hasn't been initialized yet
-            pass
+            pass  # when the stripchart hasn't been initialized yet
 
         self.close()

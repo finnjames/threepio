@@ -7,7 +7,7 @@ from tools.alert import Alert
 from tools.superclock import SuperClock
 
 from tools.observation import Observation
-from tools.inputrecord import InputRecord
+from tools.obsrecord import ObsRecord
 
 
 class ObsDialog(QtWidgets.QDialog):
@@ -52,7 +52,7 @@ class ObsDialog(QtWidgets.QDialog):
 
         # just checking data
         self.info = info
-        self.records: InputRecord = None
+        self.records: ObsRecord = None
         if self.info:
             self.unwrap(observation.input_record)
             self.ui.accept_button.setText("Close")
@@ -96,29 +96,31 @@ class ObsDialog(QtWidgets.QDialog):
             self.close()
         try:
             self.clear_messages()
-            self.set_observation()
-            if self.confirmed:  # set observation and close
+            if not self.confirmed:
+                self.set_observation()
+                # confirm
+                self.wrap()
+                self.ui.accept_button.setText("Start Observation")
+                self.ui.error_label.hide()
+                self.adjustSize()
+                self.confirmed = True
+            else:  # already confirmed -> set observation and close
                 self.parent_window.observation = self.observation
                 self.close()
 
                 target_dec = self.observation.min_dec - (
                     2 if (self.observation.obs_type == "Survey") else 0
                 )
-                self.parent_window.alert(
+
+                alerts = [
                     Alert(f"Move the telescope to {target_dec}° declination", "Okay"),
                     Alert(f"Is the telescope at {target_dec}° declination?", "Yes"),
+                    Alert("Set frequency to 1319.5MHz", "Okay"),
+                    Alert("Is the frequency set to 1319.5MHz?", "Yes"),
+                ]
+                self.parent_window.alert(
+                    *alerts[: (2 if self.observation.obs_type == "Spectrum" else 4)]
                 )
-                if self.observation.obs_type == "Spectrum":
-                    self.parent_window.alert(
-                        Alert("Set frequency to 1319.5MHz", "Okay"),
-                        Alert("Is the frequency set to 1319.5MHz?", "Yes"),
-                    )
-            else:  # confirmation
-                self.wrap()
-                self.ui.accept_button.setText("Start Observation")
-                self.ui.error_label.hide()
-                self.adjustSize()
-                self.confirmed = True
         except ValueError as err:
             self.show_error(str(err))
 
@@ -139,14 +141,16 @@ class ObsDialog(QtWidgets.QDialog):
             return self.default_filename
         return self.ui.file_name_value.text()
 
-    def unwrap(self, record: InputRecord):
+    def unwrap(self, record: ObsRecord):
+        """unwrap the record into the fields"""
         for name, (widget, getter, setter) in self.fields.items():
             setter(getattr(record, name))
         self.wrap()
 
     def wrap(self):
+        """wrap the fields into record"""
         self.set_read_only()
-        self.records = InputRecord(
+        self.records = ObsRecord(
             **{name: getter() for name, (widget, getter, setter) in self.fields.items()}
         )
         self.observation.input_record = self.records
@@ -156,35 +160,28 @@ class ObsDialog(QtWidgets.QDialog):
             i[0].setDisabled(True)
 
     def set_observation(self):
-        """add all necessary info to the encapsulated observation; 1: error"""
+        """attempt to add all necessary info to the encapsulated observation"""
 
-        # pattern = "%H:%M:%S"
-        u_start_time = self.ui.start_time.text()
-        starting_sidereal_time = (
-            3600 * int(u_start_time[:2])
-            + 60 * int(u_start_time[3:5])
-            + int(u_start_time[6:])
-        )
-        u_end_time = self.ui.end_time.text()
-        ending_sidereal_time = (
-            3600 * int(u_end_time[:2]) + 60 * int(u_end_time[3:5]) + int(u_end_time[6:])
-        )
-        if ending_sidereal_time < starting_sidereal_time:
-            ending_sidereal_time += 3600 * 24
+        # parse times; pattern = "%H:%M:%S"
+        ust = self.ui.start_time.text()  # user start time
+        starting_ra = 3600 * int(ust[:2]) + 60 * int(ust[3:5]) + int(ust[6:])
+        uet = self.ui.end_time.text()  # user end time
+        ending_ra = 3600 * int(uet[:2]) + 60 * int(uet[3:5]) + int(uet[6:])
+        if ending_ra < starting_ra:
+            ending_ra += 3600 * 24
             self.show_warning("Assuming ending RA is the next day")
 
-        start_time = (
-            starting_sidereal_time - self.clock.get_sidereal_seconds() + time.time()
-        )
+        # calculate start and end times
+        solar = self.clock.get_time()  # current solar time
+        sidereal = self.clock.get_sidereal_seconds()  # current sidereal seconds
+        start_time = solar + self.clock.sidereal_to_solar(starting_ra - sidereal)
         end_time = (
-            (ending_sidereal_time - self.clock.get_sidereal_seconds() + time.time())
+            (solar + self.clock.sidereal_to_solar(ending_ra - sidereal))
             if self.observation.obs_type != "Spectrum"
             else start_time + 180
         )
 
-        # final check and write to observation
-
-        # if no filename, use default (timestamp)
+        # if no filename, use default
         filename = self.ui.file_name_value.text()
         if filename == "":
             filename = self.default_filename
@@ -196,7 +193,7 @@ class ObsDialog(QtWidgets.QDialog):
             new_min_dec = int(self.ui.min_dec.text())
             new_max_dec = int(self.ui.max_dec.text())
         except ValueError:
-            raise ValueError("Declination must be an integer")
+            raise ValueError("Dec vals must be integers")
         self.observation.set_dec(new_min_dec, new_max_dec)
 
         self.observation.set_data_freq(int(self.ui.data_acquisition_rate_value.text()))
