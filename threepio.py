@@ -37,22 +37,6 @@ class Threepio(QtWidgets.QMainWindow):
     BASE_PERIOD = 10  # ms = 100Hz
     GUI_UPDATE_PERIOD = 1000  # ms = 1Hz
     STRIPCHART_PERIOD = 16.7  # ms = 60Hz
-    # how many data points to draw to stripchart
-    stripchart_display_seconds = 8
-    should_clear_stripchart = False
-
-    # test data
-    ticker = 0
-    other_ticker = 0
-    foo = 0.0
-
-    # stripchart
-    stripchart_low = -1
-    stripchart_high = 1
-
-    # declination calibration lists
-    x = list[float]
-    y = list[float]
 
     # palette
     BLUE = 0x2196F3
@@ -91,6 +75,8 @@ class Threepio(QtWidgets.QMainWindow):
         self.set_time()
 
         # initialize stripchart
+        self.stripchart_display_seconds = 8
+        self.should_clear_stripchart = False
         stripchart_log_task = self.log("Initializing stripchart...")
         self.stripchart_series_a = QtChart.QLineSeries()
         self.stripchart_series_b = QtChart.QLineSeries()
