@@ -70,7 +70,7 @@ class Observation:
         self.start_time = None
         self.end_time = None
 
-        self.sweeps = -1
+        self.sweep_number = -1
 
         # File interface
         self.file_a = None
@@ -306,7 +306,7 @@ class Survey(Observation):
         super().__init__()
         self.obs_type = ObsType.SURVEY
 
-        self.sweeps = 0
+        self.sweep_number = 1
 
         self.outside = True
 
@@ -319,7 +319,6 @@ class Survey(Observation):
         if data_point.dec < self.min_dec or data_point.dec > self.max_dec:
             if not self.outside:
                 self.write("*")
-                self.sweeps += 1
             self.outside = True
             if data_point.dec < self.min_dec:
                 return Comm.SEND_TEL_NORTH
@@ -328,6 +327,7 @@ class Survey(Observation):
         else:
             if self.outside:
                 self.outside = False
+                self.sweep_number += 1
                 return Comm.END_SEND_TEL
             self.write_data(data_point)
             return Comm.NO_ACTION
