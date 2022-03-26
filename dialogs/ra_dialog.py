@@ -5,7 +5,7 @@ from layouts import ra_cal_ui  # compiled PyQt dialogue ui
 class RADialog(QtWidgets.QDialog):
     """New observation dialogue window"""
 
-    def __init__(self, parent_window, superclock):
+    def __init__(self, parent_window, superclock, cancelable: bool):
         QtWidgets.QWidget.__init__(self)
         self.ui = ra_cal_ui.Ui_Dialog()
         self.ui.setupUi(self)
@@ -18,6 +18,9 @@ class RADialog(QtWidgets.QDialog):
         self.setWindowFlags(
             QtCore.Qt.Window | QtCore.Qt.WindowTitleHint | QtCore.Qt.CustomizeWindowHint
         )
+
+        if not cancelable:
+            self.ui.cancel_button.hide()
 
     def accept(self):
         # pattern = "%H:%M:%S"

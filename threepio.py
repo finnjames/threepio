@@ -70,7 +70,7 @@ class Threepio(QtWidgets.QMainWindow):
 
         # clock
         self.clock = SuperClock()
-        self.set_time()
+        self.set_time(cancelable=False)  # make this happen after window appears?
 
         # initialize stripchart
         self.stripchart_display_seconds = 8
@@ -237,7 +237,7 @@ class Threepio(QtWidgets.QMainWindow):
                     self.message("Taking calibration data!!!")
 
                 self.alert(
-                    *alerts[(0 if self.stop_tel_alert else 2):], callback=callback
+                    *alerts[(0 if self.stop_tel_alert else 2) :], callback=callback
                 )
                 if self.observation.obs_type is ObsType.SURVEY:
                     self.stop_tel_alert = True  # only alert on second cal
@@ -344,8 +344,8 @@ class Threepio(QtWidgets.QMainWindow):
         dialog = CreditsDialog()
         dialog.exec_()
 
-    def set_time(self):
-        dialog = RADialog(self, self.clock)
+    def set_time(self, cancelable=True):
+        dialog = RADialog(self, self.clock, cancelable=cancelable)
         dialog.show()
         dialog.exec_()
 
