@@ -1,3 +1,4 @@
+import time
 from PyQt5 import QtWidgets, QtCore
 from layouts import ra_cal_ui  # compiled PyQt dialogue ui
 
@@ -23,13 +24,8 @@ class RADialog(QtWidgets.QDialog):
             self.ui.cancel_button.hide()
 
     def accept(self):
-        # pattern = "%H:%M:%S"
 
-        ut = self.ui.sidereal_value.text()  # user time
-        self.clock.set_starting_sidereal_time(
-            3600 * int(ut[:2]) + 60 * int(ut[3:5]) + int(ut[6:])
-        )
-        self.clock.reset_starting_time()
+        self.set_clock(self.clock, self.ui.sidereal_value.text())
 
         try:
             self.parent_window.clear_stripchart()
@@ -37,3 +33,17 @@ class RADialog(QtWidgets.QDialog):
             pass  # when the stripchart hasn't been initialized yet
 
         self.close()
+
+    @staticmethod
+    def set_clock(superclock, input: str, epoch=None):
+        if epoch is None:
+            epoch = time.time()
+
+        # pattern = "%H:%M:%S"
+        superclock.set_starting_sidereal_time(
+            3600 * int(input[:2]) + 60 * int(input[3:5]) + int(input[6:])
+        )
+        superclock.set_starting_time(epoch)
+
+        with open("ra-cal.txt", "w") as f:
+            f.write(input + "\n" + str(epoch))

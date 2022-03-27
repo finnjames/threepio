@@ -70,7 +70,10 @@ class Threepio(QtWidgets.QMainWindow):
 
         # clock
         self.clock = SuperClock()
-        self.set_time(cancelable=False)  # make this happen after window appears?
+        with open("ra-cal.txt", "r") as f:  # get data from file
+            i = f.readline().strip()
+            e = float(f.readline())
+            RADialog.set_clock(self.clock, i, e)
 
         # initialize stripchart
         self.stripchart_display_seconds = 8
@@ -344,11 +347,6 @@ class Threepio(QtWidgets.QMainWindow):
         dialog = CreditsDialog()
         dialog.exec_()
 
-    def set_time(self, cancelable=True):
-        dialog = RADialog(self, self.clock, cancelable=cancelable)
-        dialog.show()
-        dialog.exec_()
-
     def update_stripchart_speed(self):
         self.stripchart_display_seconds = 120 - (
             (110 / 6) * self.ui.stripchart_speed_slider.value()
@@ -542,8 +540,10 @@ class Threepio(QtWidgets.QMainWindow):
 
         self.dec_calc.load_dec_cal()
 
-    def ra_calibration(self):
-        self.set_time()
+    def ra_calibration(self, cancelable=True):
+        dialog = RADialog(self, self.clock, cancelable=cancelable)
+        dialog.show()
+        dialog.exec_()
 
     def message(self, message, beep=True, log=True):
         if log:
@@ -605,7 +605,6 @@ class Threepio(QtWidgets.QMainWindow):
         def run(self, *alerts, callback: Callable[[], None]):
             for alert in alerts:
                 self.threepio.alert_aux(alert.text, alert.button)
-            print("callback")
             callback()
             self.finished.emit()
 

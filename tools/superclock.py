@@ -65,7 +65,7 @@ class SuperClock:
         self.timers = []
         self.starting_time = None
         self.anchor_time = None
-        self.reset_starting_time()
+        self.set_starting_time(time.time())
         # number of seconds since last sidereal midnight, assigned when ra is set
         self.starting_sidereal_time = 0
 
@@ -103,9 +103,11 @@ class SuperClock:
     def set_starting_sidereal_time(self, sidereal_time: int) -> None:
         self.starting_sidereal_time = sidereal_time
 
-    def reset_starting_time(self) -> None:
-        """set SuperClock starting time and anchor time to current time"""
-        self.starting_time = self.anchor_time = self.get_time()
+    def set_starting_time(self, epoch_time) -> None:
+        """set starting time and anchor time to specified time"""
+        if epoch_time is None:
+            epoch_time = time.time()
+        self.starting_time = self.anchor_time = epoch_time
         self.reset_timers()
 
     def reset_anchor_time(self) -> None:

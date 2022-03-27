@@ -99,8 +99,7 @@ class DecDialog(QtWidgets.QDialog):
 
                 open(self.CAL_FILENAME, "w").close()  # overwrite file
                 with open(self.CAL_FILENAME, "a") as f:
-                    # reverse it if it's N -> S
-                    self.STEP < 0 and self.data.reverse()
+                    self.STEP < 0 and self.data.reverse()  # reverse if N -> S
 
                     f.write("\n".join(str(line) for line in self.data))
 
