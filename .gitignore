@@ -4,7 +4,6 @@
 .nova
 venv/
 data/*
-dec-cal*.txt
 !data/.git-placeholder.txt
 .python-version
 __pycache__/
@@ -12,3 +11,4 @@ __pycache__/
 *$py.class
 dist/
 .qt_for_python
+# dec-cal*.txt
