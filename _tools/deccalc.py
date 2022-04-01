@@ -1,7 +1,9 @@
-from dialogs import DecDialog
-
-
 class DecCalc:
+
+    SOUTH_DEC = -25
+    NORTH_DEC = 95
+    STEP = 10
+
     def __init__(self):
         self.fx: list[self.XY] = []
 
@@ -18,20 +20,23 @@ class DecCalc:
         def __str__(self) -> str:
             return str(f"{self.x:0.2f} {self.y:0.2f}")
 
+    @staticmethod
+    def get_dec_list() -> list[float]:
+        r = []
+        i = DecCalc.SOUTH_DEC
+        while i <= DecCalc.NORTH_DEC:
+            r.append(i)
+            i += DecCalc.STEP
+        return r
+
     def load_dec_cal(self):
         """read the dec calibration from file and store it in memory"""
         with open("dec-cal.txt", "r") as f:  # get data from file
             x_lines = f.readlines()
-
-            y_decs = []
-            i = DecDialog.SOUTH_DEC
-            while i <= DecDialog.NORTH_DEC:
-                y_decs.append(i)
-                i += DecDialog.STEP
-            # range(DecDialog.SOUTH_DEC, DecDialog.NORTH_DEC, DecDialog.STEP)
+            y_decs = self.get_dec_list()
 
             self.fx = [self.XY(x.strip(), y) for x, y in zip(x_lines, y_decs)]
-            print([str(d) for d in self.fx])
+            # print([str(d) for d in self.fx])
 
     def calculate_declination(self, input_dec: float) -> float:
         """calculate the true dec from declinometer input and calibration data"""
