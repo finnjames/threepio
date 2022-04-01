@@ -3,11 +3,7 @@ from typing import Optional
 
 from PyQt5 import QtWidgets, QtCore
 from layouts import obs_ui  # compiled PyQt dialogue ui
-from tools.alert import Alert
-from tools.superclock import SuperClock
-
-from tools.observation import ObsType, Observation
-from tools.obsrecord import ObsRecord
+from tools import Alert, SuperClock, ObsType, Observation, ObsRecord
 
 
 class ObsDialog(QtWidgets.QDialog):

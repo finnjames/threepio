@@ -3,10 +3,7 @@ from enum import Enum
 from math import floor
 from typing import Optional
 
-from tools.comm import Comm
-from tools.datapoint import DataPoint
-from tools.precious import MyPrecious
-from tools.obsrecord import ObsRecord
+from tools import Comm, DataPoint, MyPrecious, ObsRecord
 
 
 class ObsType(Enum):

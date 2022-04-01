@@ -21,8 +21,7 @@ from tools import (
     Observation,
     Alert,
 )
-from tools.deccalc import DecCalc
-from tools.observation import ObsType
+from tools import DecCalc, ObsType
 
 
 class Threepio(QtWidgets.QMainWindow):
