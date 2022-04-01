@@ -3,47 +3,56 @@ from dialogs import DecDialog
 
 class DecCalc:
     def __init__(self):
-        self.y = []
-        self.x = []
+        self.fx: list[self.XY] = []
+
+    class XY:
+        """x and y value pair"""
+
+        def __init__(self, x, y):
+            try:
+                self.x = float(x)
+                self.y = float(y)
+            except ValueError:
+                raise ValueError("values must be numbers")
+
+        def __str__(self) -> str:
+            return str(f"{self.x:0.2f} {self.y:0.2f}")
 
     def load_dec_cal(self):
         """read the dec calibration from file and store it in memory"""
-        # create y array
-        self.y = []
-        i = DecDialog.SOUTH_DEC
-        while i <= DecDialog.NORTH_DEC:
-            self.y.append(float(i))
-            i += abs(DecDialog.STEP)
-
-        # create x array
-        self.x = []
         with open("dec-cal.txt", "r") as f:  # get data from file
-            c = f.read().splitlines()
-            for i in c:
-                self.x.append(float(i))
+            x_lines = f.readlines()
 
-    def calculate_declination(self, input_dec: float):
+            y_decs = []
+            i = DecDialog.SOUTH_DEC
+            while i <= DecDialog.NORTH_DEC:
+                y_decs.append(i)
+                i += DecDialog.STEP
+            # range(DecDialog.SOUTH_DEC, DecDialog.NORTH_DEC, DecDialog.STEP)
+
+            self.fx = [self.XY(x.strip(), y) for x, y in zip(x_lines, y_decs)]
+            print([str(d) for d in self.fx])
+
+    def calculate_declination(self, input_dec: float) -> float:
         """calculate the true dec from declinometer input and calibration data"""
 
-        if input_dec < self.x[0]:  # input is below data
+        fx = self.fx
+
+        if input_dec < fx[0].x:  # input is below data
             return (
-                (self.y[1] - self.y[0])
-                / (self.x[1] - self.x[0])
-                * (input_dec - self.x[0])
-            ) + self.y[0]
-        elif input_dec > self.x[-1]:  # input is above data
+                (fx[1].y - fx[0].y) / (fx[1].x - fx[0].x) * (input_dec - fx[0].x)
+            ) + fx[0].y
+        elif input_dec > fx[-1].x:  # input is above data
             return (
-                (self.y[-1] - self.y[-2])
-                / (self.x[-1] - self.x[-2])
-                * (input_dec - self.x[-1])
-            ) + self.y[-1]
+                (fx[-1].y - fx[-2].y) / (fx[-1].x - fx[-2].x) * (input_dec - fx[-1].x)
+            ) + fx[-1].y
         else:  # input is within data
-            for i in range(len(self.x)):
-                if input_dec <= self.x[i + 1]:
-                    if input_dec >= self.x[i]:
+            for i, _ in enumerate(self.fx):
+                if input_dec <= fx[i + 1].x:
+                    if input_dec >= fx[i].x:
                         # (dy/dx)x + y_0
                         return (
-                            (self.y[i + 1] - self.y[i])
-                            / (self.x[i + 1] - self.x[i])
-                            * (input_dec - self.x[i])
-                        ) + self.y[i]
+                            (fx[i + 1].y - fx[i].y)
+                            / (fx[i + 1].x - fx[i].x)
+                            * (input_dec - fx[i].x)
+                        ) + fx[i].y
