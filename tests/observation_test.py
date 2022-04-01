@@ -1,7 +1,6 @@
 import time
 
-from tools.observation import Scan, Survey, Spectrum
-from tools.datapoint import DataPoint
+from tools import Scan, Survey, Spectrum, DataPoint
 
 
 def test1():

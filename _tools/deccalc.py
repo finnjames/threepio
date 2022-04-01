@@ -1,4 +1,4 @@
-from dialogs.dec_dialog import DecDialog
+from dialogs import DecDialog
 
 
 class DecCalc:

@@ -20,8 +20,9 @@ from tools import (
     LogTask,
     Observation,
     Alert,
+    DecCalc,
+    ObsType,
 )
-from tools import DecCalc, ObsType
 
 
 class Threepio(QtWidgets.QMainWindow):
