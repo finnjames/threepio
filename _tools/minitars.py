@@ -32,6 +32,8 @@ class MiniTars:
         if device is not None:
             self.testing = False
             self.ser = MySerial(device)
+        else:
+            self.parent.log("Declinometer not found, simulating data")
 
     def start(self):
         if not self.testing:

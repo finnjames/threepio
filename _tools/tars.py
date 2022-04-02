@@ -60,6 +60,7 @@ class Tars:
             self.setup()
         else:
             self.testing = True
+            self.parent.log("DataQ not found, simulating data")
 
     def start(self):
         if not self.testing:
