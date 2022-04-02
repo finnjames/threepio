@@ -124,10 +124,10 @@ class Threepio(QtWidgets.QMainWindow):
 
         # bleeps and bloops
         stripchart_log_task = self.log("Initializing audio...")
-        self.click_sound = QtMultimedia.QSoundEffect()
+        self.beep_sound = QtMultimedia.QSoundEffect()
         url = QtCore.QUrl()
-        self.click_sound.setSource(url.fromLocalFile("assets/beep3.wav"))
-        self.click_sound.setVolume(0.5)
+        self.beep_sound.setSource(url.fromLocalFile("assets/beep3.wav"))
+        self.beep_sound.setVolume(0.5)
         # self.click_sound.play()
         self.last_beep_time = 0.0
         self.tobeepornottobeep = False
@@ -315,7 +315,7 @@ class Threepio(QtWidgets.QMainWindow):
             "background-color:#00ff00; color:#ff0000" if self.legacy_mode else ""
         )
         url = QtCore.QUrl()
-        self.click_sound.setSource(
+        self.beep_sound.setSource(
             url.fromLocalFile(
                 f"assets/beep{'-legacy' if self.legacy_mode else '3'}.wav"
             )
@@ -629,7 +629,7 @@ class Threepio(QtWidgets.QMainWindow):
     # noinspection PyUnusedLocal
     def beep(self, message=""):
         """message is for debugging"""
-        self.click_sound.play()
+        self.beep_sound.play()
         self.last_beep_time = time.time()
         # print("beep!", message, time.time())
 
