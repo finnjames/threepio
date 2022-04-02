@@ -140,10 +140,15 @@ class SuperClock:
         """sidereal_to_solar(get_sidereal_seconds())"""
         return self.sidereal_to_solar(self.get_sidereal_seconds())
 
-    def get_formatted_sidereal_time(self) -> str:
-        """return a string of formatted local sidereal time"""
+    def get_sidereal_tuple(self) -> tuple:
+        """return a tuple of local sidereal time"""
         current_sidereal_time = self.get_sidereal_seconds()
         minutes, seconds = divmod(current_sidereal_time, 60)
         hours, minutes = divmod(minutes, 60)
         hours = hours % 24
+        return hours, minutes, seconds
+
+    def get_formatted_sidereal_time(self) -> str:
+        """return a string of formatted local sidereal time"""
+        hours, minutes, seconds = self.get_sidereal_tuple()
         return f"{hours:02.0f}:{minutes:02.0f}:{seconds:02.0f}"

@@ -61,6 +61,10 @@ class ObsDialog(QtWidgets.QDialog):
         self.default_filename = self.clock.get_time_slug()
         self.ui.file_name_value.setPlaceholderText(str(self.default_filename))
 
+        # set default ra
+        for i in [self.ui.start_time, self.ui.end_time]:
+            i.setTime(QtCore.QTime(*self.clock.get_sidereal_tuple()))
+
         # hide error and warning labels to start
         self.clear_messages()
 
