@@ -143,7 +143,7 @@ class Threepio(QtWidgets.QMainWindow):
         # establish observation
         self.observation = None
         self.observation_state = False
-        self.stop_tel_alert = False
+        self.completed_one_calibration = False
 
         # establish data array & most recent dec
         self.data = []
@@ -228,22 +228,28 @@ class Threepio(QtWidgets.QMainWindow):
         if transmission != self.previous_transmission:  # TODO: should these be special?
             if transmission is Comm.START_CAL:
                 alerts = [
-                    Alert("STOP the telescope", "Okay"),
-                    Alert("Has the telescope been stopped?", "Yes"),
                     Alert("Turn the calibration switches ON", "Okay"),
                     Alert("Are the calibration switches ON?", "Yes"),
                 ]
+                if self.completed_one_calibration:
+                    if self.observation.obs_type is ObsType.SURVEY:
+                        alerts = [
+                            Alert("STOP the telescope", "Okay"),
+                            Alert("Has the telescope been stopped?", "Yes"),
+                        ] + alerts
+                    elif self.observation.obs_type is ObsType.SPECTRUM:
+                        alerts = [
+                            Alert("Set frequency to 1319.5MHz", "Okay"),
+                            Alert("Is the frequency set to 1319.5MHz?", "Yes"),
+                        ] + alerts
 
                 def callback():
                     self.clock.reset_anchor_time()
                     self.observation.next()
                     self.message("Taking calibration data!!!")
 
-                self.alert(
-                    *alerts[(0 if self.stop_tel_alert else 2) :], callback=callback
-                )
-                if self.observation.obs_type is ObsType.SURVEY:
-                    self.stop_tel_alert = True  # only alert on second cal
+                self.alert(*alerts, callback=callback)
+                self.completed_one_calibration = True  # only alert on second cal
 
             elif transmission is Comm.START_BG:
 
@@ -523,7 +529,7 @@ class Threepio(QtWidgets.QMainWindow):
         dialog = ObsDialog(self, obs, self.clock)
         dialog.setWindowTitle("New " + obs.obs_type.name.capitalize())
         dialog.exec_()
-        self.stop_tel_alert = False
+        self.completed_one_calibration = False
 
     def handle_get_info(self):
         if self.observation is not None:

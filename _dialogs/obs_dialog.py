@@ -9,7 +9,13 @@ from tools import Alert, SuperClock, ObsType, Observation, ObsRecord
 class ObsDialog(QtWidgets.QDialog):
     """New observation dialogue window"""
 
-    def __init__(self, parent_window, observation: Observation, clock, info=False):
+    def __init__(
+        self,
+        parent_window,
+        observation: Observation,
+        clock: SuperClock,
+        info=False,
+    ):
         QtWidgets.QWidget.__init__(self)
         self.ui = obs_ui.Ui_Dialog()
         self.ui.setupUi(self)
