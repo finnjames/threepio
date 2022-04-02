@@ -1,26 +1,27 @@
-from PyQt5 import QtWidgets, QtCore
+from PyQt5.QtWidgets import QDialog, QWidget
+from PyQt5.QtCore import Qt
 from layouts import dec_cal_ui  # compiled PyQt dialogue ui
 from tools import DecCalc as DC
 
 
-class DecDialog(QtWidgets.QDialog):
+class DecDialog(QDialog):
     """New observation dialogue window"""
 
     CAL_FILENAME = "dec-cal.txt"
     CAL_BACKUP_FILENAME = "dec-cal-backup.txt"
 
     def __init__(self, minitars, parent):
-        QtWidgets.QWidget.__init__(self)
+        QWidget.__init__(self)
         self.ui = dec_cal_ui.Ui_Dialog()
         self.ui.setupUi(self)
         self.setWindowTitle("Calibrate declination")
 
         # hide the close/minimize/fullscreen buttons and make window always on top
         self.setWindowFlags(
-            QtCore.Qt.Window
-            | QtCore.Qt.WindowTitleHint
-            | QtCore.Qt.CustomizeWindowHint
-            | QtCore.Qt.WindowStaysOnTopHint
+            Qt.Window
+            | Qt.WindowTitleHint
+            | Qt.CustomizeWindowHint
+            | Qt.WindowStaysOnTopHint
         )
 
         self.data = []

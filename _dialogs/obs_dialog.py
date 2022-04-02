@@ -1,12 +1,13 @@
 """dialogue box for keying in a new observation"""
 from typing import Optional
 
-from PyQt5 import QtWidgets, QtCore
+from PyQt5.QtWidgets import QDialog, QWidget
+from PyQt5.QtCore import Qt, QTime
 from layouts import obs_ui  # compiled PyQt dialogue ui
 from tools import Alert, SuperClock, ObsType, Observation, ObsRecord
 
 
-class ObsDialog(QtWidgets.QDialog):
+class ObsDialog(QDialog):
     """New observation dialogue window"""
 
     def __init__(
@@ -16,12 +17,10 @@ class ObsDialog(QtWidgets.QDialog):
         clock: SuperClock,
         info=False,
     ):
-        QtWidgets.QWidget.__init__(self)
+        QWidget.__init__(self)
         self.ui = obs_ui.Ui_Dialog()
         self.ui.setupUi(self)
-        self.setWindowFlags(
-            QtCore.Qt.Window | QtCore.Qt.WindowTitleHint | QtCore.Qt.CustomizeWindowHint
-        )
+        self.setWindowFlags(Qt.Window | Qt.WindowTitleHint | Qt.CustomizeWindowHint)
 
         self.observation = observation
         self.clock: SuperClock = clock
@@ -69,7 +68,7 @@ class ObsDialog(QtWidgets.QDialog):
 
         # set default ra
         for i in [self.ui.start_time, self.ui.end_time]:
-            i.setTime(QtCore.QTime(*self.clock.get_sidereal_tuple()))
+            i.setTime(QTime(*self.clock.get_sidereal_tuple()))
 
         # hide error and warning labels to start
         self.clear_messages()
@@ -91,7 +90,7 @@ class ObsDialog(QtWidgets.QDialog):
         if self.observation.obs_type is ObsType.SPECTRUM:
             for i in [self.ui.end_label, self.ui.end_time]:
                 i.hide()
-            self.ui.end_time.setTime(QtCore.QTime(23, 59, 59))
+            self.ui.end_time.setTime(QTime(23, 59, 59))
         self.adjustSize()
 
         # store parent window
