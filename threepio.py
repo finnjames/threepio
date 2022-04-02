@@ -79,17 +79,13 @@ class Threepio(QtWidgets.QMainWindow):
         # initialize stripchart
         self.stripchart_display_seconds = 8
         self.should_clear_stripchart = False
+        self.channel_visibility = (True, True)
         stripchart_log_task = self.log("Initializing stripchart...")
         self.stripchart_series_a = QtChart.QLineSeries()
         self.stripchart_series_b = QtChart.QLineSeries()
         self.axis_y = QtChart.QValueAxis()
         self.chart = QtChart.QChart()
         self.ui.stripchart.setRenderHint(QtGui.QPainter.Antialiasing)
-        pen = QtGui.QPen(QtGui.QColor(self.BLUE))
-        pen.setWidth(1)
-        self.stripchart_series_a.setPen(pen)
-        pen.setColor(QtGui.QColor(self.RED))
-        self.stripchart_series_b.setPen(pen)
         self.initialize_stripchart()  # should this include more of the above?
         stripchart_log_task.set_status(0)
 
@@ -115,6 +111,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.ui.actionTesting.triggered.connect(self.set_state_testing)
         self.ui.actionLegacy.triggered.connect(self.toggle_state_legacy)
 
+        self.ui.toggle_channel_button.clicked.connect(self.toggle_channels)
         self.ui.chart_clear_button.clicked.connect(self.clear_stripchart)
         stripchart_log_task.set_status(0)
 
@@ -489,11 +486,25 @@ class Threepio(QtWidgets.QMainWindow):
                     i.removePoints(0, 2)
             self.should_clear_stripchart = False
 
-            # These lines are required to prevent a Qt error
+            # these lines are required to prevent a Qt error
             self.chart.removeSeries(self.stripchart_series_b)
             self.chart.removeSeries(self.stripchart_series_a)
             self.chart.addSeries(self.stripchart_series_b)
             self.chart.addSeries(self.stripchart_series_a)
+
+            # check for visibility
+
+            if self.channel_visibility[0]:
+                pen = QtGui.QPen(QtGui.QColor(self.BLUE))
+            else:
+                pen = QtGui.QPen(QtGui.QColor(0, 0, 0, 0))
+            self.stripchart_series_a.setPen(pen)
+
+            if self.channel_visibility[1]:
+                pen = QtGui.QPen(QtGui.QColor(self.RED))
+            else:
+                pen = QtGui.QPen(QtGui.QColor(0, 0, 0, 0))
+            self.stripchart_series_b.setPen(pen)
 
             axis_y = QtChart.QValueAxis()
             axis_y.setMin(oldest_y)
@@ -503,8 +514,13 @@ class Threepio(QtWidgets.QMainWindow):
             self.chart.setAxisY(axis_y)
             self.stripchart_series_a.attachAxis(axis_y)
             self.stripchart_series_b.attachAxis(axis_y)
+
         except IndexError:  # no data yet
             pass
+
+    def toggle_channels(self):
+        a, b = self.channel_visibility
+        self.channel_visibility = (b, a != b)
 
     def clear_stripchart(self):
         self.should_clear_stripchart = True
