@@ -73,7 +73,7 @@ class Threepio(QtWidgets.QMainWindow):
         with open("ra-cal.txt", "r") as f:  # get data from file
             i = f.readline().strip()
             e = float(f.readline())
-            RADialog.set_clock(self.clock, i, e)
+            self.clock.calibrate(i, e)
 
         # initialize stripchart
         self.stripchart_display_seconds = 8
@@ -541,13 +541,13 @@ class Threepio(QtWidgets.QMainWindow):
     def dec_calibration(self):
         dialog = DecDialog(self.minitars, self)
         if self.mode is Threepio.Mode.TESTING:
-            dialog.show()
+            dialog.show()  # TODO: why does this work?
         dialog.exec_()
 
         self.dec_calc.load_dec_cal()
 
-    def ra_calibration(self, cancelable=True):
-        dialog = RADialog(self, self.clock, cancelable=cancelable)
+    def ra_calibration(self):
+        dialog = RADialog(self, self.clock)
         dialog.show()
         dialog.exec_()
 

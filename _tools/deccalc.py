@@ -5,7 +5,7 @@ class DecCalc:
     STEP = 10
 
     def __init__(self):
-        self.fx: list[self.XY] = []
+        self.fx: list[DecCalc.XY] = []
 
     class XY:
         """x and y value pair"""

@@ -69,6 +69,19 @@ class SuperClock:
         # number of seconds since last sidereal midnight, assigned when ra is set
         self.starting_sidereal_time = 0
 
+    def calibrate(self, input_time: str, epoch_time=None):
+        if epoch_time is None:
+            epoch_time = time.time()
+
+        # pattern = "%H:%M:%S"
+        self.set_starting_sidereal_time(
+            3600 * int(input_time[:2]) + 60 * int(input_time[3:5]) + int(input_time[6:])
+        )
+        self.set_starting_time(epoch_time)
+
+        with open("ra-cal.txt", "w") as f:
+            f.write(input_time + "\n" + str(epoch_time))
+
     @staticmethod
     def get_time() -> float:
         return time.time()
