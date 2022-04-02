@@ -171,7 +171,7 @@ class ObsDialog(QDialog):
     def set_observation(self):
         """attempt to add all necessary info to the encapsulated observation"""
 
-        # parse times; pattern = "%H:%M:%S"
+        # parse times; pattern = "HH:MM:SS"
         ust = self.ui.start_time.text()  # user start time
         starting_ra = 3600 * int(ust[:2]) + 60 * int(ust[3:5]) + int(ust[6:])
         uet = self.ui.end_time.text()  # user end time
