@@ -13,7 +13,7 @@ class ObsDialog(QDialog):
     def __init__(
         self,
         parent_window,
-        observation: Observation,
+        obs: Observation,
         clock: SuperClock,
         info=False,
     ):
@@ -22,7 +22,7 @@ class ObsDialog(QDialog):
         self.ui.setupUi(self)
         self.setWindowFlags(Qt.Window | Qt.WindowTitleHint | Qt.CustomizeWindowHint)
 
-        self.observation = observation
+        self.obs = obs
         self.clock: SuperClock = clock
 
         # dictionary of fields and their get/set functions
@@ -55,7 +55,7 @@ class ObsDialog(QDialog):
         self.info = info
         self.records: Optional[ObsRecord] = None
         if self.info:
-            self.unwrap(observation.input_record)
+            self.unwrap(obs.input_record)
             self.ui.accept_button.setText("Close")
             self.ui.cancel_button.hide()
             # TODO: show info about the observation
@@ -74,12 +74,12 @@ class ObsDialog(QDialog):
         self.clear_messages()
 
         # If a scan or spectrum, only one dec needed
-        if self.observation.obs_type in [ObsType.SCAN, ObsType.SPECTRUM]:
+        if self.obs.obs_type in [ObsType.SCAN, ObsType.SPECTRUM]:
             for i in [self.ui.max_dec, self.ui.end_dec_label]:
                 i.hide()
             self.ui.max_dec.setText("65535")  # TODO: change this?
             self.ui.start_dec_label.setText("Declination")
-        if self.observation.obs_type in [ObsType.SPECTRUM, ObsType.SURVEY]:
+        if self.obs.obs_type in [ObsType.SPECTRUM, ObsType.SURVEY]:
             for i in [
                 self.ui.data_acquisition_rate_label,
                 self.ui.data_acquisition_rate_value,
@@ -87,7 +87,7 @@ class ObsDialog(QDialog):
                 i.hide()
             # all spectra and surveys have data acquisition rates of 6
             self.ui.data_acquisition_rate_value.setValue(6)
-        if self.observation.obs_type is ObsType.SPECTRUM:
+        if self.obs.obs_type is ObsType.SPECTRUM:
             for i in [self.ui.end_label, self.ui.end_time]:
                 i.hide()
             self.ui.end_time.setTime(QTime(23, 59, 59))
@@ -112,12 +112,12 @@ class ObsDialog(QDialog):
             else:  # already confirmed -> set observation and close
                 self.close()
 
-                target_dec = self.observation.min_dec - (
-                    2 if (self.observation.obs_type is ObsType.SURVEY) else 0
+                target_dec = self.obs.min_dec - (
+                    2 if (self.obs.obs_type is ObsType.SURVEY) else 0
                 )
 
                 def callback():
-                    self.parent_window.observation = self.observation
+                    self.parent_window.obs = self.obs
 
                 alerts = [
                     Alert(f"Move the telescope to {target_dec}° declination", "Okay"),
@@ -126,9 +126,7 @@ class ObsDialog(QDialog):
                     Alert("Is the frequency set to 1319.5MHz?", "Yes"),
                 ]
                 self.parent_window.alert(
-                    *alerts[
-                        : (4 if self.observation.obs_type is ObsType.SPECTRUM else 2)
-                    ],
+                    *alerts[: (4 if self.obs.obs_type is ObsType.SPECTRUM else 2)],
                     callback=callback,
                 )
 
@@ -164,7 +162,7 @@ class ObsDialog(QDialog):
         self.records = ObsRecord(
             **{name: getter() for name, (widget, getter, setter) in self.fields.items()}
         )
-        self.observation.input_record = self.records
+        self.obs.input_record = self.records
 
     def set_read_only(self):
         for i in self.fields.values():
@@ -188,7 +186,7 @@ class ObsDialog(QDialog):
         start_time = solar + self.clock.sidereal_to_solar(starting_ra - sidereal)
         end_time = (
             (solar + self.clock.sidereal_to_solar(ending_ra - sidereal))
-            if self.observation.obs_type is not ObsType.SPECTRUM
+            if self.obs.obs_type is not ObsType.SPECTRUM
             else start_time + 180
         )
 
@@ -196,15 +194,15 @@ class ObsDialog(QDialog):
         filename = self.ui.file_name_value.text()
         if filename == "":
             filename = self.default_filename
-        self.observation.set_name(filename)
+        self.obs.set_name(filename)
 
         # attempt to set data of observation
-        self.observation.set_ra(start_time, end_time)
+        self.obs.set_ra(start_time, end_time)
         try:
             new_min_dec = int(self.ui.min_dec.text())
             new_max_dec = int(self.ui.max_dec.text())
         except ValueError:
             raise ValueError("Dec vals must be integers")
-        self.observation.set_dec(new_min_dec, new_max_dec)
+        self.obs.set_dec(new_min_dec, new_max_dec)
 
-        self.observation.set_data_freq(int(self.ui.data_acquisition_rate_value.text()))
+        self.obs.set_data_freq(int(self.ui.data_acquisition_rate_value.text()))

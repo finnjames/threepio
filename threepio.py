@@ -139,8 +139,8 @@ class Threepio(QtWidgets.QMainWindow):
         self.worker = None
 
         # establish observation
-        self.observation = None
-        self.observation_state = False
+        self.obs = None
+        self.obs_state = False
         self.completed_one_calibration = False
 
         # establish data array & most recent dec
@@ -214,14 +214,14 @@ class Threepio(QtWidgets.QMainWindow):
         if not self.check_observation_state():
             return
 
-        period = 1000 / self.observation.freq  # Hz -> ms
+        period = 1000 / self.obs.freq  # Hz -> ms
         self.data_timer.set_period(period)
 
-        transmission = self.observation.communicate(
+        transmission = self.obs.communicate(
             self.current_data_point, self.clock.get_time()
         )
 
-        obs_type = self.observation.obs_type
+        obs_type = self.obs.obs_type
 
         if transmission != self.previous_transmission:  # TODO: should these be special?
             if transmission is Comm.START_CAL:
@@ -230,12 +230,12 @@ class Threepio(QtWidgets.QMainWindow):
                     Alert("Are the calibration switches ON?", "Yes"),
                 ]
                 if self.completed_one_calibration:
-                    if self.observation.obs_type is ObsType.SURVEY:
+                    if self.obs.obs_type is ObsType.SURVEY:
                         alerts = [
                             Alert("STOP the telescope", "Okay"),
                             Alert("Has the telescope been stopped?", "Yes"),
                         ] + alerts
-                    elif self.observation.obs_type is ObsType.SPECTRUM:
+                    elif self.obs.obs_type is ObsType.SPECTRUM:
                         alerts = [
                             Alert("Set frequency to 1319.5MHz", "Okay"),
                             Alert("Is the frequency set to 1319.5MHz?", "Yes"),
@@ -243,7 +243,7 @@ class Threepio(QtWidgets.QMainWindow):
 
                 def callback():
                     self.clock.reset_anchor_time()
-                    self.observation.next()
+                    self.obs.next()
                     self.message("Taking calibration data!!!")
 
                 self.alert(*alerts, callback=callback)
@@ -253,7 +253,7 @@ class Threepio(QtWidgets.QMainWindow):
 
                 def callback():
                     self.clock.reset_anchor_time()
-                    self.observation.next()
+                    self.obs.next()
                     self.message("Taking background data!!!")
 
                 self.alert(
@@ -263,15 +263,15 @@ class Threepio(QtWidgets.QMainWindow):
                 )
 
         if transmission is Comm.START_WAIT:
-            self.observation.next()
+            self.obs.next()
             self.message(f"Waiting for {obs_type.name.lower()} to begin...")
         elif transmission is Comm.START_DATA:
-            self.observation.next()
+            self.obs.next()
             self.message(f"Taking {obs_type.name.lower()} data!!!")
         elif transmission is Comm.FINISHED:
-            self.observation.next()
+            self.obs.next()
             self.message(f"{obs_type.name.capitalize()} complete!!!")
-            self.observation = None
+            self.obs = None
         elif transmission is Comm.SEND_TEL_NORTH:
             self.message("Send telescope NORTH at max speed!!!", beep=False, log=False)
             self.tobeepornottobeep = True
@@ -287,7 +287,7 @@ class Threepio(QtWidgets.QMainWindow):
         elif transmission is Comm.BEEP:
             self.tobeepornottobeep = True
         elif transmission is Comm.NEXT:
-            self.observation.next()
+            self.obs.next()
         elif transmission is Comm.NO_ACTION:
             pass
 
@@ -324,18 +324,18 @@ class Threepio(QtWidgets.QMainWindow):
 
     def check_observation_state(self) -> bool:
         if (
-            self.observation_state
-            and self.observation is None
-            or not self.observation_state
-            and self.observation is not None
+            self.obs_state
+            and self.obs is None
+            or not self.obs_state
+            and self.obs is not None
         ):
             self.toggle_observation_state()
 
-        return self.observation_state
+        return self.obs_state
 
     def toggle_observation_state(self) -> None:
         # disable resetting RA/Dec after loading obs
-        self.observation_state = not self.observation_state
+        self.obs_state = not self.obs_state
         for a in (
             self.ui.actionRA,
             self.ui.actionDec,
@@ -343,8 +343,8 @@ class Threepio(QtWidgets.QMainWindow):
             self.ui.actionScan,
             self.ui.actionSpectrum,
         ):
-            a.setDisabled(self.observation_state)
-        self.ui.actionGetInfo.setEnabled(self.observation_state)
+            a.setDisabled(self.obs_state)
+        self.ui.actionGetInfo.setEnabled(self.obs_state)
 
     @staticmethod
     def handle_credits():
@@ -364,11 +364,9 @@ class Threepio(QtWidgets.QMainWindow):
 
         self.ui.ra_value.setText(self.clock.get_formatted_sidereal_time())  # RA
         self.ui.dec_value.setText(f"{self.current_dec:.4f}°")  # dec
-        if self.observation is not None:
+        if self.obs is not None:
             self.ui.sweep_value.setText(
-                str(self.observation.sweep_number)
-                if self.observation.sweep_number != -1
-                else "n/a"
+                str(self.obs.sweep_number) if self.obs.sweep_number != -1 else "n/a"
             )  # sweep number
 
         self.update_progress_bar()
@@ -378,43 +376,34 @@ class Threepio(QtWidgets.QMainWindow):
 
     def update_progress_bar(self):
         # T=start_RA
-        if self.observation is not None:
-            # if not self.observation.end_RA - self.observation.start_RA <= 1:
-            if (
-                self.clock.get_time_until(self.observation.start_RA)
-                > 0
-                > self.clock.get_time_until(self.observation.end_RA)
-            ):  # between start and end time
+        if self.obs is not None:
+            tus = self.clock.get_time_until(self.obs.start_RA)  # time until start
+            tue = self.clock.get_time_until(self.obs.end_RA)  # time until end
+            print(tus, tue)
+
+            if tus > 0 > tue:  # between start and end time
                 self.ui.progressBar.setValue(
-                    int(
-                        (
-                            self.clock.get_time_until(self.observation.end_RA)
-                            / (self.observation.end_RA - self.observation.start_RA)
-                        )
-                        * 100
-                        % 100
-                    )
+                    int((tue / (self.obs.end_RA - self.obs.start_RA)) * 100 % 100)
                 )
             else:
                 self.ui.progressBar.setValue(0)
 
             # display the time nicely
-            tus = self.clock.get_time_until(
-                self.observation.start_RA
-            )  # time until start
-            hours = int((abs_tus := abs(tus)) / 3600)
-            minutes = int((abs_tus - (hours * 3600)) / 60)
-            seconds = int(abs_tus - (hours * 3600) - (minutes * 60))
-            self.ui.progressBar.setFormat(
-                f"T{'-' if tus < 0 else '+'}"
-                f"{hours:0>2}{':' if hours != 0 else ''}"
-                f"{minutes:0>2}{':' if minutes != 0 else ''}"
-                f"{seconds:0>2}"
+            hours = int((atus := abs(tus)) / 3600)
+            minutes = int((atus - (hours * 3600)) / 60)
+            seconds = int(atus - (hours * 3600) - (minutes * 60))
+            label = reduce(
+                lambda a, c: a + c,
+                [
+                    f"T{'-' if tus < 0 else '+'}" f"{hours:0>2}:" if hours > 0 else "",
+                    f"{minutes:0>2}:" if minutes > 0 else "",
+                    f"{seconds:0>2}",
+                ],
             )
-            return
-
-        self.ui.progressBar.setFormat("n/a")
-        self.ui.progressBar.setValue(0)
+            self.ui.progressBar.setFormat(label)
+        else:
+            self.ui.progressBar.setFormat("n/a")
+            self.ui.progressBar.setValue(0)
 
     def update_dec_view(self):
         angle = self.current_dec - GB_LATITUDE
@@ -548,10 +537,10 @@ class Threepio(QtWidgets.QMainWindow):
         self.completed_one_calibration = False
 
     def handle_get_info(self):
-        if self.observation is not None:
+        if self.obs is not None:
             pass
-        dialog = ObsDialog(self, self.observation, self.clock, info=True)
-        dialog.setWindowTitle("Current " + self.observation.obs_type.name.capitalize())
+        dialog = ObsDialog(self, self.obs, self.clock, info=True)
+        dialog.setWindowTitle("Current " + self.obs.obs_type.name.capitalize())
         dialog.exec_()
 
     def dec_calibration(self):
