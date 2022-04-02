@@ -2,7 +2,7 @@
 from _tools.comm import Comm
 from _tools.datapoint import DataPoint
 from _tools.precious import MyPrecious
-from _tools.superclock import SuperClock
+from _tools.superclock import SuperClock, GB_LATITUDE
 from _tools.tars import Tars, discovery
 from _tools.logtask import LogTask
 from _tools.minitars import MiniTars

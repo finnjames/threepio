@@ -4,12 +4,12 @@ import time
 import datetime
 from typing import Callable
 
+SIDEREAL = 1.00273790935  # the number of sidereal seconds per second
+GB_LATITUDE = 38.437235
+
 
 class SuperClock:
     """Clock object for encapsulation; keeps track of the time(tm)"""
-
-    SIDEREAL = 1.00273790935  # the number of sidereal seconds per second
-    GB_LATITUDE = 38.437235
 
     class Timer:
 
@@ -65,7 +65,7 @@ class SuperClock:
         self.timers = []
         self.starting_time = None
         self.anchor_time = None
-        self.set_starting_time(time.time())
+        self.set_starting_time()
         # number of seconds since last sidereal midnight, assigned when ra is set
         self.starting_sidereal_time = 0
 
@@ -88,11 +88,21 @@ class SuperClock:
 
     @staticmethod
     def solar_to_sidereal(solar_seconds: float) -> float:
-        return solar_seconds * SuperClock.SIDEREAL
+        return solar_seconds * SIDEREAL
 
     @staticmethod
     def sidereal_to_solar(sidereal_seconds: float) -> float:
-        return sidereal_seconds / SuperClock.SIDEREAL
+        return sidereal_seconds / SIDEREAL
+
+    @staticmethod
+    def get_time_slug() -> str:
+        """get timestamp suitable for file naming"""
+        return "{:%Y.%m.%d-%H.%M}".format(datetime.datetime(*time.localtime()[:5]))
+
+    @staticmethod
+    def get_time_until(destination_time) -> float:
+        """Positive means it already happened, negative means it will happen"""
+        return time.time() - destination_time
 
     def run_timers(self) -> None:
         """run all timers"""
@@ -110,13 +120,10 @@ class SuperClock:
         self.timers.append(new_timer)
         return new_timer
 
-    def get_starting_time(self) -> float:
-        return self.starting_time
-
     def set_starting_sidereal_time(self, sidereal_time: int) -> None:
         self.starting_sidereal_time = sidereal_time
 
-    def set_starting_time(self, epoch_time) -> None:
+    def set_starting_time(self, epoch_time=None) -> None:
         """set starting time and anchor time to specified time"""
         if epoch_time is None:
             epoch_time = time.time()
@@ -128,26 +135,12 @@ class SuperClock:
         self.anchor_time = time.time()
         self.reset_timers()
 
-    def get_local_time(self) -> time.struct_time:
-        return time.localtime(self.get_time())
-
-    def get_time_slug(self) -> str:
-        """get timestamp suitable for file naming"""
-        gmtime = self.get_local_time()
-        return "{:%Y.%m.%d-%H.%M}".format(datetime.datetime(*gmtime[:5]))
-
-    def get_time_until(self, destination_time) -> float:
-        """Positive means it already happened, negative means it will happen"""
-        return self.get_time() - destination_time
-
     def get_elapsed_time(self) -> float:
-        return self.get_time() - self.starting_time
+        return time.time() - self.starting_time
 
     def get_sidereal_seconds(self) -> float:
         """get timestamp-able number of sidereal seconds since last sidereal midnight"""
-        return (
-            self.starting_sidereal_time + SuperClock.SIDEREAL * self.get_elapsed_time()
-        )
+        return self.starting_sidereal_time + SIDEREAL * self.get_elapsed_time()
 
     def get_solar_seconds(self) -> float:
         """sidereal_to_solar(get_sidereal_seconds())"""

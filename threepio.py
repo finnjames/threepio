@@ -14,6 +14,7 @@ from tools import (
     Scan,
     Spectrum,
     SuperClock,
+    GB_LATITUDE,
     Tars,
     MiniTars,
     discovery,
@@ -420,7 +421,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.ui.progressBar.setValue(0)
 
     def update_dec_view(self):
-        angle = self.current_dec - self.clock.GB_LATITUDE
+        angle = self.current_dec - GB_LATITUDE
 
         # telescope dish
         dish = QtGui.QPixmap("assets/dish.png")
