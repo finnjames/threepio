@@ -1,17 +1,17 @@
-from enum import Enum
+from enum import Enum, auto
 
 
 class Comm(Enum):
-    NO_ACTION = 0
-    BEEP = 1
-    START_CAL = 2
-    START_BG = 3
-    NEXT = 4
-    FINISHED = 5
+    NO_ACTION = auto()
+    BEEP = auto()
+    START_CAL = auto()
+    START_BG = auto()
+    NEXT = auto()
+    FINISHED = auto()
     # extra
-    START_WAIT = 6
-    START_DATA = 7
-    SEND_TEL_NORTH = 8
-    SEND_TEL_SOUTH = 9
-    END_SEND_TEL = 10
-    FINISH_SWEEP = 11
+    START_WAIT = auto()
+    START_DATA = auto()
+    SEND_TEL_NORTH = auto()
+    SEND_TEL_SOUTH = auto()
+    END_SEND_TEL = auto()
+    FINISH_SWEEP = auto()
