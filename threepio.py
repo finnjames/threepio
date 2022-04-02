@@ -379,7 +379,6 @@ class Threepio(QtWidgets.QMainWindow):
         if self.obs is not None:
             tus = self.clock.get_time_until(self.obs.start_RA)  # time until start
             tue = self.clock.get_time_until(self.obs.end_RA)  # time until end
-            print(tus, tue)
 
             if tus > 0 > tue:  # between start and end time
                 self.ui.progressBar.setValue(
@@ -395,7 +394,8 @@ class Threepio(QtWidgets.QMainWindow):
             label = reduce(
                 lambda a, c: a + c,
                 [
-                    f"T{'-' if tus < 0 else '+'}" f"{hours:0>2}:" if hours > 0 else "",
+                    f"T{'-' if tus < 0 else '+'}",
+                    f"{hours:0>2}:" if hours > 0 else "",
                     f"{minutes:0>2}:" if minutes > 0 else "",
                     f"{seconds:0>2}",
                 ],
