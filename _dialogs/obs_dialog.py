@@ -90,7 +90,8 @@ class ObsDialog(QDialog):
         if self.obs.obs_type is ObsType.SPECTRUM:
             for i in [self.ui.end_label, self.ui.end_time]:
                 i.hide()
-            self.ui.end_time.setTime(QTime(23, 59, 59))
+            # all spectra have a duration of 120 seconds
+            self.ui.end_time.setTime(QTime(23, 59, 59))  # TODO: failure at 23:59:59?
         self.adjustSize()
 
         # store parent window
