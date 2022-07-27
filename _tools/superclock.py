@@ -36,7 +36,7 @@ class SuperClock:
             while time.time() > (
                 anchor_time + (self.period / 1000) * (self.offset + 1)
             ):
-                self.offset += 1  # can this be done in O(1)?
+                self.offset += 1  # TODO: can this be done in O(1)?
 
             if self.period > 0 and (
                 time.time() >= (anchor_time + (self.period / 1000) * self.offset)
@@ -66,21 +66,18 @@ class SuperClock:
         self.starting_time = None
         self.anchor_time = None
         self.set_starting_time()
-        # number of seconds since last sidereal midnight, assigned when ra is set
-        self.starting_sidereal_time = 0
+        # time, in seconds, since last sidereal midnight, assigned when ra is set
+        self.starting_sidereal_time = 0.0
 
-    def calibrate(self, input_time: str, epoch_time=None):
+    def calibrate(self, input_time: float, epoch_time: float = None):
         if epoch_time is None:
             epoch_time = time.time()
 
-        # pattern = "HH:MM:SS"
-        self.set_starting_sidereal_time(
-            3600 * int(input_time[:2]) + 60 * int(input_time[3:5]) + int(input_time[6:])
-        )
+        self.set_starting_sidereal_time(input_time)
         self.set_starting_time(epoch_time)
 
         with open("ra-cal.txt", "w") as f:
-            f.write(self.get_formatted_sidereal_time() + "\n" + str(time.time()))
+            f.write(f"{self.get_sidereal_seconds()}\n{time.time()}")
 
     @staticmethod
     def get_time() -> float:
@@ -104,6 +101,12 @@ class SuperClock:
         """Positive means it already happened, negative means it will happen"""
         return time.time() - destination_time
 
+    @staticmethod
+    def deformat_time(time_string: str) -> float:
+        """convert a string of the form HH:MM:SS to a float of seconds"""
+        hours, minutes, seconds = map(float, time_string.split(":"))
+        return hours * 3600 + minutes * 60 + seconds
+
     def run_timers(self) -> None:
         """run all timers"""
         for timer in self.timers:
@@ -120,7 +123,7 @@ class SuperClock:
         self.timers.append(new_timer)
         return new_timer
 
-    def set_starting_sidereal_time(self, sidereal_time: int) -> None:
+    def set_starting_sidereal_time(self, sidereal_time: float) -> None:
         self.starting_sidereal_time = sidereal_time
 
     def set_starting_time(self, epoch_time=None) -> None:
@@ -139,7 +142,7 @@ class SuperClock:
         return time.time() - self.starting_time
 
     def get_sidereal_seconds(self) -> float:
-        """get timestamp-able number of sidereal seconds since last sidereal midnight"""
+        """sidereal seconds since the sidereal midnight before calibration"""
         return self.starting_sidereal_time + SIDEREAL * self.get_elapsed_time()
 
     def get_solar_seconds(self) -> float:
@@ -147,7 +150,7 @@ class SuperClock:
         return self.sidereal_to_solar(self.get_sidereal_seconds())
 
     def get_sidereal_tuple(self) -> tuple:
-        """return a tuple of local sidereal time"""
+        """return an hours, minutes, seconds tuple of local sidereal time"""
         current_sidereal_time = self.get_sidereal_seconds()
         minutes, seconds = divmod(current_sidereal_time, 60)
         hours, minutes = divmod(minutes, 60)
@@ -155,6 +158,6 @@ class SuperClock:
         return hours, minutes, seconds
 
     def get_formatted_sidereal_time(self) -> str:
-        """return a string of formatted local sidereal time"""
+        """return a string of HH:MM:SS formatted local sidereal time"""
         hours, minutes, seconds = self.get_sidereal_tuple()
         return f"{hours:02.0f}:{minutes:02.0f}:{seconds:02.0f}"

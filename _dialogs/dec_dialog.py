@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QDialog, QWidget
 from PyQt5.QtCore import Qt
 from layouts import dec_cal_ui  # compiled PyQt dialogue ui
-from tools import DecCalc as DC
+from tools import DecCalc as dc
 
 
 class DecDialog(QDialog):
@@ -25,8 +25,8 @@ class DecDialog(QDialog):
         )
 
         self.data = []
-        self.current_dec = DC.SOUTH_DEC
-        self.step = DC.STEP
+        self.current_dec = dc.SOUTH_DEC
+        self.step = dc.STEP
         self.update_label()
 
         self.minitars = minitars
@@ -43,10 +43,10 @@ class DecDialog(QDialog):
 
     def switch_direction(self):
         if self.ui.north_or_south_combo_box.currentIndex() == 0:
-            self.current_dec = DC.SOUTH_DEC
+            self.current_dec = dc.SOUTH_DEC
             self.step = 10
         else:
-            self.current_dec = DC.NORTH_DEC
+            self.current_dec = dc.NORTH_DEC
             self.step = -10
         self.update_label()
 
@@ -76,17 +76,17 @@ class DecDialog(QDialog):
             self.ui.next_cal_button.setText("Next")
             self.ui.set_dec_label.setText("Set declination to")
 
-            if self.current_dec not in [DC.SOUTH_DEC, DC.NORTH_DEC]:
+            if self.current_dec not in [dc.SOUTH_DEC, dc.NORTH_DEC]:
                 # disable N/S choice if not first
                 self.ui.north_or_south_combo_box.setDisabled(True)
-            elif self.current_dec <= DC.SOUTH_DEC or self.current_dec >= DC.NORTH_DEC:
+            elif self.current_dec <= dc.SOUTH_DEC or self.current_dec >= dc.NORTH_DEC:
                 self.ui.next_cal_button.setText("Save")
 
             self.update_label()
             self.confirmed = False
 
             # is calibration complete?
-            if self.current_dec > DC.NORTH_DEC or self.current_dec < DC.SOUTH_DEC:
+            if self.current_dec > dc.NORTH_DEC or self.current_dec < dc.SOUTH_DEC:
                 # copy over the current file to the backup file
                 with open(self.CAL_FILENAME) as f, open(
                     self.CAL_BACKUP_FILENAME, "w"

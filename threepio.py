@@ -1,5 +1,5 @@
-from enum import Enum
 import time
+from enum import Enum
 from functools import reduce
 from typing import Callable
 
@@ -72,9 +72,7 @@ class Threepio(QtWidgets.QMainWindow):
         # clock
         self.clock = SuperClock()
         with open("ra-cal.txt", "r") as f:  # get data from file
-            i = f.readline().strip()
-            e = float(f.readline())
-            self.clock.calibrate(i, e)
+            self.clock.calibrate(*[float(f.readline()) for _ in range(2)])
 
         # initialize stripchart
         self.stripchart_display_seconds = 8

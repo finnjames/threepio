@@ -172,10 +172,8 @@ class ObsDialog(QDialog):
         """attempt to add all necessary info to the encapsulated observation"""
 
         # parse times; pattern = "HH:MM:SS"
-        ust = self.ui.start_time.text()  # user start time
-        starting_ra = 3600 * int(ust[:2]) + 60 * int(ust[3:5]) + int(ust[6:])
-        uet = self.ui.end_time.text()  # user end time
-        ending_ra = 3600 * int(uet[:2]) + 60 * int(uet[3:5]) + int(uet[6:])
+        starting_ra = SuperClock.deformat_time(self.ui.start_time.text())
+        ending_ra = SuperClock.deformat_time(self.ui.end_time.text())
         if ending_ra < starting_ra:
             ending_ra += 3600 * 24
             self.show_warning("Assuming ending RA is the next day")
