@@ -1,5 +1,6 @@
 """clock for keeping track of the time ;)"""
 
+from math import floor
 import time
 import datetime
 from typing import Callable
@@ -33,14 +34,16 @@ class SuperClock:
             self.callback()
 
         def run_if_appropriate(self, anchor_time: float) -> bool:
-            while time.time() > (
-                anchor_time + (self.period / 1000) * (self.offset + 1)
-            ):
-                self.offset += 1  # TODO: can this be done in O(1)?
+            if self.period <= 0:
+                return False
+            current_time = time.time()
 
-            if self.period > 0 and (
-                time.time() >= (anchor_time + (self.period / 1000) * self.offset)
-            ):
+            # TODO: this works, right?
+            if current_time > anchor_time + (self.period / 1000) * (self.offset + 1):
+                self.offset = floor((current_time - anchor_time) / (self.period / 1000))
+
+            if current_time >= (anchor_time + (self.period / 1000) * self.offset):
+                print(self.offset, anchor_time, current_time)
                 self.run()
                 self.offset += 1
                 return True
