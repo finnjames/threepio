@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(366, 620)
+        Dialog.resize(366, 610)
         self.verticalLayout = QtWidgets.QVBoxLayout(Dialog)
         self.verticalLayout.setContentsMargins(-1, -1, -1, 0)
         self.verticalLayout.setObjectName("verticalLayout")
@@ -39,7 +39,7 @@ class Ui_Dialog(object):
         self.close_button.setObjectName("close_button")
         self.gridLayout.addWidget(self.close_button, 0, 1, 1, 1)
         self.verticalLayout.addWidget(self.button_frame)
-        spacerItem4 = QtWidgets.QSpacerItem(0, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.MinimumExpanding)
+        spacerItem4 = QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.MinimumExpanding)
         self.verticalLayout.addItem(spacerItem4)
         self.label = QtWidgets.QLabel(Dialog)
         self.label.setText("")

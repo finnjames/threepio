@@ -37,9 +37,10 @@ class Threepio(QtWidgets.QMainWindow):
     GUI_UPDATE_PERIOD = 1000  # ms = 1Hz
     STRIPCHART_PERIOD = 16.7  # ms = 60Hz
 
-    # palette
+    # style
     BLUE = 0x2196F3
     RED = 0xFF5252
+    MIN_WIDTH = 860
 
     class Mode(Enum):
         NORMAL = 0
@@ -295,14 +296,14 @@ class Threepio(QtWidgets.QMainWindow):
         self.ui.actionNormal.setChecked(True)
         self.ui.actionTesting.setChecked(False)
         self.ui.testing_frame.hide()
-        self.adjustSize()
-        self.setFixedSize(800, 640)
+        # self.adjustSize()
+        self.setFixedSize(self.MIN_WIDTH, 640)
         self.mode = Threepio.Mode.NORMAL
 
     def set_state_testing(self):
         self.ui.actionNormal.setChecked(False)
         self.ui.actionTesting.setChecked(True)
-        self.setFixedSize(800, 826)
+        self.setFixedSize(self.MIN_WIDTH, 826)
         self.ui.testing_frame.show()
         self.mode = Threepio.Mode.TESTING
 
