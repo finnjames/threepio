@@ -84,7 +84,6 @@ class Ui_Dialog(object):
         self.data_acquisition_rate_value.setFont(font)
         self.data_acquisition_rate_value.setMinimum(1)
         self.data_acquisition_rate_value.setMaximum(100)
-        self.data_acquisition_rate_value.setProperty("value", 10)
         self.data_acquisition_rate_value.setObjectName("data_acquisition_rate_value")
         self.gridLayout.addWidget(self.data_acquisition_rate_value, 6, 2, 1, 1)
         self.end_dec_label = QtWidgets.QLabel(Dialog)
