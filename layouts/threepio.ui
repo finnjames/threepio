@@ -933,6 +933,9 @@
    <property name="text">
     <string>Exit</string>
    </property>
+   <property name="shortcut">
+    <string>Esc</string>
+   </property>
   </action>
   <action name="actionHelp">
    <property name="enabled">

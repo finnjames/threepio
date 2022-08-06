@@ -14,13 +14,13 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(860, 940)
+        MainWindow.resize(860, 900)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(MainWindow.sizePolicy().hasHeightForWidth())
         MainWindow.setSizePolicy(sizePolicy)
-        MainWindow.setMinimumSize(QtCore.QSize(860, 940))
+        MainWindow.setMinimumSize(QtCore.QSize(860, 900))
         MainWindow.setAutoFillBackground(True)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
@@ -532,6 +532,7 @@ class Ui_MainWindow(object):
         self.actionSurvey.setShortcut(_translate("MainWindow", "Ctrl+2"))
         self.actionInfo.setText(_translate("MainWindow", "Credits..."))
         self.actionQuit.setText(_translate("MainWindow", "Exit"))
+        self.actionQuit.setShortcut(_translate("MainWindow", "Esc"))
         self.actionHelp.setText(_translate("MainWindow", "Help..."))
         self.actionScan.setText(_translate("MainWindow", "New Scan..."))
         self.actionScan.setShortcut(_translate("MainWindow", "Ctrl+1"))
