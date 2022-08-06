@@ -124,13 +124,13 @@ class Observation:
             else:
                 return Comm.START_CAL
         elif self.state == State.CAL_1:
-            if floor(timestamp - self.cal_start) <= self.cal_dur:
+            if floor(timestamp - self.cal_start) < self.cal_dur:
                 self.write_data(data_point)
                 return Comm.NO_ACTION
             else:
                 return Comm.START_BG
         elif self.state == State.BG_1:
-            if floor(timestamp - self.bg_start) <= self.bg_dur:
+            if floor(timestamp - self.bg_start) < self.bg_dur:
                 self.write_data(data_point)
                 return Comm.NO_ACTION
             else:
@@ -156,13 +156,13 @@ class Observation:
             else:
                 return Comm.START_CAL
         elif self.state == State.CAL_2:
-            if floor(timestamp - self.cal_start) <= self.cal_dur:
+            if floor(timestamp - self.cal_start) < self.cal_dur:
                 self.write_data(data_point)
                 return Comm.NO_ACTION
             else:
                 return Comm.START_BG
         elif self.state == State.BG_2:
-            if floor(timestamp - self.bg_start) <= self.bg_dur:
+            if floor(timestamp - self.bg_start) < self.bg_dur:
                 self.write_data(data_point)
                 return Comm.NO_ACTION
             else:

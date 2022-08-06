@@ -70,27 +70,30 @@ class Threepio(QtWidgets.QMainWindow):
         self.log(">>> THREEPIO")
         self.update_console()
 
+        stripchart_log_task = self.log(">>> Initializing...")
         # clock
         self.clock = SuperClock()
-        with open("ra-cal.txt", "r") as f:  # get data from file
-            self.clock.calibrate(*[float(f.readline()) for _ in range(2)])
+        try:
+            with open("ra-cal.txt", "r") as f:  # get data from file
+                self.clock.calibrate(*[float(f.readline()) for _ in range(2)])
+        except FileNotFoundError:
+            ra_cal_logtask = self.log("Generating RA cal file...")
+            self.clock.calibrate(0.0)
+            ra_cal_logtask.set_status(0)
 
         # initialize stripchart
         self.stripchart_display_seconds = 8
         self.should_clear_stripchart = False
         self.channel_visibility = (True, True)
-        stripchart_log_task = self.log("Initializing stripchart...")
         self.stripchart_series_a = QtChart.QLineSeries()
         self.stripchart_series_b = QtChart.QLineSeries()
         self.axis_y = QtChart.QValueAxis()
         self.chart = QtChart.QChart()
         self.ui.stripchart.setRenderHint(QtGui.QPainter.Antialiasing)
         self.initialize_stripchart()  # should this include more of the above?
-        stripchart_log_task.set_status(0)
 
         self.update_stripchart_speed()
 
-        stripchart_log_task = self.log("Initializing buttons...")
         # connect buttons
         self.ui.stripchart_speed_slider.valueChanged.connect(
             self.update_stripchart_speed
@@ -112,17 +115,8 @@ class Threepio(QtWidgets.QMainWindow):
 
         self.ui.toggle_channel_button.clicked.connect(self.toggle_channels)
         self.ui.chart_clear_button.clicked.connect(self.clear_stripchart)
-        stripchart_log_task.set_status(0)
-
-        # Tars/DATAQ
-        dataq, arduino = discovery()
-        self.tars = Tars(parent=self, device=dataq)
-        self.tars.start()
-        self.minitars = MiniTars(parent=self, device=arduino)
-        self.minitars.start()
 
         # bleeps and bloops
-        stripchart_log_task = self.log("Initializing audio...")
         self.beep_sound = QtMultimedia.QSoundEffect()
         url = QtCore.QUrl()
         self.beep_sound.setSource(url.fromLocalFile("assets/beep3.wav"))
@@ -130,12 +124,18 @@ class Threepio(QtWidgets.QMainWindow):
         # self.click_sound.play()
         self.last_beep_time = 0.0
         self.tobeepornottobeep = False
-        stripchart_log_task.set_status(0)
 
         # alerts
         self.open_alert = None
         self.alert_thread: set[QtCore.QThread] = set()
         self.worker = None
+
+        # Tars/DATAQ
+        dataq, arduino = discovery()
+        self.tars = Tars(parent=self, device=dataq)
+        self.tars.start()
+        self.minitars = MiniTars(parent=self, device=arduino)
+        self.minitars.start()
 
         # establish observation
         self.obs = None
@@ -160,20 +160,19 @@ class Threepio(QtWidgets.QMainWindow):
         self.dec_calc.load_dec_cal()
 
         # primary clock
-        stripchart_log_task = self.log("Initializing clock...")
         self.timer = QtCore.QTimer(self)
         self.timer.timeout.connect(self.tick)  # do everything
         self.timer.start(self.BASE_PERIOD)  # set refresh rate
         # assign timers to functions meant to fire periodically
         self.clock.add_timer(1000, self.update_gui)
         self.data_timer = self.clock.add_timer(1000, self.update_data)
-        stripchart_log_task.set_status(0)
 
         # measure refresh rate
         self.time_of_last_fps_update = time.perf_counter()
         self.ticks_since_last_fps_update = 0
 
         # alert user that threepio is done initializing
+        stripchart_log_task.set_status(0)
         self.message("Ready!!!")
 
     def tick(self):
