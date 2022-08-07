@@ -55,9 +55,7 @@ class DecDialog(QDialog):
         self.parent.beep()
 
         if not self.confirmed:
-            self.ui.set_dec_label.setText("Are you sure?")
-            self.ui.next_cal_button.setText("Yes")
-            self.confirmed = True
+            self.set_confirmed_true()
         else:
             # read just the declination value
             new_dec = None
@@ -74,6 +72,7 @@ class DecDialog(QDialog):
 
             self.current_dec += self.step
             self.ui.next_cal_button.setText("Next")
+            self.ui.discard_cal_button.setText("Discard")
             self.ui.set_dec_label.setText("Set declination to")
 
             if self.current_dec not in [dc.SOUTH_DEC, dc.NORTH_DEC]:
@@ -103,7 +102,22 @@ class DecDialog(QDialog):
                 self.close()
 
     def handle_discard(self):
-        self.close()
+        if self.confirmed:
+            self.set_confirmed_false()
+        else:
+            self.close()
 
     def update_label(self):
         self.ui.set_dec_value.setText(str(self.current_dec) + "°")
+
+    def set_confirmed_true(self):
+        self.confirmed = True
+        self.ui.set_dec_label.setText("Are you sure?")
+        self.ui.discard_cal_button.setText("No")
+        self.ui.next_cal_button.setText("Yes")
+
+    def set_confirmed_false(self):
+        self.confirmed = False
+        self.ui.next_cal_button.setText("Next")
+        self.ui.discard_cal_button.setText("Discard")
+        self.ui.set_dec_label.setText("Set declination to")
