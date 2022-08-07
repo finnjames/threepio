@@ -10,7 +10,7 @@ class DecDialog(QDialog):
     CAL_FILENAME = "dec-cal.txt"
     CAL_BACKUP_FILENAME = "dec-cal-backup.txt"
 
-    def __init__(self, minitars, parent):
+    def __init__(self, minitars, threepio):
         QWidget.__init__(self)
         self.ui = dec_cal_ui.Ui_Dialog()
         self.ui.setupUi(self)
@@ -30,7 +30,7 @@ class DecDialog(QDialog):
         self.update_label()
 
         self.minitars = minitars
-        self.parent = parent
+        self.parent = threepio
 
         # connect buttons
         self.ui.discard_cal_button.clicked.connect(self.handle_discard)
