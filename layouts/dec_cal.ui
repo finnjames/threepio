@@ -111,6 +111,12 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>north_or_south_combo_box</tabstop>
+  <tabstop>next_cal_button</tabstop>
+  <tabstop>previous_cal_button</tabstop>
+  <tabstop>discard_cal_button</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

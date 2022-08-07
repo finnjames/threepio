@@ -73,6 +73,7 @@ class Threepio(QtWidgets.QMainWindow):
         stripchart_log_task = self.log(">>> Initializing...")
         # clock
         self.clock = SuperClock()
+        # initial RA calibration
         try:
             with open("ra-cal.txt", "r") as f:  # get data from file
                 self.clock.calibrate(*[float(f.readline()) for _ in range(2)])
@@ -155,9 +156,12 @@ class Threepio(QtWidgets.QMainWindow):
         self.ui.dec_view.setScene(self.dec_scene)
         self.update_dec_view()
 
-        # run initial calibration
+        # initial dec calibration
         self.dec_calc = DecCalc()
-        self.dec_calc.load_dec_cal()
+        try:
+            self.dec_calc.load_dec_cal()
+        except FileNotFoundError:
+            self.alert(Alert("Dec must be calibrated", "Got it"))
 
         # primary clock
         self.timer = QtCore.QTimer(self)
@@ -541,13 +545,16 @@ class Threepio(QtWidgets.QMainWindow):
         dialog.setWindowTitle("Current " + self.obs.obs_type.name.capitalize())
         dialog.exec_()
 
-    def dec_calibration(self):
-        dialog = DecDialog(self.minitars, self)
-        if self.mode is Threepio.Mode.TESTING:
-            dialog.show()  # TODO: why does this work?
-        dialog.exec_()
+    def dec_calibration(self, placeholder=False):
+        if placeholder:
+            DecDialog.set_placeholder_cal()
+        else:
+            dialog = DecDialog(self.minitars, self)
+            if self.mode is Threepio.Mode.TESTING:
+                dialog.show()  # TODO: why does this work?
+            dialog.exec_()
 
-        self.dec_calc.load_dec_cal()
+            self.dec_calc.load_dec_cal()
 
     def ra_calibration(self):
         dialog = RADialog(self, self.clock)
@@ -561,17 +568,22 @@ class Threepio(QtWidgets.QMainWindow):
             self.beep(message="message")
         self.ui.message_label.setText(message)
 
-    def log(self, message, allow_dups=False) -> LogTask:
+    def log(self, message, allow_dups=False, warning=False) -> LogTask:
         if (
             len(self.message_log) == 0
             or allow_dups
             or message != self.message_log[-1].message
         ):
             new_log_task = LogTask(message)
-            try:
-                new_log_task.set_sidereal_str(self.clock.get_formatted_sidereal_time())
-            except AttributeError:
-                pass
+            if warning:
+                new_log_task.set_leading_str("WARNING!")
+            else:
+                try:
+                    new_log_task.set_leading_str(
+                        self.clock.get_formatted_sidereal_time()
+                    )
+                except AttributeError:
+                    pass
             self.message_log.append(new_log_task)
             print(new_log_task.get_message())
             return new_log_task

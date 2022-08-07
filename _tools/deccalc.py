@@ -29,14 +29,21 @@ class DecCalc:
             i += DecCalc.STEP
         return r
 
-    def load_dec_cal(self):
+    def load_dec_cal(self) -> int:
         """read the dec calibration from file and store it in memory"""
-        with open("dec-cal.txt", "r") as f:  # get data from file
-            x_lines = f.readlines()
-            y_decs = self.get_dec_list()
 
+        def set_fx(x_lines: list):
+            y_decs = self.get_dec_list()
             self.fx = [self.XY(x.strip(), y) for x, y in zip(x_lines, y_decs)]
-            # print([str(d) for d in self.fx])
+
+        try:
+            with open("dec-cal.txt", "r") as f:  # get data from file
+                set_fx(f.readlines())
+                return 0
+
+        except FileNotFoundError:
+            set_fx([i for i in map(lambda a: str(a * 0.01), range(-90, 91, 15))])
+            raise FileNotFoundError
 
     def calculate_declination(self, input_dec: float) -> float:
         """calculate the true dec from declinometer input and calibration data"""

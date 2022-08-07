@@ -87,14 +87,16 @@ class DecDialog(QDialog):
             # is calibration complete?
             if self.current_dec > dc.NORTH_DEC or self.current_dec < dc.SOUTH_DEC:
                 # copy over the current file to the backup file
-                with open(self.CAL_FILENAME) as f, open(
-                    self.CAL_BACKUP_FILENAME, "w"
-                ) as b:
-                    for line in f:
-                        b.write(line)
+                try:
+                    with open(self.CAL_FILENAME) as f, open(
+                        self.CAL_BACKUP_FILENAME, "w+"
+                    ) as b:
+                        for line in f:
+                            b.write(line)
+                except FileNotFoundError:
+                    pass
 
-                open(self.CAL_FILENAME, "w").close()  # overwrite file
-                with open(self.CAL_FILENAME, "a") as f:
+                with open(self.CAL_FILENAME, "w+") as f:
                     self.step < 0 and self.data.reverse()  # reverse if N -> S
 
                     f.write("\n".join(str(line) for line in self.data))
@@ -102,10 +104,7 @@ class DecDialog(QDialog):
                 self.close()
 
     def handle_discard(self):
-        if self.confirmed:
-            self.set_confirmed_false()
-        else:
-            self.close()
+        self.close()
 
     def update_label(self):
         self.ui.set_dec_value.setText(str(self.current_dec) + "°")
@@ -113,11 +112,11 @@ class DecDialog(QDialog):
     def set_confirmed_true(self):
         self.confirmed = True
         self.ui.set_dec_label.setText("Are you sure?")
-        self.ui.discard_cal_button.setText("No")
+        # self.ui.previous_cal_button.setText("No")
         self.ui.next_cal_button.setText("Yes")
 
     def set_confirmed_false(self):
         self.confirmed = False
-        self.ui.next_cal_button.setText("Next")
-        self.ui.discard_cal_button.setText("Discard")
         self.ui.set_dec_label.setText("Set declination to")
+        # self.ui.previous_cal_button.setText("Previous")
+        self.ui.next_cal_button.setText("Next")

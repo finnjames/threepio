@@ -17,7 +17,7 @@ class LogTask:
             r += f" {self.__status_to_string()}"
         return r
 
-    def set_sidereal_str(self, sidereal_str: str):
+    def set_leading_str(self, sidereal_str: str):
         self.sidereal_str = sidereal_str
 
     def set_status(self, status: int):  # TODO: make this an enum

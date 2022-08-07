@@ -12,3 +12,4 @@ __pycache__/
 dist/
 .qt_for_python
 ra-cal.txt
+dec-cal*.txt

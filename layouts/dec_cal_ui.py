@@ -14,12 +14,13 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(320, 122)
+        Dialog.resize(440, 120)
         self.gridLayout = QtWidgets.QGridLayout(Dialog)
         self.gridLayout.setObjectName("gridLayout")
         self.set_dec_value = QtWidgets.QLabel(Dialog)
         font = QtGui.QFont()
         font.setFamily("Iosevka Aile")
+        font.setPointSize(20)
         self.set_dec_value.setFont(font)
         self.set_dec_value.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.set_dec_value.setObjectName("set_dec_value")
@@ -44,13 +45,19 @@ class Ui_Dialog(object):
         self.next_cal_button.setCheckable(False)
         self.next_cal_button.setDefault(True)
         self.next_cal_button.setObjectName("next_cal_button")
-        self.gridLayout_2.addWidget(self.next_cal_button, 0, 3, 1, 1)
+        self.gridLayout_2.addWidget(self.next_cal_button, 0, 4, 1, 1)
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.gridLayout_2.addItem(spacerItem, 0, 1, 1, 1)
+        self.previous_cal_button = QtWidgets.QPushButton(self.button_frame)
+        self.previous_cal_button.setObjectName("previous_cal_button")
+        self.gridLayout_2.addWidget(self.previous_cal_button, 0, 3, 1, 1)
         self.gridLayout.addWidget(self.button_frame, 2, 0, 1, 3)
 
         self.retranslateUi(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
+        Dialog.setTabOrder(self.north_or_south_combo_box, self.next_cal_button)
+        Dialog.setTabOrder(self.next_cal_button, self.previous_cal_button)
+        Dialog.setTabOrder(self.previous_cal_button, self.discard_cal_button)
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
@@ -61,3 +68,4 @@ class Ui_Dialog(object):
         self.north_or_south_combo_box.setItemText(1, _translate("Dialog", "N → S"))
         self.discard_cal_button.setText(_translate("Dialog", "Discard"))
         self.next_cal_button.setText(_translate("Dialog", "Next"))
+        self.previous_cal_button.setText(_translate("Dialog", "Previous"))
