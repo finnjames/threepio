@@ -132,10 +132,10 @@ class Threepio(QtWidgets.QMainWindow):
         self.worker = None
 
         # Tars/DATAQ
-        dataq, arduino = discovery()
+        dataq, declinometer = discovery()
         self.tars = Tars(parent=self, device=dataq)
         self.tars.start()
-        self.minitars = MiniTars(parent=self, device=arduino)
+        self.minitars = MiniTars(parent=self, device=declinometer)
         self.minitars.start()
 
         # establish observation

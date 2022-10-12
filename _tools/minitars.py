@@ -13,15 +13,15 @@ import math
 
 
 def discovery():
-    """Get a list of active com ports and scan for arduino"""
+    """Get a list of active com ports and scan for declinometer"""
     available_ports = serial.tools.list_ports.comports()
 
-    arduino = None
+    declinometer = None
     for p in available_ports:
-        if "VID:PID=2341:0043" in p.hwid:
-            arduino = p.device
+        if "VID:PID=0403:6001" in p.hwid:
+            declinometer = p.device
 
-    return arduino
+    return declinometer
 
 
 class MiniTars:
@@ -32,6 +32,7 @@ class MiniTars:
         if device is not None:
             self.testing = False
             self.ser = MySerial(device)
+            self.ser.baudrate = 38400
         else:
             self.parent.log("Declinometer not found, simulating data")
 
@@ -81,8 +82,18 @@ class MiniTars:
         if not self.testing:
             if self.in_waiting() < 1:
                 return None
-            line = self.ser.readline()  # read a byte string
+            # TODO: clean up
+            # print("start")
+            # print("get-360".encode("ascii"))
+            # self.ser.write(bytes("get-360".encode("ascii")))
+            # line = self.ser.read(size=8)
+            line = self.ser.read_until(
+                expected="\r".encode("ascii")
+            )  # read a byte string TODO: encoding necessary?
+            # print(line.decode())
+            # print(f"minitars: {line}")
             try:
+                print(f"minitars: {float(line.decode())}")
                 return float(line.decode())
             except (UnicodeDecodeError, ValueError):
                 pass
@@ -100,21 +111,21 @@ class MiniTars:
 
 
 def main():
-    arduino = discovery()
+    declinometer = discovery()
 
-    while not arduino:
+    while not declinometer:
         print("No declinometer detected, retrying in 3 seconds.")
         time.sleep(3)
-        arduino = discovery()
+        declinometer = discovery()
 
-    print("Found a declinometer on", arduino)
-    minitars = MiniTars(device=arduino)
+    print("Found a declinometer on", declinometer)
+    minitars = MiniTars(device=declinometer)
 
     minitars.start()
 
     while True:
         data = minitars.read_latest()
-        print(data)
+        # print(data)
         if data is not None:
             print(minitars.testing)
             print(data)

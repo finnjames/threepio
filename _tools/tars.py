@@ -21,14 +21,14 @@ def discovery() -> tuple:
     available_ports = serial.tools.list_ports.comports()
 
     dataq = None
-    arduino = None
+    declinometer = None
     for p in available_ports:
         if "VID:PID=0683:4109" in p.hwid:
             dataq = p.device
-        if "VID:PID=2341:0043" in p.hwid:
-            arduino = p.device
+        if "VID:PID=0403:6001" in p.hwid:
+            declinometer = p.device
 
-    return dataq, arduino
+    return dataq, declinometer
 
 
 def convert(buffer: list, volt: int) -> float:
