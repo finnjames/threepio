@@ -140,7 +140,7 @@ class Threepio(QtWidgets.QMainWindow):
 
         # establish observation
         self.obs = None
-        self.obs_state = False
+        self.ui_thinks_obs_is_set = False
         self.completed_one_calibration = False
 
         # establish data array & most recent dec
@@ -213,7 +213,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.ticks_since_last_fps_update += 1  # for measuring fps
 
     def update_data(self) -> None:
-        if not self.check_observation_state():
+        if not self.check_and_set_observation_state():
             return
 
         period = 1000 / self.obs.freq  # Hz -> ms
@@ -324,29 +324,28 @@ class Threepio(QtWidgets.QMainWindow):
         )
         self.ui.actionLegacy.setChecked(self.legacy_mode)
 
-    def check_observation_state(self) -> bool:
-        if (
-            self.obs_state
-            and self.obs is None
-            or not self.obs_state
-            and self.obs is not None
-        ):
-            self.toggle_observation_state()
+    def check_and_set_observation_state(self) -> bool:
+        """Check if there is a discrepancy between whether an observation is currently
+        loaded and the ui state and update the UI accordingly."""
 
-        return self.obs_state
+        def set_observation_ui_state(obs_is_loaded: bool):
+            if_obs_is_loaded = obs_is_loaded  # for readability
+            self.ui.actionRA.setDisabled(if_obs_is_loaded)
+            self.ui.actionDec.setDisabled(if_obs_is_loaded)
+            self.ui.actionSurvey.setDisabled(if_obs_is_loaded)
+            self.ui.actionScan.setDisabled(if_obs_is_loaded)
+            self.ui.actionSpectrum.setDisabled(if_obs_is_loaded)
+            self.ui.actionGetInfo.setDisabled(not if_obs_is_loaded)
+            self.ui_thinks_obs_is_set = obs_is_loaded
 
-    def toggle_observation_state(self) -> None:
-        # disable resetting RA/Dec after loading obs
-        self.obs_state = not self.obs_state
-        for a in (
-            self.ui.actionRA,
-            self.ui.actionDec,
-            self.ui.actionSurvey,
-            self.ui.actionScan,
-            self.ui.actionSpectrum,
-        ):
-            a.setDisabled(self.obs_state)
-        self.ui.actionGetInfo.setEnabled(self.obs_state)
+        if self.obs is not None:
+            if not self.ui_thinks_obs_is_set:
+                set_observation_ui_state(True)  # update UI if discrepancy
+            return True
+        else:
+            if self.ui_thinks_obs_is_set:  
+                set_observation_ui_state(False)
+            return False
 
     @staticmethod
     def handle_credits():
