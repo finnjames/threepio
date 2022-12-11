@@ -31,11 +31,12 @@ class Observation:
     """
     Superclass for each of the three types of observation: Scan, Survey, and Spectrum
 
-    To interact with any type of the observation object (e.g. an Oberservation object obs), first set
-    its properties using the three 'obs.set_xxx()' API. Then, call the method 'obs.communication()'
-    every 'obs.freq' seconds. Then, when the comm method returns a message other than 'Comm.NO_ACTION',
-    prompt user for the appropriate action and call 'obs.next()' once to proceed into next stage.
-    An observation is finished when the 'communication()' method returns 'Comm.FINISHED'.
+    To interact with any type of the observation object (e.g. an Oberservation object
+    obs), first set its properties using the three 'obs.set_xxx()' API. Then,
+    call the method 'obs.communication()' every 'obs.freq' seconds. Then, when the
+    comm method returns a message other than 'Comm.NO_ACTION', prompt user for the
+    appropriate action and call 'obs.next()' once to proceed into next stage. An
+    observation is finished when the 'communication()' method returns 'Comm.FINISHED'.
     """
 
     def __init__(self):
@@ -47,9 +48,10 @@ class Observation:
         self.bg_dur = 60
         self.cal_dur = 60
 
-        # Calibration and BG share the same sampling frequency, while the data has its own sampling
-        #   frequency. Only the data frequency is user-editable. When running the program, the sampling
-        #   frequency is automatically set by the current state and is stored in 'self.freq'.
+        # Calibration and BG share the same sampling frequency, while the data has
+        # its own sampling frequency. Only the data frequency is user-editable. When
+        # running the program, the sampling frequency is automatically set by the
+        # current state and is stored in 'self.freq'.
         self.cal_freq = 1
         self.data_freq = 6
 
@@ -233,14 +235,16 @@ class Observation:
 
     # To be implemented in each subclass
     def set_files(self):
-        """This function generates appropriate file types (.md1 or .md2) based on observation type"""
+        """This function generates appropriate file types (.md1 or .md2) based on
+        observation type """
         pass
 
     def data_logic(self, data_point):
         """
-        This function defines the behavior of observation during the main data collection period.
-        For example, in Survey this method is responsible for tracking if the dec is too high or too
-        low. In Spectrum, this method tells the UI to beep to remind the user to change frequency.s
+        This function defines the behavior of observation during the main data
+        collection period. For example, in Survey this method is responsible for
+        tracking if the dec is too high or too low. In Spectrum, this method tells
+        the UI to beep to remind the user to change frequency.s
         """
         pass
 
