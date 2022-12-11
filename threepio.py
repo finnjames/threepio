@@ -483,7 +483,6 @@ class Threepio(QtWidgets.QMainWindow):
             self.chart.addSeries(self.stripchart_series_a)
 
             # check for visibility
-
             if self.channel_visibility[0]:
                 pen = QtGui.QPen(QtGui.QColor(self.BLUE))
             else:
@@ -534,7 +533,10 @@ class Threepio(QtWidgets.QMainWindow):
 
     def new_observation(self, obs: Observation):
         dialog = ObsDialog(self, obs, self.clock)
-        dialog.setWindowTitle("New " + obs.obs_type.name.capitalize())
+        try:
+            dialog.setWindowTitle("New " + obs.obs_type.name.capitalize())
+        except AttributeError:
+            pass
         dialog.exec_()
         self.completed_one_calibration = False
 
