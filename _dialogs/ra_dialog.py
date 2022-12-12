@@ -18,6 +18,7 @@ class RADialog(QDialog):
 
         # hide the close/minimize/fullscreen buttons
         self.setWindowFlags(Qt.Window | Qt.WindowTitleHint | Qt.CustomizeWindowHint)  # type: ignore
+
     def accept(self):
 
         self.clock.calibrate(SuperClock.deformat_time(self.ui.sidereal_value.text()))
