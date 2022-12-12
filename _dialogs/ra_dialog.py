@@ -17,8 +17,7 @@ class RADialog(QDialog):
         self.clock = superclock
 
         # hide the close/minimize/fullscreen buttons
-        self.setWindowFlags(Qt.Window | Qt.WindowTitleHint | Qt.CustomizeWindowHint)
-
+        self.setWindowFlags(Qt.Window | Qt.WindowTitleHint | Qt.CustomizeWindowHint)  # type: ignore
     def accept(self):
 
         self.clock.calibrate(SuperClock.deformat_time(self.ui.sidereal_value.text()))
