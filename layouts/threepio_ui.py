@@ -245,6 +245,7 @@ class Ui_MainWindow(object):
         font.setFamily("Iosevka Aile")
         font.setPointSize(16)
         self.progressBar.setFont(font)
+        self.progressBar.setMaximum(1000)
         self.progressBar.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
         self.progressBar.setInvertedAppearance(False)
         self.progressBar.setObjectName("progressBar")

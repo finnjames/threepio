@@ -378,24 +378,29 @@ class Threepio(QtWidgets.QMainWindow):
     def update_progress_bar(self):
         # T=start_RA
         if self.obs is not None:
-            tus = self.clock.get_time_until(self.obs.start_RA)  # time until start
-            tue = self.clock.get_time_until(self.obs.end_RA)  # time until end
+            (start_time, end_time) = self.obs.state_time_interval
+            current_time = time.time()
 
-            if tus > 0 > tue:  # between start and end time
+
+            if end_time > current_time > start_time:
+                val = int(round((current_time - start_time) / (end_time - start_time) * 1000))
                 self.ui.progressBar.setValue(
-                    int((tue / (self.obs.end_RA - self.obs.start_RA)) * 100 % 100)
+                    int(round((current_time - start_time) / (end_time - start_time) * 1000))
                 )
             else:
+                val = 0
                 self.ui.progressBar.setValue(0)
 
-            # display the time nicely
-            hours = int((atus := abs(tus)) / 3600)
-            minutes = int((atus - (hours * 3600)) / 60)
-            seconds = int(atus - (hours * 3600) - (minutes * 60))
+            # set the label
+            time_until_next_step = end_time - current_time
+            hours = int((atuns := abs(time_until_next_step)) / 3600)
+            minutes = int((atuns - (hours * 3600)) / 60)
+            seconds = int(round(atuns - (hours * 3600) - (minutes * 60)))
+            print(f"{val=}, {hours}:{minutes}:{seconds}")
             label = reduce(
                 lambda a, c: a + c,
                 [
-                    f"T{'-' if tus < 0 else '+'}",
+                    f"T{'-' if time_until_next_step > 0 else '+'}",
                     f"{hours:0>2}:" if hours > 0 else "",
                     f"{minutes:0>2}:" if minutes > 0 else "",
                     f"{seconds:0>2}",
@@ -586,7 +591,7 @@ class Threepio(QtWidgets.QMainWindow):
                 except AttributeError:
                     pass
             self.message_log.append(new_log_task)
-            print(new_log_task.get_message())
+            # print(new_log_task.get_message())
         return new_log_task
 
     def update_console(self):

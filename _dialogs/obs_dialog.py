@@ -196,7 +196,7 @@ class ObsDialog(QDialog):
         self.obs.set_name(filename)
 
         # attempt to set data of observation
-        self.obs.set_ra(start_time, end_time)
+        self.obs.set_start_and_end_times(start_time, end_time)
         try:
             new_min_dec = int(self.ui.min_dec.text())
             new_max_dec = int(self.ui.max_dec.text())

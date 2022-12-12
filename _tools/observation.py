@@ -16,7 +16,7 @@ class ObsType(Enum):
 
 # State machine
 class State(Enum):
-    NO_STATE = 0  # do not use!
+    NO_STATE = 0  # do not use! indicates error has occurred
     OFF = 1
     CAL_1 = 2
     BG_1 = 3
@@ -60,9 +60,11 @@ class Observation:
 
         self.state = State.OFF
 
+        self.state_time_interval: tuple = (-1.0, -1.0)
+
         # Info
-        self.start_RA = None
-        self.end_RA = None
+        self.start_time = None
+        self.end_time = None
         self.min_dec = None  # if only one dec, this is it
         self.max_dec = None
 
@@ -87,9 +89,9 @@ class Observation:
         self.data_end = None
 
     # Settings API
-    def set_ra(self, start_ra, end_ra):
-        self.start_RA = start_ra
-        self.end_RA = end_ra
+    def set_start_and_end_times(self, start_ra, end_ra):
+        self.start_time = start_ra
+        self.end_time = end_ra
 
     def set_dec(self, min_dec, max_dec=None):
         if min_dec is None:
@@ -115,12 +117,13 @@ class Observation:
 
     # Communication API
     def communicate(self, data_point, timestamp=None):
-        if timestamp is None:
+        if timestamp is None:  # TODO: this should be either always true or always false
             timestamp = time.time()
 
-        user_start_time = self.start_RA - (self.bg_dur + self.cal_dur + 30)
+        user_start_time = self.start_time - (self.bg_dur + self.cal_dur + 30)
 
         if self.state == State.OFF:
+            self.state_time_interval = (-1.0, user_start_time)
             if timestamp < user_start_time:  # A 30-second buffer for user actions
                 return Comm.NO_ACTION
             else:
@@ -138,14 +141,14 @@ class Observation:
             else:
                 return Comm.START_WAIT
         elif self.state == State.WAITING:
-            if timestamp < self.start_RA:
+            if timestamp < self.start_time:
                 return Comm.NO_ACTION
             else:
                 return Comm.START_DATA
         elif self.state == State.DATA:
-            if timestamp < self.start_RA:
+            if timestamp < self.start_time:
                 return Comm.NO_ACTION
-            elif timestamp < self.end_RA:
+            elif timestamp < self.end_time:
                 return self.data_logic(data_point)
             # TODO: I hate this
             elif self.obs_type is ObsType.SURVEY and self.data_logic(
@@ -200,11 +203,13 @@ class Observation:
         self.start_time = time.time()
         self.cal_start = time.time()
         self.freq = self.cal_freq
+        self.state_time_interval = (self.cal_start, self.cal_start + self.cal_dur)
 
     def end_calibration_1(self):
         self.state = State.BG_1
         self.write("*")
         self.bg_start = time.time()
+        self.state_time_interval = (self.bg_start, self.bg_start + self.bg_dur)
 
     def end_background_1(self):
         self.state = State.WAITING
@@ -213,21 +218,25 @@ class Observation:
         self.state = State.DATA
         self.write("*")
         self.freq = self.data_freq
+        self.state_time_interval = (self.start_time, self.end_time)
 
     def start_calibration_2(self):
         self.state = State.CAL_2
         self.write("*")
         self.cal_start = time.time()
         self.freq = self.cal_freq
+        self.state_time_interval = (self.cal_start, self.cal_start + self.cal_dur)
 
     def end_calibration_2(self):
         self.state = State.BG_2
         self.write("*")
         self.bg_start = time.time()
+        self.state_time_interval = (self.bg_start, self.bg_start + self.bg_dur)
 
     def stop(self):
         self.state = State.DONE
         self.end_time = time.time()
+        self.state_time_interval = (-1.0, self.end_time)
         self.write("*")
         self.write("*")
         self.write_meta()
@@ -352,8 +361,8 @@ class Spectrum(Observation):
         self.freq_time = None
         self.timing_margin = 0.97
 
-    def set_ra(self, start_ra, end_ra):
-        super().set_ra(start_ra, start_ra + 180)
+    def set_start_and_end_times(self, start_ra, end_ra):  # overloaded
+        super().set_start_and_end_times(start_ra, start_ra + 180)
 
     def set_data_time(self, data_start, data_end):
         super().set_data_time(data_start, data_start + 180)
