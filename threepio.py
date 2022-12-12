@@ -570,12 +570,12 @@ class Threepio(QtWidgets.QMainWindow):
         self.ui.message_label.setText(message)
 
     def log(self, message, allow_dups=False, warning=False) -> LogTask:
+        new_log_task = LogTask(message)
         if (
             len(self.message_log) == 0
             or allow_dups
             or message != self.message_log[-1].message
         ):
-            new_log_task = LogTask(message)
             if warning:
                 new_log_task.set_leading_str("WARNING!")
             else:
