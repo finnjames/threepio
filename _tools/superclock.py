@@ -1,9 +1,10 @@
-"""clock for keeping track of the time ;)"""
+"""clock for keeping track of the time and running functions at different intervals"""
 
+from __future__ import annotations
 from math import floor
 import time
 import datetime
-from typing import Callable
+from typing import Callable, Optional
 
 SIDEREAL = 1.00273790935  # the number of sidereal seconds per second
 GB_LATITUDE = 38.437235
@@ -11,58 +12,6 @@ GB_LATITUDE = 38.437235
 
 class SuperClock:
     """Clock object for encapsulation; keeps track of the time(tm)"""
-
-    class Timer:
-
-        """A timer for syncing things that run at different, variable rates
-
-        Attributes:
-            offset (int): the number of times the timer has run
-        """
-
-        def __init__(self, period: float, callback: Callable[[], None]):
-            """
-            Args:
-                period (int): in milliseconds
-                callback (Callable): function to call when the timer runs
-            """
-            self.period = float(period)  # ms
-            self.callback = callback
-            self.offset = 0
-
-        def run(self) -> None:
-            self.callback()
-
-        def run_if_appropriate(self, anchor_time: float) -> bool:
-            if self.period <= 0:
-                return False
-            current_time = time.time()
-
-            # TODO: this works, right?
-            if current_time > anchor_time + (self.period / 1000) * (self.offset + 1):
-                self.offset = floor((current_time - anchor_time) / (self.period / 1000))
-
-            if current_time >= (anchor_time + (self.period / 1000) * self.offset):
-                print(self.offset, anchor_time, current_time)
-                self.run()
-                self.offset += 1
-                return True
-            return False
-
-        def set_period(self, new_period) -> None:
-            """
-            Args:
-                new_period (int): in milliseconds
-            """
-            if self.period != new_period:
-                self.offset = 0
-            self.period = new_period
-
-        def cancel(self) -> None:
-            self.period = 0.0
-
-        def __repr__(self) -> str:
-            return f"Timer({self.period}ms, {self.callback})"
 
     def __init__(self):
         self.timers = []
@@ -72,7 +21,7 @@ class SuperClock:
         # time, in seconds, since last sidereal midnight, assigned when ra is set
         self.starting_sidereal_time = 0.0
 
-    def calibrate(self, input_time: float, epoch_time: float = None):
+    def calibrate(self, input_time: float, epoch_time: Optional[float] = None):
         if epoch_time is None:
             epoch_time = time.time()
 
@@ -111,7 +60,7 @@ class SuperClock:
         return hours * 3600 + minutes * 60 + seconds
 
     def run_timers(self) -> None:
-        """run all timers"""
+        """run every timer that is due to run"""
         for timer in self.timers:
             timer.run_if_appropriate(self.anchor_time)
 
@@ -120,9 +69,9 @@ class SuperClock:
         for timer in self.timers:
             timer.offset = 0
 
-    def add_timer(self, period, callback) -> Timer:
+    def add_timer(self, period, callback, name="", log=False) -> Timer:
         """set a timer to call a function periodically"""
-        new_timer = SuperClock.Timer(period, callback)
+        new_timer = Timer(period, callback, name, log)
         self.timers.append(new_timer)
         return new_timer
 
@@ -164,3 +113,56 @@ class SuperClock:
         """return a string of HH:MM:SS formatted local sidereal time"""
         hours, minutes, seconds = self.get_sidereal_tuple()
         return f"{hours:02.0f}:{minutes:02.0f}:{seconds:02.0f}"
+
+class Timer:
+    """A timer for syncing things that run at different, variable rates
+    
+    Args:
+        period (int): in milliseconds
+        callback (Callable[[], None]): function to call when the timer runs
+        name (str): name of the timer
+        log (bool): whether to print the timer's name and status when it runs
+        
+    """
+
+    def __init__(self, period: float, callback: Callable[[], None], name: str, log: bool):
+        self.period = float(period)  # ms
+        self.callback = callback
+        self.offset = 0
+        self.name = name
+        self.log = log
+
+    def run(self) -> None:
+        self.callback()
+
+    def run_if_appropriate(self, anchor_time: float) -> bool:
+        if self.period <= 0:
+            return False
+        current_time = time.time()
+
+        # TODO: this works, right?
+        if current_time > anchor_time + (self.period / 1000) * (self.offset + 1):
+            self.offset = floor((current_time - anchor_time) / (self.period / 1000))
+
+        if current_time >= (anchor_time + (self.period / 1000) * self.offset):
+            if self.log:  # TODO: should this be in production?
+                print(f"{self.name}: offset={self.offset}, {anchor_time=}, {current_time=}")
+            self.run()
+            self.offset += 1
+            return True
+        return False
+
+    def set_period(self, new_period) -> None:
+        """
+        Args:
+            new_period (int): in milliseconds
+        """
+        if self.period != new_period:
+            self.offset = 0
+        self.period = new_period
+
+    def cancel(self) -> None:
+        self.period = 0.0
+
+    def __repr__(self) -> str:
+        return f"Timer({self.period}ms, {self.callback})"

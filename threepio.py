@@ -168,8 +168,8 @@ class Threepio(QtWidgets.QMainWindow):
         self.timer.timeout.connect(self.tick)  # do everything
         self.timer.start(self.BASE_PERIOD)  # set refresh rate
         # assign timers to functions meant to fire periodically
-        self.clock.add_timer(1000, self.update_gui)
-        self.data_timer = self.clock.add_timer(1000, self.update_data)
+        self.clock.add_timer(1000, self.update_gui, name="update_gui")
+        self.data_timer = self.clock.add_timer(1000, self.update_data, name="update_data")
 
         # measure refresh rate
         self.time_of_last_fps_update = time.perf_counter()
