@@ -258,7 +258,7 @@ class Observation:
             self.file_b.write(string)
 
     def write_data(self, point: DataPoint):
-        print(f"{point.timestamp}, dec: {point.dec}")
+        # print(f"{point.timestamp}, dec: {point.dec}")
         self.write("%.2f" % point.timestamp)
         self.write("%.2f" % point.dec)
         if self.composite:
