@@ -441,7 +441,7 @@ class Threepio(QtWidgets.QMainWindow):
                 self.ticks_since_last_fps_update / time_since_last_fps_update
             )
         except ZeroDivisionError:
-            new_fps = -1.0
+            new_fps = "-1.0"
 
         self.ui.refresh_value.setText(new_fps)
         self.time_of_last_fps_update = current_time
