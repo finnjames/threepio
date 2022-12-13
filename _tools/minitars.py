@@ -104,10 +104,8 @@ class MiniTars:
     def random_data(self) -> float:
         """for testing"""
         if self.parent.ui.dec_auto_check_box.isChecked():
-            t = time.time() / 8
-            y = math.sin(4 * t)
-            return y
-        return float(self.parent.ui.declination_slider.value()) / 100
+            return math.sin(time.time() / 2) * 100
+        return float(self.parent.ui.declination_slider.value())
 
 
 def main():
