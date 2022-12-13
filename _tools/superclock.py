@@ -15,7 +15,7 @@ class SuperClock:
 
     def __init__(self):
         self.timers = []
-        self.starting_time = None
+        self.starting_time = time.time()  # TODO: is this okay?
         self.anchor_time = None
         self.set_starting_time()
         # time, in seconds, since last sidereal midnight, assigned when ra is set
