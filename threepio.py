@@ -551,16 +551,13 @@ class Threepio(QtWidgets.QMainWindow):
         dialog.setWindowTitle("Current " + self.obs.obs_type.name.capitalize())
         dialog.exec_()
 
-    def dec_calibration(self, placeholder=False):
-        if placeholder:
-            DecDialog.set_placeholder_cal()
-        else:
-            dialog = DecDialog(self.minitars, self)
-            if self.mode is Threepio.Mode.TESTING:
-                dialog.show()  # TODO: why does this work?
-            dialog.exec_()
+    def dec_calibration(self):
+        dialog = DecDialog(self.minitars, self)
+        if self.mode is Threepio.Mode.TESTING:
+            dialog.show()  # TODO: why does this work?
+        dialog.exec_()
 
-            self.dec_calc.load_dec_cal()
+        self.dec_calc.load_dec_cal()
 
     def ra_calibration(self):
         dialog = RADialog(self, self.clock)
@@ -645,7 +642,7 @@ class Threepio(QtWidgets.QMainWindow):
     # noinspection PyUnusedLocal
     def beep(self, message=""):
         """message is for debugging"""
-        self.beep_sound.play()
+        # self.beep_sound.play()
         self.last_beep_time = time.time()
         # print("beep!", message, time.time())
 
