@@ -69,7 +69,7 @@ class SuperClock:
         for timer in self.timers:
             timer.offset = 0
 
-    def add_timer(self, period, callback, name="", log=False) -> Timer:
+    def add_timer(self, period: int, callback, name="", log=False) -> Timer:
         """set a timer to call a function periodically"""
         new_timer = Timer(period, callback, name, log)
         self.timers.append(new_timer)
@@ -114,6 +114,7 @@ class SuperClock:
         hours, minutes, seconds = self.get_sidereal_tuple()
         return f"{hours:02.0f}:{minutes:02.0f}:{seconds:02.0f}"
 
+
 class Timer:
     """A timer for syncing things that run at different, variable rates
     
@@ -125,8 +126,8 @@ class Timer:
         
     """
 
-    def __init__(self, period: float, callback: Callable[[], None], name: str, log: bool):
-        self.period = float(period)  # ms
+    def __init__(self, period: int, callback: Callable[[], None], name: str, log: bool):
+        self.period = period  # ms
         self.callback = callback
         self.offset = 0
         self.name = name
@@ -146,13 +147,13 @@ class Timer:
 
         if current_time >= (anchor_time + (self.period / 1000) * self.offset):
             if self.log:  # TODO: should this be in production?
-                print(f"{self.name}: offset={self.offset}, {anchor_time=}, {current_time=}")
+                print(f"{self.name}: {self.offset=}, {anchor_time=}, {current_time=}")
             self.run()
             self.offset += 1
             return True
         return False
 
-    def set_period(self, new_period) -> None:
+    def set_period(self, new_period: int) -> None:
         """
         Args:
             new_period (int): in milliseconds
@@ -162,7 +163,7 @@ class Timer:
         self.period = new_period
 
     def cancel(self) -> None:
-        self.period = 0.0
+        self.period = 0
 
     def __repr__(self) -> str:
         return f"Timer({self.period}ms, {self.callback})"

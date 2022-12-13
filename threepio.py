@@ -169,7 +169,9 @@ class Threepio(QtWidgets.QMainWindow):
         self.timer.start(self.BASE_PERIOD)  # set refresh rate
         # assign timers to functions meant to fire periodically
         self.clock.add_timer(1000, self.update_gui, name="update_gui")
-        self.data_timer = self.clock.add_timer(1000, self.update_data, name="update_data")
+        self.data_timer = self.clock.add_timer(1000,
+                                               self.update_data,
+                                               name="update_data")
 
         # measure refresh rate
         self.time_of_last_fps_update = time.perf_counter()
@@ -381,12 +383,11 @@ class Threepio(QtWidgets.QMainWindow):
             (start_time, end_time) = self.obs.state_time_interval
             current_time = time.time()
 
-
             if end_time > current_time > start_time:
-                val = int(round((current_time - start_time) / (end_time - start_time) * 1000))
-                self.ui.progressBar.setValue(
-                    int(round((current_time - start_time) / (end_time - start_time) * 1000))
-                )
+                val = int(round(
+                    (current_time - start_time) / (end_time - start_time) * 1000))
+                self.ui.progressBar.setValue(int(round(
+                        (current_time - start_time) / (end_time - start_time) * 1000)))
             else:
                 val = 0
                 self.ui.progressBar.setValue(0)
