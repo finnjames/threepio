@@ -14,7 +14,6 @@ class ObsType(Enum):
     SPECTRUM = 2
 
 
-# State machine
 class State(Enum):
     NO_STATE = 0  # do not use! indicates error has occurred
     OFF = 1
