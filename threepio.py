@@ -582,7 +582,7 @@ class Threepio(QtWidgets.QMainWindow):
                 except AttributeError:
                     pass
             self.message_log.append(new_log_task)
-            # print(new_log_task.get_message())
+            print(new_log_task.get_message())
         return new_log_task
 
     def update_console(self):
