@@ -5,9 +5,12 @@ from math import floor
 import time
 import datetime
 from typing import Callable, Optional
+from astropy.time import Time
+from astropy.coordinates import EarthLocation
 
 SIDEREAL = 1.00273790935  # the number of sidereal seconds per second
-GB_LATITUDE = 38.437235
+GB_LATITUDE = 38.437235  # north
+GB_LONGITUDE = -79.839835  # west
 
 
 class SiderealTime:
@@ -33,12 +36,10 @@ class SuperClock:
         # time, in seconds, since the sidereal midnight before last calibration
         self.starting_sidereal_time = 0.0
 
-        try:
-            with open("ra-cal.txt", "r") as f:  # get data from file
-                self.calibrate_sidereal_time(*[float(f.readline()) for _ in range(2)])
-        except FileNotFoundError:  # if file doesn't exist, create it
-            self.calibrate_sidereal_time(0.0, current_time)
-        
+        loc = EarthLocation(lat=GB_LATITUDE, lon=GB_LONGITUDE)
+        t = Time(time.time(), format="unix", scale="utc", location=loc)
+        current_ra = SuperClock.hours_to_seconds(t.sidereal_time("apparent").value)
+        self.calibrate_sidereal_time(current_ra, current_time)
 
     def calibrate_sidereal_time(self,
                                 starting_sidereal_time: float,
@@ -56,10 +57,6 @@ class SuperClock:
         self.set_starting_sidereal_time(corrected_sidereal_time)
 
         print(f"{self.starting_sidereal_time=}, {self.starting_epoch_time=}")
-
-        with open("ra-cal.txt", "w") as f:
-            # f.write(f"{self.get_sidereal_seconds()}\n{time.time()}")
-            f.write(f"{corrected_sidereal_time}\n{corrected_epoch_time}")
 
     @staticmethod
     def get_time() -> float:
@@ -88,6 +85,10 @@ class SuperClock:
         """convert a string of the form HH:MM:SS to a float of seconds"""
         hours, minutes, seconds = map(float, time_string.split(":"))
         return hours * 3600 + minutes * 60 + seconds
+    
+    @staticmethod
+    def hours_to_seconds(hours: float) -> float:
+        return hours * 3600
     
     def run_timers(self) -> None:
         """run every timer that is due to run"""

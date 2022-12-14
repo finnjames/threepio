@@ -375,7 +375,7 @@ class Threepio(QtWidgets.QMainWindow):
             (start_time, end_time) = self.obs.state_time_interval
             
             if end_time > 0.0:
-                print(f"{start_time=}, {end_time=}")
+                # print(f"{start_time=}, {end_time=}, {time.time()=}")
                 current_time = time.time()
 
                 val = 0
@@ -390,7 +390,6 @@ class Threepio(QtWidgets.QMainWindow):
                 hours = int((atuns := abs(time_until_next_step)) / 3600)
                 minutes = int((atuns - (hours * 3600)) / 60)
                 seconds = int(round(atuns - (hours * 3600) - (minutes * 60)))
-                print(f"{val=}, {hours}:{minutes}:{seconds}")
                 label = reduce(
                     lambda a, c: a + c,
                     [

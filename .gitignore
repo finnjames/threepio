@@ -11,5 +11,5 @@ __pycache__/
 *$py.class
 dist/
 .qt_for_python
-ra-cal.txt
 dec-cal*.txt
+test.py
