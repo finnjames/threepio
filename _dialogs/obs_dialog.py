@@ -59,16 +59,16 @@ class ObsDialog(QDialog):
             self.ui.accept_button.setText("Close")
             self.ui.cancel_button.hide()
             # TODO: show info about the observation
+        else:
+            # set default ra
+            for i in [self.ui.start_time, self.ui.end_time]:
+                i.setTime(QTime(*self.clock.get_sidereal_tuple()))
 
         self.confirmed = False
 
         # make default filename
         self.default_filename = self.clock.get_time_slug()
         self.ui.file_name_value.setPlaceholderText(str(self.default_filename))
-
-        # set default ra
-        for i in [self.ui.start_time, self.ui.end_time]:
-            i.setTime(QTime(*self.clock.get_sidereal_tuple()))
 
         # hide error and warning labels to start
         self.clear_messages()
