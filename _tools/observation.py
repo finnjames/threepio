@@ -88,9 +88,9 @@ class Observation:
         self.data_end = None
 
     # Settings API
-    def set_start_and_end_times(self, start_ra, end_ra):
-        self.start_time = start_ra
-        self.end_time = end_ra
+    def set_start_and_end_times(self, start_time, end_time):
+        self.start_time = start_time
+        self.end_time = end_time
 
     def set_dec(self, min_dec, max_dec=None):
         if min_dec is None:
@@ -115,9 +115,7 @@ class Observation:
         self.input_record = input_record
 
     # Communication API
-    def communicate(self, data_point, timestamp=None):
-        if timestamp is None:  # TODO: this should be either always true or always false
-            timestamp = time.time()
+    def communicate(self, data_point, timestamp: float):
 
         user_start_time = self.start_time - (self.bg_dur + self.cal_dur + 30)
 

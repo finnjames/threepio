@@ -10,26 +10,56 @@ SIDEREAL = 1.00273790935  # the number of sidereal seconds per second
 GB_LATITUDE = 38.437235
 
 
+class SiderealTime:
+    """Time object that holds a local (i.e. 24hr) sidereal time"""
+
+    def __init__(self, input_sidereal_time: str):
+        self.sidereal_string = input_sidereal_time
+        self.sidereal_seconds = SuperClock.deformat_time_string(input_sidereal_time)
+    
+    def __str__(self):
+        return self.sidereal_string
+
+
 class SuperClock:
     """Clock object for encapsulation; keeps track of the time(tm)"""
 
     def __init__(self):
         self.timers = []
-        self.starting_time = time.time()  # TODO: is this okay?
-        self.anchor_time = None
-        self.set_starting_time()
-        # time, in seconds, since last sidereal midnight, assigned when ra is set
+        current_time = SuperClock.get_time()
+        self.starting_epoch_time: float = 0.0  # TODO: is this okay?
+        self.anchor_time: float = 0.0
+        self.set_starting_time(current_time)
+        # time, in seconds, since the sidereal midnight before last calibration
         self.starting_sidereal_time = 0.0
 
-    def calibrate(self, input_time: float, epoch_time: Optional[float] = None):
-        if epoch_time is None:
-            epoch_time = time.time()
+        try:
+            with open("ra-cal.txt", "r") as f:  # get data from file
+                self.calibrate_sidereal_time(*[float(f.readline()) for _ in range(2)])
+        except FileNotFoundError:  # if file doesn't exist, create it
+            self.calibrate_sidereal_time(0.0, current_time)
+        
 
-        self.set_starting_sidereal_time(input_time)
-        self.set_starting_time(epoch_time)
+    def calibrate_sidereal_time(self,
+                                starting_sidereal_time: float,
+                                starting_epoch_time: Optional[float] = None):
+        if starting_epoch_time is None:
+            starting_epoch_time = time.time()
+        
+        current_time = time.time()
+        
+        sidereal_offset = SuperClock.solar_to_sidereal(current_time - starting_epoch_time)
+        corrected_sidereal_time = (starting_sidereal_time + sidereal_offset) % 86400
+        corrected_epoch_time = time.time()
+
+        self.set_starting_time(corrected_epoch_time)
+        self.set_starting_sidereal_time(corrected_sidereal_time)
+
+        print(f"{self.starting_sidereal_time=}, {self.starting_epoch_time=}")
 
         with open("ra-cal.txt", "w") as f:
-            f.write(f"{self.get_sidereal_seconds()}\n{time.time()}")
+            # f.write(f"{self.get_sidereal_seconds()}\n{time.time()}")
+            f.write(f"{corrected_sidereal_time}\n{corrected_epoch_time}")
 
     @staticmethod
     def get_time() -> float:
@@ -54,17 +84,17 @@ class SuperClock:
         return time.time() - destination_time
 
     @staticmethod
-    def deformat_time(time_string: str) -> float:
+    def deformat_time_string(time_string: str) -> float:
         """convert a string of the form HH:MM:SS to a float of seconds"""
         hours, minutes, seconds = map(float, time_string.split(":"))
         return hours * 3600 + minutes * 60 + seconds
-
+    
     def run_timers(self) -> None:
         """run every timer that is due to run"""
         for timer in self.timers:
             timer.run_if_appropriate(self.anchor_time)
 
-    def reset_timers(self) -> None:
+    def reset_all_timer_offsets(self) -> None:
         """set offset of all timers to 0"""
         for timer in self.timers:
             timer.offset = 0
@@ -78,28 +108,25 @@ class SuperClock:
     def set_starting_sidereal_time(self, sidereal_time: float) -> None:
         self.starting_sidereal_time = sidereal_time
 
-    def set_starting_time(self, epoch_time=None) -> None:
+    def set_starting_time(self, epoch_time: float) -> None:
         """set starting time and anchor time to specified time"""
-        if epoch_time is None:
-            epoch_time = time.time()
-        self.starting_time = self.anchor_time = epoch_time
-        self.reset_timers()
+        self.starting_epoch_time = self.anchor_time = epoch_time
+        self.reset_all_timer_offsets()
 
     def reset_anchor_time(self) -> None:
         """set anchor time to current time"""
         self.anchor_time = time.time()
-        self.reset_timers()
+        self.reset_all_timer_offsets()
 
     def get_elapsed_time(self) -> float:
-        return time.time() - self.starting_time
+        return time.time() - self.starting_epoch_time
+
+    def get_starting_time(self) -> float:
+        return self.starting_epoch_time
 
     def get_sidereal_seconds(self) -> float:
         """sidereal seconds since the sidereal midnight before calibration"""
         return self.starting_sidereal_time + SIDEREAL * self.get_elapsed_time()
-
-    def get_solar_seconds(self) -> float:
-        """sidereal_to_solar(get_sidereal_seconds())"""
-        return self.sidereal_to_solar(self.get_sidereal_seconds())
 
     def get_sidereal_tuple(self) -> tuple:
         """return an hours, minutes, seconds tuple of local sidereal time"""

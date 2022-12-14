@@ -73,14 +73,6 @@ class Threepio(QtWidgets.QMainWindow):
         stripchart_log_task = self.log(">>> Initializing...")
         # clock
         self.clock = SuperClock()
-        # initial RA calibration
-        try:
-            with open("ra-cal.txt", "r") as f:  # get data from file
-                self.clock.calibrate(*[float(f.readline()) for _ in range(2)])
-        except FileNotFoundError:
-            ra_cal_logtask = self.log("Generating RA cal file...")
-            self.clock.calibrate(0.0)
-            ra_cal_logtask.set_status(0)
 
         # initialize stripchart
         self.stripchart_display_seconds = 8
@@ -381,36 +373,38 @@ class Threepio(QtWidgets.QMainWindow):
         # T=start_RA
         if self.obs is not None:
             (start_time, end_time) = self.obs.state_time_interval
-            current_time = time.time()
+            
+            if end_time > 0.0:
+                print(f"{start_time=}, {end_time=}")
+                current_time = time.time()
 
-            if end_time > current_time > start_time:
-                val = int(round(
-                    (current_time - start_time) / (end_time - start_time) * 1000))
-                self.ui.progressBar.setValue(int(round(
-                        (current_time - start_time) / (end_time - start_time) * 1000)))
-            else:
                 val = 0
-                self.ui.progressBar.setValue(0)
+                if end_time > current_time > start_time and start_time > 0:
+                    val = int(round(
+                        (current_time - start_time) / (end_time - start_time) * 1000))
+                self.ui.progressBar.setValue(val)
 
-            # set the label
-            time_until_next_step = end_time - current_time
-            hours = int((atuns := abs(time_until_next_step)) / 3600)
-            minutes = int((atuns - (hours * 3600)) / 60)
-            seconds = int(round(atuns - (hours * 3600) - (minutes * 60)))
-            print(f"{val=}, {hours}:{minutes}:{seconds}")
-            label = reduce(
-                lambda a, c: a + c,
-                [
-                    f"T{'-' if time_until_next_step > 0 else '+'}",
-                    f"{hours:0>2}:" if hours > 0 else "",
-                    f"{minutes:0>2}:" if minutes > 0 else "",
-                    f"{seconds:0>2}",
-                ],
-            )
-            self.ui.progressBar.setFormat(label)
-        else:
-            self.ui.progressBar.setFormat("n/a")
-            self.ui.progressBar.setValue(0)
+                # set the label
+                time_until_next_step = end_time - current_time
+                # TODO: abstract this?
+                hours = int((atuns := abs(time_until_next_step)) / 3600)
+                minutes = int((atuns - (hours * 3600)) / 60)
+                seconds = int(round(atuns - (hours * 3600) - (minutes * 60)))
+                print(f"{val=}, {hours}:{minutes}:{seconds}")
+                label = reduce(
+                    lambda a, c: a + c,
+                    [
+                        f"T{'-' if time_until_next_step > 0 else '+'}",
+                        f"{hours:0>2}:" if hours > 0 else "",
+                        f"{minutes:0>2}:" if minutes > 0 else "",
+                        f"{seconds:0>2}",
+                    ],
+                )
+                self.ui.progressBar.setFormat(label)
+                return
+
+        self.ui.progressBar.setFormat("n/a")
+        self.ui.progressBar.setValue(0)
 
     def update_dec_view(self):
         angle = self.current_dec - GB_LATITUDE

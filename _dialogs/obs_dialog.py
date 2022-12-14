@@ -173,16 +173,17 @@ class ObsDialog(QDialog):
         """attempt to add all necessary info to the encapsulated observation"""
 
         # parse times; pattern = "HH:MM:SS"
-        starting_ra = SuperClock.deformat_time(self.ui.start_time.text())
-        ending_ra = SuperClock.deformat_time(self.ui.end_time.text())
+        starting_ra = SuperClock.deformat_time_string(self.ui.start_time.text())
+        ending_ra = SuperClock.deformat_time_string(self.ui.end_time.text())
         if ending_ra < starting_ra:
             ending_ra += 3600 * 24
             self.show_warning("Assuming ending RA is the next day")
 
         # calculate start and end times
-        solar = self.clock.get_time()  # current solar time
-        sidereal = self.clock.get_sidereal_seconds()  # current sidereal seconds
+        solar = self.clock.get_starting_time()  # solar time of last calibration
+        sidereal = self.clock.get_sidereal_seconds()  # sidereal seconds since midnight before last calibration
         start_time = solar + self.clock.sidereal_to_solar(starting_ra - sidereal)
+        print(f"{solar=}, {sidereal=}, {starting_ra=}, {start_time=}")
         end_time = (
             (solar + self.clock.sidereal_to_solar(ending_ra - sidereal))
             if self.obs.obs_type is not ObsType.SPECTRUM
@@ -195,7 +196,7 @@ class ObsDialog(QDialog):
             filename = self.default_filename
         self.obs.set_name(filename)
 
-        # attempt to set data of observation
+        # attempt to set observation data
         self.obs.set_start_and_end_times(start_time, end_time)
         try:
             new_min_dec = int(self.ui.min_dec.text())

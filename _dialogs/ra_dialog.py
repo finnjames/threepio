@@ -21,7 +21,8 @@ class RADialog(QDialog):
 
     def accept(self):
 
-        self.clock.calibrate(SuperClock.deformat_time(self.ui.sidereal_value.text()))
+        sidereal_seconds = SuperClock.deformat_time_string(self.ui.sidereal_value.text())
+        self.clock.calibrate_sidereal_time(sidereal_seconds)
 
         try:
             self.parent_window.clear_stripchart()
