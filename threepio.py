@@ -2,6 +2,7 @@ import time
 from enum import Enum
 from functools import reduce
 from typing import Callable
+from math import floor
 
 from PyQt5 import QtChart, QtCore, QtGui, QtWidgets, QtMultimedia
 
@@ -55,11 +56,6 @@ class Threepio(QtWidgets.QMainWindow):
             self.setStyleSheet(f.read())
         self.ui.setupUi(self)
         self.setWindowTitle("threepio")
-
-        # hide the close/minimize/fullscreen buttons
-        self.setWindowFlags(
-            QtCore.Qt.Window | QtCore.Qt.WindowTitleHint | QtCore.Qt.CustomizeWindowHint
-        )
 
         # mode
         self.legacy_mode = False
@@ -296,14 +292,13 @@ class Threepio(QtWidgets.QMainWindow):
         self.ui.actionNormal.setChecked(True)
         self.ui.actionTesting.setChecked(False)
         self.ui.testing_frame.hide()
-        # self.adjustSize()
-        self.setFixedSize(self.MIN_WIDTH, 640)
+        self.adjustSize()
         self.mode = Threepio.Mode.NORMAL
 
     def set_state_testing(self):
         self.ui.actionNormal.setChecked(False)
         self.ui.actionTesting.setChecked(True)
-        self.setFixedSize(self.MIN_WIDTH, 826)
+        # self.setFixedSize(self.MIN_WIDTH, 826)
         self.ui.testing_frame.show()
         self.mode = Threepio.Mode.TESTING
 
@@ -590,10 +585,11 @@ class Threepio(QtWidgets.QMainWindow):
 
     def update_console(self):
         """refresh console with the latest statuses and last 7 logs"""
+        number_of_logs = floor(self.ui.console_label.height() / 14)
         self.ui.console_label.setText(
             reduce(
                 lambda c, a: c + "\n" + a,
-                [i.get_message() for i in self.message_log[-7:]],
+                [i.get_message() for i in self.message_log[-1*number_of_logs:]],
             )
         )
 
