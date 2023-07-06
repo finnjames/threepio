@@ -14,4 +14,4 @@ class CreditsDialog(QDialog):
         self.ui.setupUi(self)
         self.ui.label.setPixmap(QPixmap("assets/c3po.png"))
 
-        self.setWindowFlags(Qt.Window | Qt.WindowTitleHint | Qt.CustomizeWindowHint)
+        # self.setWindowFlags(Qt.Window | Qt.WindowTitleHint)
