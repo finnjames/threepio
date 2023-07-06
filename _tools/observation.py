@@ -12,6 +12,7 @@ class ObsType(Enum):
     SCAN = 0
     SURVEY = 1
     SPECTRUM = 2
+    UNSPECIFIED = 3
 
 
 class State(Enum):
@@ -41,7 +42,7 @@ class Observation:
     def __init__(self):
         self.name = None
         self.composite = False
-        self.obs_type = None
+        self.obs_type = ObsType.UNSPECIFIED
 
         # Parameters
         self.bg_dur = 60

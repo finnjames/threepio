@@ -209,6 +209,7 @@ class Threepio(QtWidgets.QMainWindow):
     def update_data(self) -> None:
         if not self.check_and_set_observation_state():
             return
+        assert self.obs is not None  # the language server was complaining
 
         period = 1000 / self.obs.freq  # Hz -> ms
         self.data_timer.set_period(period)
@@ -219,7 +220,7 @@ class Threepio(QtWidgets.QMainWindow):
 
         obs_type = self.obs.obs_type
 
-        if transmission != self.previous_transmission:  # TODO: should these be special?
+        if transmission != self.previous_transmission:  #TODO: should these be special?
             if transmission is Comm.START_CAL:
                 alerts = [
                     Alert("Turn the calibration switches ON", "Okay"),
@@ -239,6 +240,7 @@ class Threepio(QtWidgets.QMainWindow):
 
                 def callback():
                     self.clock.reset_anchor_time()
+                    assert self.obs is not None  # the language server was complaining
                     self.obs.next()
                     self.message("Taking calibration data!!!")
 
@@ -249,6 +251,7 @@ class Threepio(QtWidgets.QMainWindow):
 
                 def callback():
                     self.clock.reset_anchor_time()
+                    assert self.obs is not None  # the language server was complaining
                     self.obs.next()
                     self.message("Taking background data!!!")
 
@@ -371,8 +374,9 @@ class Threepio(QtWidgets.QMainWindow):
 
     def update_progress_bar(self):
         # T=start_RA
-        if self.obs is not None:
-            (start_time, end_time) = self.obs.state_time_interval
+        try:
+            assert self.obs is not None
+            (start_time, end_time) = self.obs.state_time_interval # type: ignore
             
             if end_time > 0.0:
                 # print(f"{start_time=}, {end_time=}, {time.time()=}")
@@ -401,9 +405,9 @@ class Threepio(QtWidgets.QMainWindow):
                 )
                 self.ui.progressBar.setFormat(label)
                 return
-
-        self.ui.progressBar.setFormat("n/a")
-        self.ui.progressBar.setValue(0)
+        except AssertionError:
+            self.ui.progressBar.setFormat("n/a")
+            self.ui.progressBar.setValue(0)
 
     def update_dec_view(self):
         angle = self.current_dec - GB_LATITUDE
@@ -539,8 +543,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.completed_one_calibration = False
 
     def handle_get_info(self):
-        if self.obs is not None:
-            pass
+        assert self.obs is not None
         dialog = ObsDialog(self, self.obs, self.clock, info=True)
         dialog.setWindowTitle("Current " + self.obs.obs_type.name.capitalize())
         dialog.exec_()
@@ -600,7 +603,10 @@ class Threepio(QtWidgets.QMainWindow):
         self.worker = self.AlertWorker(self)
         self.worker.moveToThread(new_thread)
         # connect signals and slots
-        new_thread.started.connect(lambda: self.worker.run(*alerts, callback=callback))
+        new_thread.started.connect(
+                lambda: self.worker is not None
+                and self.worker.run(*alerts, callback=callback)
+            )
         self.worker.finished.connect(new_thread.quit)
         self.worker.finished.connect(self.worker.deleteLater)
 
@@ -633,7 +639,6 @@ class Threepio(QtWidgets.QMainWindow):
         alert.show()
         alert.exec_()
 
-    # noinspection PyUnusedLocal
     def beep(self, message=""):
         """message is for debugging"""
         self.beep_sound.play()
@@ -642,15 +647,15 @@ class Threepio(QtWidgets.QMainWindow):
 
     def closeEvent(self, event):
         """override quit action to confirm before closing"""
-        m = QtWidgets.QDialog()
-        m.ui = quit_ui.Ui_Dialog()
-        m.ui.setupUi(m)
+        quit_dialog = QtWidgets.QDialog()
+        quit_dialog.ui = quit_ui.Ui_Dialog() # type: ignore
+        quit_dialog.ui.setupUi(quit_dialog)
 
-        m.setWindowFlags(
-            QtCore.Qt.Window | QtCore.Qt.WindowTitleHint | QtCore.Qt.CustomizeWindowHint
+        quit_dialog.setWindowFlags(
+            QtCore.Qt.Window | QtCore.Qt.WindowTitleHint | QtCore.Qt.CustomizeWindowHint # type: ignore
         )
 
-        close = m.exec()
+        close = quit_dialog.exec()
         if close:
             event.accept()
         else:
