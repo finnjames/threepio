@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(463, 369)
+        Dialog.resize(554, 369)
         self.verticalLayout = QtWidgets.QVBoxLayout(Dialog)
         self.verticalLayout.setObjectName("verticalLayout")
         self.cal_display_widget = QtWidgets.QWidget(Dialog)
@@ -85,6 +85,11 @@ class Ui_Dialog(object):
         self.discard_cal_button.setObjectName("discard_cal_button")
         self.horizontalLayout_3.addWidget(self.discard_cal_button)
         self.previous_button = QtWidgets.QPushButton(self.button_frame)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.previous_button.sizePolicy().hasHeightForWidth())
+        self.previous_button.setSizePolicy(sizePolicy)
         self.previous_button.setObjectName("previous_button")
         self.horizontalLayout_3.addWidget(self.previous_button)
         self.next_button = QtWidgets.QPushButton(self.button_frame)
@@ -95,13 +100,20 @@ class Ui_Dialog(object):
         self.record_button.setDefault(True)
         self.record_button.setObjectName("record_button")
         self.horizontalLayout_3.addWidget(self.record_button)
+        self.save_button = QtWidgets.QPushButton(self.button_frame)
+        self.save_button.setEnabled(False)
+        self.save_button.setObjectName("save_button")
+        self.horizontalLayout_3.addWidget(self.save_button)
         self.verticalLayout.addWidget(self.button_frame)
 
         self.retranslateUi(Dialog)
         self.discard_cal_button.clicked.connect(Dialog.close)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
-        Dialog.setTabOrder(self.north_south_combo_box, self.previous_button)
+        Dialog.setTabOrder(self.north_south_combo_box, self.record_button)
+        Dialog.setTabOrder(self.record_button, self.next_button)
+        Dialog.setTabOrder(self.next_button, self.previous_button)
         Dialog.setTabOrder(self.previous_button, self.discard_cal_button)
+        Dialog.setTabOrder(self.discard_cal_button, self.save_button)
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
@@ -117,3 +129,4 @@ class Ui_Dialog(object):
         self.previous_button.setText(_translate("Dialog", "<"))
         self.next_button.setText(_translate("Dialog", ">"))
         self.record_button.setText(_translate("Dialog", "Record"))
+        self.save_button.setText(_translate("Dialog", "Save"))

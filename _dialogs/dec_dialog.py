@@ -27,6 +27,7 @@ class DecDialog(QDialog):
         self.step = dc.STEP
         self.current_dec = dc.SOUTH_DEC
         self.data = self.get_empty_data()
+        self.confirmation_requested = False
         self.ui.warning_label.hide()
         self.update_labels()
 
@@ -37,6 +38,7 @@ class DecDialog(QDialog):
         self.ui.record_button.clicked.connect(self.handle_record)
         self.ui.next_button.clicked.connect(self.handle_next)
         self.ui.previous_button.clicked.connect(self.handle_previous)
+        self.ui.save_button.clicked.connect(self.handle_save)
         self.ui.north_south_combo_box.currentIndexChanged.connect(
             self.set_direction
         )
@@ -56,10 +58,18 @@ class DecDialog(QDialog):
         self.update_labels()
     
     def get_dec_range(self):
-        return range(self.starting_dec, self.ending_dec + 1, self.step)
+        return range(self.starting_dec, self.ending_dec + self.step, self.step)
     
     def get_empty_data(self):
         return {key: None for key in self.get_dec_range()}
+    
+    def handle_save(self):
+        try:
+            self.complete_calibration()
+        except Exception as e:
+            self.parent.log(f"Dec cal failed: {e.__str__()}")
+        finally:
+            self.close()
 
     def handle_record(self):
         self.parent.beep()
@@ -74,48 +84,46 @@ class DecDialog(QDialog):
         nonmonotonic = False
         try:
             self.validate_data()
-        except TypeError:
+        except TypeError as e:
             nonmonotonic = True
+            print(e.__str__())
         if nonmonotonic:
             self.ui.warning_label.setText("Warning: data is not monotonic")
             self.ui.warning_label.show()
         else:
             self.ui.warning_label.hide()
 
-        self.current_dec += self.step
+        self.move(self.step)
 
         self.update_labels()
-
-        # is calibration complete?
-        if self.current_dec > dc.NORTH_DEC or self.current_dec < dc.SOUTH_DEC:
-            try:
-                self.complete_calibration()
-            except Exception as e:
-                self.parent.log(f"Dec cal failed: {e.__str__()}")
-            self.close()
     
     def validate_data(self, allow_incomplete = True):
         decs_to_test = self.get_dec_range()
         if allow_incomplete:
             decs_to_test = list(filter(lambda a: self.data[a] is not None, decs_to_test))
-            assert sorted(decs_to_test)
+            assert sorted(decs_to_test) or sorted(decs_to_test, reverse=True)
         print(decs_to_test)
-        for dec in decs_to_test:
+        for i, _ in enumerate(decs_to_test):
             try:
-                this_dec = self.data[dec]
-                prior_dec = self.data[dec - self.step]
-                twice_prior_dec = self.data[dec - (2*self.step)]
-                print("yep")
+                if i < 2:
+                    continue
+                print(f"{decs_to_test[i]=}, {decs_to_test[i-1]=}, {decs_to_test[i-2]=}")
+                this_dec = self.data[decs_to_test[i]]
+                prior_dec = self.data[decs_to_test[i - 1]]
+                twice_prior_dec = self.data[decs_to_test[i - 2]]
                 assert this_dec is not None
                 assert prior_dec is not None
                 assert twice_prior_dec is not None
-                print((this_dec - prior_dec) * (prior_dec - twice_prior_dec) <= 0)
+                print(f"{this_dec=}, {prior_dec=}, {twice_prior_dec=}")
+                print(f"{(this_dec - prior_dec) * (prior_dec - twice_prior_dec) <= 0}")
                 if (this_dec - prior_dec) * (prior_dec - twice_prior_dec) <= 0:
                     raise TypeError("non-monotonic data")
             except AssertionError:
                 if not allow_incomplete:
                     raise AssertionError("not all declinations recorded")
             except KeyError:
+                pass
+            except IndexError:
                 pass
 
     def complete_calibration(self):
@@ -133,7 +141,7 @@ class DecDialog(QDialog):
 
         with open(self.CAL_FILENAME, "w+") as f:
             write_str = ""
-            for dec in range(dc.SOUTH_DEC, dc.NORTH_DEC + 1, dc.STEP):
+            for dec in range(dc.SOUTH_DEC, dc.NORTH_DEC + dc.STEP, dc.STEP):
                 write_str += (f"{self.data[dec]}\n")
             f.write(write_str)
 
@@ -152,6 +160,10 @@ class DecDialog(QDialog):
         elif new_dec == self.starting_dec:
             # re-enable N/S choice if first
             self.ui.north_south_combo_box.setDisabled(False)
+    
+    def allow_save(self):
+        self.ui.save_button.setEnabled(True)
+        self.confirmation_requested = True
 
     def update_labels(self):
         self.ui.set_dec_value.setText(str(self.current_dec) + "°")
@@ -159,22 +171,15 @@ class DecDialog(QDialog):
         self.ui.north_south_combo_box.setEnabled(
             self.current_dec == self.starting_dec
         )
-        self.ui.record_button.setText(
-            "Save" if self.current_dec == self.ending_dec else "Record"
-        )
+
+        # if all values are filled, enable the save button
+        self.ui.save_button.setEnabled(all([val is not None for val in self.data.values()]))
 
         dec_range = self.get_dec_range()
-        
         degree_values_string = ""
         for dec in dec_range:
             degree_values_string += (("-> " if dec == self.current_dec else "") + str(dec) + "\n")
         self.ui.degree_values_label.setText(degree_values_string)
-        #     reduce(
-        #         lambda c, a: c + "\n" + a,
-        #         [("-> " if i == self.current_dec else "") + str(i) for i in dec_range],
-        #     )
-        # )
-
         data_string = ""
         for dec in dec_range:
             data_string += (
