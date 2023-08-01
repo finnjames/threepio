@@ -63,14 +63,6 @@ class DecDialog(QDialog):
     def get_empty_data(self):
         return {key: None for key in self.get_dec_range()}
     
-    def handle_save(self):
-        try:
-            self.complete_calibration()
-        except Exception as e:
-            self.parent.log(f"Dec cal failed: {e.__str__()}")
-        finally:
-            self.close()
-
     def handle_record(self):
         self.parent.beep()
 
@@ -96,6 +88,35 @@ class DecDialog(QDialog):
 
         self.update_labels()
     
+    def handle_save(self):
+        try:
+            self.complete_calibration()
+        except Exception as e:
+            self.parent.log(f"Dec cal failed: {e.__str__()}")
+        finally:
+            self.close()
+
+    def complete_calibration(self):
+        self.validate_data(allow_incomplete=False)
+
+        # copy over the current file to the backup file
+        try:
+            with open(self.CAL_FILENAME) as f, open(
+                self.CAL_BACKUP_FILENAME, "w+"
+            ) as b:
+                for line in f:
+                    b.write(line)
+        except FileNotFoundError:
+            pass
+
+        with open(self.CAL_FILENAME, "w+") as f:
+            write_str = ""
+            for dec in range(dc.SOUTH_DEC, dc.NORTH_DEC + dc.STEP, dc.STEP):
+                write_str += (f"{self.data[dec]}\n")
+            f.write(write_str)
+
+        self.move(-self.step)
+
     def validate_data(self, allow_incomplete = True):
         decs_to_test = self.get_dec_range()
         if allow_incomplete:
@@ -120,28 +141,6 @@ class DecDialog(QDialog):
                 pass
             except IndexError:
                 pass
-
-    def complete_calibration(self):
-        self.validate_data(allow_incomplete=False)
-
-        # copy over the current file to the backup file
-        try:
-            with open(self.CAL_FILENAME) as f, open(
-                self.CAL_BACKUP_FILENAME, "w+"
-            ) as b:
-                for line in f:
-                    b.write(line)
-        except FileNotFoundError:
-            pass
-
-        with open(self.CAL_FILENAME, "w+") as f:
-            write_str = ""
-            for dec in range(dc.SOUTH_DEC, dc.NORTH_DEC + dc.STEP, dc.STEP):
-                write_str += (f"{self.data[dec]}\n")
-            f.write(write_str)
-
-    def handle_previous(self):
-        self.move(-self.step)
 
     def handle_next(self):
         self.move(self.step)
