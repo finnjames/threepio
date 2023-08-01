@@ -143,8 +143,8 @@ class ObsDialog(QDialog):
         self.ui.warning_label.show()
 
     def clear_messages(self):
-        for i in [self.ui.error_label, self.ui.warning_label]:
-            i.hide()
+        self.ui.error_label.hide()
+        self.ui.warning_label.hide()
 
     def get_filename(self):
         if self.ui.file_name_value.text() == "":
