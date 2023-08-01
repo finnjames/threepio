@@ -86,7 +86,6 @@ class DecDialog(QDialog):
             self.validate_data()
         except TypeError as e:
             nonmonotonic = True
-            print(e.__str__())
         if nonmonotonic:
             self.ui.warning_label.setText("Warning: data is not monotonic")
             self.ui.warning_label.show()
@@ -102,20 +101,16 @@ class DecDialog(QDialog):
         if allow_incomplete:
             decs_to_test = list(filter(lambda a: self.data[a] is not None, decs_to_test))
             assert sorted(decs_to_test) or sorted(decs_to_test, reverse=True)
-        print(decs_to_test)
         for i, _ in enumerate(decs_to_test):
             try:
                 if i < 2:
                     continue
-                print(f"{decs_to_test[i]=}, {decs_to_test[i-1]=}, {decs_to_test[i-2]=}")
                 this_dec = self.data[decs_to_test[i]]
                 prior_dec = self.data[decs_to_test[i - 1]]
                 twice_prior_dec = self.data[decs_to_test[i - 2]]
                 assert this_dec is not None
                 assert prior_dec is not None
                 assert twice_prior_dec is not None
-                print(f"{this_dec=}, {prior_dec=}, {twice_prior_dec=}")
-                print(f"{(this_dec - prior_dec) * (prior_dec - twice_prior_dec) <= 0}")
                 if (this_dec - prior_dec) * (prior_dec - twice_prior_dec) <= 0:
                     raise TypeError("non-monotonic data")
             except AssertionError:
