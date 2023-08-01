@@ -87,7 +87,7 @@ class DecDialog(QDialog):
         self.move(self.step)
 
         self.update_labels()
-    
+
     def handle_save(self):
         try:
             self.complete_calibration()
@@ -95,7 +95,7 @@ class DecDialog(QDialog):
             self.parent.log(f"Dec cal failed: {e.__str__()}")
         finally:
             self.close()
-
+    
     def complete_calibration(self):
         self.validate_data(allow_incomplete=False)
 
@@ -114,8 +114,6 @@ class DecDialog(QDialog):
             for dec in range(dc.SOUTH_DEC, dc.NORTH_DEC + dc.STEP, dc.STEP):
                 write_str += (f"{self.data[dec]}\n")
             f.write(write_str)
-
-        self.move(-self.step)
 
     def validate_data(self, allow_incomplete = True):
         decs_to_test = self.get_dec_range()
@@ -141,6 +139,9 @@ class DecDialog(QDialog):
                 pass
             except IndexError:
                 pass
+
+    def handle_previous(self):
+        self.move(-self.step)
 
     def handle_next(self):
         self.move(self.step)
