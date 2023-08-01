@@ -20,7 +20,7 @@ class ObsDialog(QDialog):
         QWidget.__init__(self)
         self.ui = obs_ui.Ui_Dialog()
         self.ui.setupUi(self)
-        self.setWindowFlags(Qt.Window | Qt.WindowTitleHint | Qt.CustomizeWindowHint)
+        self.setWindowFlags(Qt.Window | Qt.WindowTitleHint | Qt.CustomizeWindowHint) # type: ignore
 
         self.obs = obs
         self.clock: SuperClock = clock
@@ -55,6 +55,7 @@ class ObsDialog(QDialog):
         self.info = info
         self.records: Optional[ObsRecord] = None
         if self.info:
+            assert obs.input_record is not None
             self.unwrap(obs.input_record)
             self.ui.accept_button.setText("Close")
             self.ui.cancel_button.hide()
@@ -113,6 +114,7 @@ class ObsDialog(QDialog):
             else:  # already confirmed -> set observation and close
                 self.close()
 
+                assert self.obs.min_dec is not None
                 target_dec = self.obs.min_dec - (
                     2 if (self.obs.obs_type is ObsType.SURVEY) else 0
                 )
