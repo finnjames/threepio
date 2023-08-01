@@ -1,8 +1,8 @@
 class DecCalc:
 
     SOUTH_DEC = -25
-    NORTH_DEC = 95
-    STEP = 10
+    NORTH_DEC = 100
+    STEP = 5
 
     def __init__(self):
         self.fx: list[DecCalc.XY] = []
@@ -22,12 +22,9 @@ class DecCalc:
 
     @staticmethod
     def get_dec_list() -> list[float]:
-        r = []
-        i = DecCalc.SOUTH_DEC
-        while i <= DecCalc.NORTH_DEC:
-            r.append(i)
-            i += DecCalc.STEP
-        return r
+        return list(
+            range(DecCalc.SOUTH_DEC, DecCalc.NORTH_DEC + DecCalc.STEP, DecCalc.STEP)
+        )
 
     def load_dec_cal(self) -> int:
         """read the dec calibration from file and store it in memory"""
