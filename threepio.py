@@ -637,7 +637,7 @@ class Threepio(QtWidgets.QMainWindow):
 
     def beep(self, message=""):
         """message is for debugging"""
-        self.beep_sound.play()
+        # self.beep_sound.play()
         self.last_beep_time = time.time()
         # print("beep!", message, time.time())
 
