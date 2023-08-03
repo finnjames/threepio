@@ -257,6 +257,8 @@ class Threepio(QtWidgets.QMainWindow):
                     callback=callback,
                 )
 
+        print(transmission)
+
         if transmission is Comm.START_WAIT:
             self.obs.next()
             self.message(f"Waiting for {obs_type.name.lower()} to begin...")
@@ -278,7 +280,7 @@ class Threepio(QtWidgets.QMainWindow):
                 f"Taking {obs_type.name.lower()} data!!!", beep=False, log=False
             )
         elif transmission is Comm.FINISH_SWEEP:
-            self.message("Finishing last sweep!!!", beep=False, log=False)
+            self.message("Finishing last sweep!!!", beep=False)
         elif transmission is Comm.BEEP:
             self.tobeepornottobeep = True
         elif transmission is Comm.NEXT:
