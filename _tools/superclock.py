@@ -10,18 +10,7 @@ from astropy.coordinates import EarthLocation
 
 SIDEREAL = 1.00273790935  # the number of sidereal seconds per second
 GB_LATITUDE = 38.437235  # north
-GB_LONGITUDE = -79.839835  # west
-
-
-class SiderealTime:
-    """Time object that holds a local (i.e. 24hr) sidereal time"""
-
-    def __init__(self, input_sidereal_time: str):
-        self.sidereal_string = input_sidereal_time
-        self.sidereal_seconds = SuperClock.deformat_time_string(input_sidereal_time)
-    
-    def __str__(self):
-        return self.sidereal_string
+GB_LONGITUDE = -79.839835  # west (so negative)
 
 
 class SuperClock:
@@ -30,30 +19,21 @@ class SuperClock:
     def __init__(self):
         self.timers = []
         current_time = SuperClock.get_time()
-        self.starting_epoch_time: float = 0.0  # TODO: is this okay?
+        self.starting_epoch_time: float = 0.0
         self.anchor_time: float = 0.0
-        self.set_starting_time(current_time)
         # time, in seconds, since the sidereal midnight before last calibration
         self.starting_sidereal_time = 0.0
 
         loc = EarthLocation(lat=GB_LATITUDE, lon=GB_LONGITUDE)
         t = Time(time.time(), format="unix", scale="utc", location=loc)
         current_ra = SuperClock.hours_to_seconds(t.sidereal_time("apparent").value)
-        self.calibrate_sidereal_time(current_ra, current_time)
+        self.calibrate_sidereal_time(current_ra)
 
-    def calibrate_sidereal_time(self,
-                                starting_sidereal_time: float,
-                                starting_epoch_time: Optional[float] = None):
-        if starting_epoch_time is None:
-            starting_epoch_time = time.time()
-        
+    def calibrate_sidereal_time(self, starting_sidereal_time: float):
         current_time = time.time()
-        
-        sidereal_offset = SuperClock.solar_to_sidereal(current_time - starting_epoch_time)
-        corrected_sidereal_time = (starting_sidereal_time + sidereal_offset) % 86400
-        corrected_epoch_time = time.time()
+        corrected_sidereal_time = (starting_sidereal_time) % 86400
 
-        self.set_starting_time(corrected_epoch_time)
+        self.set_starting_time(current_time)
         self.set_starting_sidereal_time(corrected_sidereal_time)
 
         print(f"{self.starting_sidereal_time=}, {self.starting_epoch_time=}")
@@ -111,7 +91,8 @@ class SuperClock:
 
     def set_starting_time(self, epoch_time: float) -> None:
         """set starting time and anchor time to specified time"""
-        self.starting_epoch_time = self.anchor_time = epoch_time
+        self.starting_epoch_time = epoch_time
+        self.anchor_time = epoch_time
         self.reset_all_timer_offsets()
 
     def reset_anchor_time(self) -> None:
@@ -122,9 +103,14 @@ class SuperClock:
     def get_elapsed_time(self) -> float:
         return time.time() - self.starting_epoch_time
 
-    def get_starting_time(self) -> float:
+    def get_starting_epoch_time(self) -> float:
+        """solar time of last calibration as epoch date"""
         return self.starting_epoch_time
 
+    def get_starting_sidereal_time(self) -> float:
+        """sidereal time of last calibration in seconds"""
+        return self.starting_sidereal_time
+    
     def get_sidereal_seconds(self) -> float:
         """sidereal seconds since the sidereal midnight before calibration"""
         return self.starting_sidereal_time + SIDEREAL * self.get_elapsed_time()

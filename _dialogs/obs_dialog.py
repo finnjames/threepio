@@ -1,4 +1,5 @@
 """dialogue box for keying in a new observation"""
+import time
 from typing import Optional
 
 from PyQt5.QtWidgets import QDialog, QWidget
@@ -182,15 +183,16 @@ class ObsDialog(QDialog):
             self.show_warning("Assuming ending RA is the next day")
 
         # calculate start and end times
-        solar = self.clock.get_starting_time()  # solar time of last calibration
-        sidereal = self.clock.get_sidereal_seconds()  # sidereal seconds since midnight before last calibration
-        start_time = solar + self.clock.sidereal_to_solar(starting_ra - sidereal)
-        print(f"{solar=}, {sidereal=}, {starting_ra=}, {start_time=}")
+        solar = self.clock.get_starting_epoch_time()  # solar time of last calibration
+        sidereal = self.clock.get_starting_sidereal_time()  # sidereal seconds since midnight before last calibration
+        start_time = solar + SuperClock.sidereal_to_solar(starting_ra - sidereal)
+        print(f"{solar=}, {sidereal=}, {starting_ra=}, {start_time=}, current time={time.time()}")
         end_time = (
             (solar + self.clock.sidereal_to_solar(ending_ra - sidereal))
             if self.obs.obs_type is not ObsType.SPECTRUM
             else start_time + 180
         )
+        print(f"{ending_ra=}, {end_time=}, current time={time.time()}")
 
         # if no filename, use default
         filename = self.ui.file_name_value.text()
