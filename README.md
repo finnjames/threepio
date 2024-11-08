@@ -11,7 +11,7 @@ Threepio uses `PyQt5` for GUI and `pySerial` for communication to the data colle
 ### For Linux & macOS
 Clone the repo and `cd` into it.
 ```
-$ git clone https://github.com/radiolevity/threepio.git
+$ git clone https://github.com/finnjames/threepio.git
 $ cd threepio
 ```
 
@@ -40,7 +40,7 @@ Run
 ### For Windows
 Clone the repo and `cd` into it.
 ```
-$ git clone https://github.com/radiolevity/threepio.git
+$ git clone https://github.com/finnjames/threepio.git
 $ cd threepio
 ```
 
