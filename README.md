@@ -15,10 +15,10 @@ $ git clone https://github.com/finnjames/threepio.git
 $ cd threepio
 ```
 
-Threepio requires Python 3.9.x. Using a virtual environment is strongly recommended.
+Threepio requires Python 3.13.x. Using a virtual environment is strongly recommended.
 ```
 $ python --version
-Python 3.9.1
+Python 3.13.6
 $ python -m venv --upgrade-deps venv
 ```
 
@@ -44,10 +44,10 @@ $ git clone https://github.com/finnjames/threepio.git
 $ cd threepio
 ```
 
-Threepio requires Python 3.9.x. Using a virtual environment is strongly recommended.
+Threepio requires Python 3.13.x. Using a virtual environment is strongly recommended.
 ```
 $ python --version
-Python 3.9.1
+Python 3.13.6
 $ python -m venv --upgrade-deps venv
 ```
 
