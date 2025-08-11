@@ -76,6 +76,7 @@ class MiniTars:
     def in_waiting(self) -> int:
         if not self.testing:
             return self.ser.in_waiting
+        return None
 
     def buffer_read(self) -> Optional[float]:
         """read angle from serial buffer"""
@@ -98,6 +99,7 @@ class MiniTars:
             except (UnicodeDecodeError, ValueError):
                 pass
             return None
+        return None
 
     # Testing
 

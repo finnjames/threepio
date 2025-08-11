@@ -121,7 +121,7 @@ class Tars:
         if not self.testing:
             self.send("stop")
             self.send("encode 0")  # 0 = binary, 1 = ascii
-            self.send("ps 0")  # small pocket size for responsiveness
+            self.send("ps 0")  # small pocketsize for responsiveness
 
             for i in range(0, len(self.channels)):
                 self.send("slist " + str(i) + " " + str(self.channels[i]))
@@ -137,6 +137,7 @@ class Tars:
     def in_waiting(self) -> int:
         if not self.testing:
             return self.ser.in_waiting
+        return None
 
     def buffer_read(self, channel: int) -> Optional[float]:
         """
@@ -153,6 +154,7 @@ class Tars:
                 * int.from_bytes(buffer, byteorder="little", signed=True)
                 / 32768
             )
+        return None
 
     # Testing
 
