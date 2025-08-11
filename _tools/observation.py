@@ -266,8 +266,8 @@ class Observation:
 
     def write_data(self, point: DataPoint):
         # print(f"{point.timestamp}, dec: {point.dec}")
-        self.write("%.2f" % point.timestamp)
-        self.write("%.2f" % point.dec)
+        self.write("%.0f" % point.timestamp)
+        self.write("%.4f" % point.dec)
         if self.composite:
             self.file_comp.write("%.4f" % point.a)
             self.file_comp.write("%.4f" % point.b)
