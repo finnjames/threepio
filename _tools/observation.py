@@ -7,7 +7,7 @@ from tools import Comm, DataPoint, MyPrecious, ObsRecord
 
 
 class ObsType(Enum):
-    """Observation type"""
+    """Observation type."""
 
     SCAN = 0
     SURVEY = 1
@@ -29,7 +29,7 @@ class State(Enum):
 
 class Observation:
     """
-    Superclass for each of the three types of observation: Scan, Survey, and Spectrum
+    Superclass for each of the three types of observation: Scan, Survey, and Spectrum.
 
     To interact with any type of the observation object (e.g. an Oberservation object
     obs), first set its properties using the three 'obs.set_xxx()' API. Then,
@@ -193,7 +193,7 @@ class Observation:
             elif self.state == State.BG_2:
                 self.stop()
             else:
-                pass  # state == DONE, do nothing
+                pass  # When state == DONE, do nothing
         return self.state
 
     def start_calibration_1(self):
@@ -243,7 +243,7 @@ class Observation:
     # To be implemented in each subclass
     def set_files(self):
         """This function generates appropriate file types (.md1 or .md2) based on
-        observation type """
+        observation type."""
         pass
 
     def data_logic(self, data_point):
@@ -251,7 +251,7 @@ class Observation:
         This function defines the behavior of observation during the main data
         collection period. For example, in Survey this method is responsible for
         tracking if the dec is too high or too low. In Spectrum, this method tells
-        the UI to beep to remind the user to change frequency.s
+        the UI to beep to remind the user to change frequency.
         """
         pass
 
@@ -291,7 +291,7 @@ class Observation:
 
 
 class Scan(Observation):
-    """Set a start and end RA"""
+    """A 'drift scan' across a source."""
 
     def __init__(self):
         super().__init__()
@@ -308,7 +308,7 @@ class Scan(Observation):
 
 
 class Survey(Observation):
-    """Set a region in sky using start and end RA/DEC"""
+    """2D 'nodding' map of a region of the radio sky."""
 
     def __init__(self):
         super().__init__()
@@ -342,7 +342,7 @@ class Survey(Observation):
 
 
 class Spectrum(Observation):
-    """for all your spectrum observation needs"""
+    """Spectrums are similar to Scans, except that they measure many frequencies."""
 
     def __init__(self):
         super().__init__()
@@ -359,7 +359,7 @@ class Spectrum(Observation):
         self.freq_time = None
         self.timing_margin = 0.97
 
-    def set_start_and_end_times(self, start_ra, end_ra):  # overloaded
+    def set_start_and_end_times(self, start_ra, end_ra):
         super().set_start_and_end_times(start_ra, start_ra + 180)
 
     def set_data_time(self, data_start, data_end):

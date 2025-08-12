@@ -79,7 +79,7 @@ class MiniTars:
         return None
 
     def buffer_read(self) -> Optional[float]:
-        """read angle from serial buffer"""
+        """Read angle from serial buffer"""
         if not self.testing:
             if self.in_waiting() < 1:
                 return None
@@ -104,7 +104,7 @@ class MiniTars:
     # Testing
 
     def random_data(self) -> float:
-        """for testing"""
+        """For testing"""
         if self.parent.ui.dec_auto_check_box.isChecked():
             return math.sin(time.time() / 2) * 100
         return float(self.parent.ui.declination_slider.value())

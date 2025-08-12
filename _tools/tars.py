@@ -51,9 +51,9 @@ class Tars:
 
             self.ser = MySerial(device)
             self.channels = [
-                0x0100,  # channel 0, telescope channel A, ±5 V range
-                0x0101,  # channel 1, telescope channel B, ±5 V range
-                0x0102,  # channel 2, declinometer, ±5 V range
+                0x0100,  # Channel 0, telescope channel A, ±5 V range
+                0x0101,  # Channel 1, telescope channel B, ±5 V range
+                0x0102,  # Channel 2, declinometer, ±5 V range
             ]
             self.acquiring = False
 

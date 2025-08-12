@@ -1,4 +1,4 @@
-"""clock for keeping track of the time and running functions at different intervals"""
+"""Clock for keeping track of the time and running functions at different intervals"""
 
 from __future__ import annotations
 from math import floor
@@ -52,7 +52,7 @@ class SuperClock:
 
     @staticmethod
     def get_time_slug() -> str:
-        """get timestamp suitable for file naming"""
+        """Get timestamp suitable for file naming"""
         return "{:%Y.%m.%d-%H.%M}".format(datetime.datetime(*time.localtime()[:5]))
 
     @staticmethod
@@ -62,7 +62,7 @@ class SuperClock:
 
     @staticmethod
     def deformat_time_string(time_string: str) -> float:
-        """convert a string of the form HH:MM:SS to a float of seconds"""
+        """Convert a string of the form HH:MM:SS to a float of seconds"""
         hours, minutes, seconds = map(float, time_string.split(":"))
         return hours * 3600 + minutes * 60 + seconds
     
@@ -71,17 +71,17 @@ class SuperClock:
         return hours * 3600
     
     def run_timers(self) -> None:
-        """run every timer that is due to run"""
+        """Run every timer that is due to run"""
         for timer in self.timers:
             timer.run_if_appropriate(self.anchor_time)
 
     def reset_all_timer_offsets(self) -> None:
-        """set offset of all timers to 0"""
+        """Set offset of all timers to 0"""
         for timer in self.timers:
             timer.offset = 0
 
     def add_timer(self, period: int, callback, name="", log=False) -> Timer:
-        """set a timer to call a function periodically"""
+        """Set a timer to call a function periodically"""
         new_timer = Timer(period, callback, name, log)
         self.timers.append(new_timer)
         return new_timer
@@ -90,13 +90,13 @@ class SuperClock:
         self.starting_sidereal_time = sidereal_time
 
     def set_starting_time(self, epoch_time: float) -> None:
-        """set starting time and anchor time to specified time"""
+        """Set starting time and anchor time to specified time"""
         self.starting_epoch_time = epoch_time
         self.anchor_time = epoch_time
         self.reset_all_timer_offsets()
 
     def reset_anchor_time(self) -> None:
-        """set anchor time to current time"""
+        """Set anchor time to current time"""
         self.anchor_time = time.time()
         self.reset_all_timer_offsets()
 
@@ -104,19 +104,19 @@ class SuperClock:
         return time.time() - self.starting_epoch_time
 
     def get_starting_epoch_time(self) -> float:
-        """solar time of last calibration as epoch date"""
+        """Solar time of last calibration as epoch date"""
         return self.starting_epoch_time
 
     def get_starting_sidereal_time(self) -> float:
-        """sidereal time of last calibration in seconds"""
+        """Sidereal time of last calibration in seconds"""
         return self.starting_sidereal_time
     
     def get_sidereal_seconds(self) -> float:
-        """sidereal seconds since the sidereal midnight before calibration"""
+        """Sidereal seconds since the sidereal midnight before calibration"""
         return self.starting_sidereal_time + SIDEREAL * self.get_elapsed_time()
 
     def get_sidereal_tuple(self) -> tuple:
-        """return an hours, minutes, seconds tuple of local sidereal time"""
+        """Return an hours, minutes, seconds tuple of local sidereal time"""
         current_sidereal_time = self.get_sidereal_seconds()
         minutes, seconds = divmod(current_sidereal_time, 60)
         hours, minutes = divmod(minutes, 60)
@@ -124,7 +124,7 @@ class SuperClock:
         return hours, minutes, seconds
 
     def get_formatted_sidereal_time(self) -> str:
-        """return a string of HH:MM:SS formatted local sidereal time"""
+        """Return a string of HH:MM:SS formatted local sidereal time"""
         hours, minutes, seconds = self.get_sidereal_tuple()
         return f"{hours:02.0f}:{minutes:02.0f}:{seconds:02.0f}"
 

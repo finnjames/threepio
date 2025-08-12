@@ -8,7 +8,7 @@ class DecCalc:
         self.fx: list[DecCalc.XY] = []
 
     class XY:
-        """x and y value pair"""
+        """X and Y value pair"""
 
         def __init__(self, x, y):
             try:

@@ -33,12 +33,12 @@ class Threepio(QtWidgets.QMainWindow):
     Extends Qt's QMainWindow class and is the main window of the application.
     """
 
-    # basic time
+    # Basic time
     BASE_PERIOD = 10  # ms = 100Hz
     GUI_UPDATE_PERIOD = 1000  # ms = 1Hz
     STRIPCHART_PERIOD = 16.7  # ms = 60Hz
 
-    # style
+    # Style
     BLUE = 0x2196F3
     RED = 0xFF5252
     MIN_WIDTH = 860
@@ -50,24 +50,24 @@ class Threepio(QtWidgets.QMainWindow):
     def __init__(self):
         QtWidgets.QWidget.__init__(self)
 
-        # use main_ui for window setup
+        # Use main_ui for window setup
         self.ui = threepio_ui.Ui_MainWindow()
         with open("stylesheet.qss") as f:
             self.setStyleSheet(f.read())
         self.ui.setupUi(self)
         self.setWindowTitle("threepio")
 
-        # mode
+        # Mode
         self.legacy_mode = False
         self.mode = Threepio.Mode.NORMAL
 
-        # "console" output
+        # "Console" output
         self.message_log: list[LogTask] = []
         self.log(">>> THREEPIO")
         self.update_console()
 
         stripchart_log_task = self.log(">>> Initializing...")
-        # clock
+        # Clock
         self.clock = SuperClock()
 
         # Initialize stripchart
@@ -185,7 +185,7 @@ class Threepio(QtWidgets.QMainWindow):
         if tars_data is not None and minitars_data is not None:
             self.current_dec = self.dec_calc.calculate_declination(
                 minitars_data
-            )  # get dec
+            )  # Get dec
             self.current_data_point = DataPoint(  # Create data point
                 sidereal_timestamp,  # RA
                 self.current_dec,  # Dec
@@ -304,7 +304,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.mode = Threepio.Mode.TESTING
 
     def toggle_state_legacy(self):
-        """lol"""
+        """Makes Threepio look like the outgoing ERIRA DAQ software."""
         self.legacy_mode = not self.legacy_mode
         self.setStyleSheet(
             "background-color:#00ff00; color:#ff0000" if self.legacy_mode else ""
@@ -356,7 +356,7 @@ class Threepio(QtWidgets.QMainWindow):
             self.tobeepornottobeep = False
 
         self.ui.ra_value.setText(self.clock.get_formatted_sidereal_time())  # RA
-        self.ui.dec_value.setText(f"{self.current_dec:.4f}°")  # dec
+        self.ui.dec_value.setText(f"{self.current_dec:.4f}°")  # Dec
         if self.obs is not None:
             self.ui.sweep_value.setText(
                 str(self.obs.sweep_number) if self.obs.sweep_number != -1 else "n/a"
@@ -425,7 +425,7 @@ class Threepio(QtWidgets.QMainWindow):
             self.dec_scene.addItem(i)
 
     def update_fps(self):
-        """updates the fps counter to display current refresh rate"""
+        """Updates the fps counter to display current refresh rate"""
         current_time = time.perf_counter()
         time_since_last_fps_update = current_time - self.time_of_last_fps_update
 
@@ -546,7 +546,7 @@ class Threepio(QtWidgets.QMainWindow):
     def dec_calibration(self):
         dialog = DecDialog(self.minitars, self)
         if self.mode is Threepio.Mode.TESTING:
-            dialog.show()  # TODO: Why does this work?
+            dialog.show()
         dialog.exec_()
 
         self.dec_calc.load_dec_cal()
@@ -584,7 +584,7 @@ class Threepio(QtWidgets.QMainWindow):
         return new_log_task
 
     def update_console(self):
-        """refresh console with the latest statuses and last 7 logs"""
+        """Refresh console with the latest statuses and last 7 logs"""
         number_of_logs = floor(self.ui.console_label.height() / 14)
         self.ui.console_label.setText(
             reduce(
@@ -636,13 +636,13 @@ class Threepio(QtWidgets.QMainWindow):
         alert.exec_()
 
     def beep(self, message=""):
-        """message is for debugging"""
+        """Message is for debugging"""
         # self.beep_sound.play()
         self.last_beep_time = time.time()
         # print("beep!", message, time.time())
 
     def closeEvent(self, event):
-        """override quit action to confirm before closing"""
+        """Override quit action to confirm before closing"""
         quit_dialog = QtWidgets.QDialog()
         quit_dialog.ui = quit_ui.Ui_Dialog() # type: ignore
         quit_dialog.ui.setupUi(quit_dialog)

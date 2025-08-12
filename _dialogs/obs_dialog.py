@@ -1,4 +1,4 @@
-"""dialogue box for keying in a new observation"""
+"""Dialogue box for keying in a new observation"""
 import time
 from typing import Optional
 
@@ -155,13 +155,13 @@ class ObsDialog(QDialog):
         return self.ui.file_name_value.text()
 
     def unwrap(self, record: ObsRecord):
-        """unwrap the record into the fields"""
+        """Unwrap the record into the fields"""
         for name, (widget, getter, setter) in self.fields.items():
             setter(getattr(record, name))
         self.wrap()
 
     def wrap(self):
-        """wrap the fields into record"""
+        """Wrap the fields into record"""
         self.set_read_only()
         self.records = ObsRecord(
             **{name: getter() for name, (widget, getter, setter) in self.fields.items()}
@@ -173,7 +173,7 @@ class ObsDialog(QDialog):
             i[0].setDisabled(True)
 
     def set_observation(self):
-        """attempt to add all necessary info to the encapsulated observation"""
+        """Attempt to add all necessary info to the encapsulated observation"""
 
         # Parse times; pattern = "HH:MM:SS"
         starting_ra = SuperClock.deformat_time_string(self.ui.start_time.text())

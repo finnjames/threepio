@@ -8,7 +8,7 @@ class Comm(Enum):
     START_BG = auto()
     NEXT = auto()
     FINISHED = auto()
-    # extra
+    # Extra
     START_WAIT = auto()
     START_DATA = auto()
     SEND_TEL_NORTH = auto()

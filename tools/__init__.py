@@ -1,4 +1,4 @@
-"""package containing all random tools used by larger threepio"""
+"""Package for the tools used by Threepio."""
 from _tools.comm import Comm
 from _tools.datapoint import DataPoint
 from _tools.precious import MyPrecious
