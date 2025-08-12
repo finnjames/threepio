@@ -55,7 +55,7 @@ class Threepio(QtWidgets.QMainWindow):
         with open("stylesheet.qss") as f:
             self.setStyleSheet(f.read())
         self.ui.setupUi(self)
-        self.setWindowTitle("threepio")
+        self.setWindowTitle("Threepio")
 
         # Mode
         self.legacy_mode = False

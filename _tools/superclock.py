@@ -137,7 +137,6 @@ class Timer:
         callback (Callable[[], None]): function to call when the timer runs
         name (str): name of the timer
         log (bool): whether to print the timer's name and status when it runs
-        
     """
 
     def __init__(self, period: int, callback: Callable[[], None], name: str, log: bool):
