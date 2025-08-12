@@ -15,6 +15,7 @@ class AlertDialog(QDialog):
         self.ui.setupUi(self)
 
         # Hide the close/minimize/fullscreen buttons and make window always on top
+        # noinspection PyTypeChecker
         self.setWindowFlags(
             Qt.Window
             | Qt.WindowTitleHint

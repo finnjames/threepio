@@ -134,7 +134,7 @@ class Tars:
             # self.send("dec 512")
             # self.send("srate 11718")
 
-    def in_waiting(self) -> int:
+    def in_waiting(self) -> int | None:
         if not self.testing:
             return self.ser.in_waiting
         return None

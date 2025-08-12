@@ -61,6 +61,7 @@ class MyPrecious:
                 + "'a' for append and 'w' for write (overwrite)."
             )
         with open(self.dir + self.filename, mode) as file:
+            # noinspection PyTypeChecker
             print(data, end="\n", file=file)
 
     def __file_overwrite(self, data):

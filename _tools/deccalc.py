@@ -42,7 +42,7 @@ class DecCalc:
             set_fx([i for i in map(lambda a: str(a * 0.01), range(-90, 91, 15))])
             raise FileNotFoundError
 
-    def calculate_declination(self, input_dec: float) -> float:
+    def calculate_declination(self, input_dec: float) -> float | None:
         """Calculate the true dec from declinometer input and calibration data"""
 
         fx = self.fx

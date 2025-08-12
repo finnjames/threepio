@@ -4,7 +4,7 @@ from __future__ import annotations
 from math import floor
 import time
 import datetime
-from typing import Callable, Optional
+from typing import Callable
 from astropy.time import Time
 from astropy.coordinates import EarthLocation
 

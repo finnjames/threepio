@@ -1,7 +1,5 @@
 from enum import Enum
-from functools import reduce
 from PyQt5.QtWidgets import QDialog, QWidget
-from PyQt5.QtCore import Qt
 from layouts import dec_cal_ui
 from tools import DecCalc as dc
 

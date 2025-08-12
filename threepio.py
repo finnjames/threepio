@@ -216,7 +216,7 @@ class Threepio(QtWidgets.QMainWindow):
 
         obs_type = self.obs.obs_type
 
-        if transmission != self.previous_transmission:  #TODO: Should these be special?
+        if transmission != self.previous_transmission:
             if transmission is Comm.START_CAL:
                 alerts = [
                     Alert("Turn the calibration switches ON", "Okay"),

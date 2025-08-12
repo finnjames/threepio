@@ -1,5 +1,4 @@
 from PyQt5.QtWidgets import QDialog, QWidget
-from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
 from layouts import credits_ui
 
