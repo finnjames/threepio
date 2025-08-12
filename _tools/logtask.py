@@ -20,7 +20,7 @@ class LogTask:
     def set_leading_str(self, sidereal_str: str):
         self.sidereal_str = sidereal_str
 
-    def set_status(self, status: int):  # TODO: make this an enum
+    def set_status(self, status: int):  # TODO: Should this be an enum?
         """
         -1: pending
         0: success

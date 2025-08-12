@@ -16,7 +16,7 @@ class ObsType(Enum):
 
 
 class State(Enum):
-    NO_STATE = 0  # do not use! indicates error has occurred
+    NO_STATE = 0  # Do not use! indicates error has occurred
     OFF = 1
     CAL_1 = 2
     BG_1 = 3
@@ -24,7 +24,7 @@ class State(Enum):
     CAL_2 = 5
     BG_2 = 6
     DONE = 7
-    WAITING = 8  # extra
+    WAITING = 8  # Extra
 
 
 class Observation:
@@ -65,7 +65,7 @@ class Observation:
         # Info
         self.start_time = None
         self.end_time = None
-        self.min_dec = None  # if only one dec, this is it
+        self.min_dec = None  # If only one dec, this is it
         self.max_dec = None
 
         self.start_time = None
@@ -148,7 +148,7 @@ class Observation:
                 return Comm.NO_ACTION
             elif timestamp < self.end_time:
                 return self.data_logic(data_point)
-            # TODO: I hate this
+            # TODO: This logic should probably not be here
             elif self.obs_type is ObsType.SURVEY and self.data_logic(
                 data_point
             ) not in [

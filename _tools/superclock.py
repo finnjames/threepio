@@ -8,9 +8,9 @@ from typing import Callable, Optional
 from astropy.time import Time
 from astropy.coordinates import EarthLocation
 
-SIDEREAL = 1.00273790935  # the number of sidereal seconds per second
-GB_LATITUDE = 38.437235  # north
-GB_LONGITUDE = -79.839835  # west (so negative)
+SIDEREAL = 1.00273790935  # The number of sidereal seconds per second
+GB_LATITUDE = 38.437235  # North
+GB_LONGITUDE = -79.839835  # West (so negative)
 
 
 class SuperClock:
@@ -21,7 +21,7 @@ class SuperClock:
         current_time = SuperClock.get_time()
         self.starting_epoch_time: float = 0.0
         self.anchor_time: float = 0.0
-        # time, in seconds, since the sidereal midnight before last calibration
+        # Time, in seconds, since the sidereal midnight before last calibration
         self.starting_sidereal_time = 0.0
 
         loc = EarthLocation(lat=GB_LATITUDE, lon=GB_LONGITUDE)
@@ -155,12 +155,12 @@ class Timer:
             return False
         current_time = time.time()
 
-        # TODO: this works, right?
+        # TODO: This works, right?
         if current_time > anchor_time + (self.period / 1000) * (self.offset + 1):
             self.offset = floor((current_time - anchor_time) / (self.period / 1000))
 
         if current_time >= (anchor_time + (self.period / 1000) * self.offset):
-            if self.log:  # TODO: should this be in production?
+            if self.log:  # TODO: Should this be in production?
                 print(f"{self.name}: {self.offset=}, {anchor_time=}, {current_time=}")
             self.run()
             self.offset += 1

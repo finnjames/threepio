@@ -83,7 +83,7 @@ class MiniTars:
         if not self.testing:
             if self.in_waiting() < 1:
                 return None
-            # TODO: clean up
+            # TODO: Clean this up.
             # print("start")
             # print("get-360".encode("ascii"))
             # self.ser.write(bytes("get-360".encode("ascii")))

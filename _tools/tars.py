@@ -12,7 +12,7 @@ from .myserial import MySerial
 import serial.tools.list_ports
 import time
 
-import random as r  # for testing
+import random as r  # For testing
 import math
 
 
@@ -121,7 +121,7 @@ class Tars:
         if not self.testing:
             self.send("stop")
             self.send("encode 0")  # 0 = binary, 1 = ascii
-            self.send("ps 0")  # small pocketsize for responsiveness
+            self.send("ps 0")  # Small pocketsize for responsiveness
 
             for i in range(0, len(self.channels)):
                 self.send("slist " + str(i) + " " + str(self.channels[i]))
@@ -141,7 +141,7 @@ class Tars:
 
     def buffer_read(self, channel: int) -> Optional[float]:
         """
-        This function reads one value from the serial buffer. I.e. it will only read *one channel* at a time.
+        This function reads one value from the serial buffer. I.E. it will only read *one channel* at a time.
         Therefore, do not use this function by itself. If data is not always read in pairs of three there's no
         way to tell the channels apart.
         """
@@ -159,7 +159,7 @@ class Tars:
     # Testing
 
     def random_data(self):
-        """sometimes it's not worth asking"""
+        """This gives something that kind of looks like real data, for UI testing."""
         x = time.time() / 8
 
         n = r.choice([-0.2, 1]) / (64 * (r.random() + 0.02))
@@ -182,7 +182,7 @@ class Tars:
         a = f + g * v + n + c
         b = a - 0.1 * self.parent.ui.polarization_dial.value() * g * (v / 2 + 1)
 
-        a, b = (i / 272 + c + 1 for i in (a, b))  # normalize, kinda
+        a, b = (i / 272 + c + 1 for i in (a, b))  # Normalize, kinda
 
         # a, b, dec
         return [

@@ -2,7 +2,7 @@ from enum import Enum
 from functools import reduce
 from PyQt5.QtWidgets import QDialog, QWidget
 from PyQt5.QtCore import Qt
-from layouts import dec_cal_ui  # compiled PyQt dialogue ui
+from layouts import dec_cal_ui
 from tools import DecCalc as dc
 
 class NorthSouth(Enum):
@@ -34,7 +34,7 @@ class DecDialog(QDialog):
         self.minitars = minitars
         self.parent = threepio
 
-        # connect buttons
+        # Connect buttons
         self.ui.record_button.clicked.connect(self.handle_record)
         self.ui.next_button.clicked.connect(self.handle_next)
         self.ui.previous_button.clicked.connect(self.handle_previous)
@@ -66,7 +66,7 @@ class DecDialog(QDialog):
     def handle_record(self):
         self.parent.beep()
 
-        # read just the declination value
+        # Read just the declination value
         new_dec = None
         while new_dec is None:
             new_dec = self.minitars.read_latest()
@@ -99,7 +99,7 @@ class DecDialog(QDialog):
     def complete_calibration(self):
         self.validate_data(allow_incomplete=False)
 
-        # copy over the current file to the backup file
+        # Copy over the current file to the backup file
         try:
             with open(self.CAL_FILENAME) as f, open(
                 self.CAL_BACKUP_FILENAME, "w+"
@@ -153,7 +153,7 @@ class DecDialog(QDialog):
             self.current_dec = new_dec
             self.update_labels()
         elif new_dec == self.starting_dec:
-            # re-enable N/S choice if first
+            # Re-enable N/S choice if first
             self.ui.north_south_combo_box.setDisabled(False)
     
     def allow_save(self):
@@ -167,7 +167,7 @@ class DecDialog(QDialog):
             self.current_dec == self.starting_dec
         )
 
-        # if all values are filled, enable the save button
+        # If all values are filled, enable the save button
         self.ui.save_button.setEnabled(all([val is not None for val in self.data.values()]))
 
         dec_range = self.get_dec_range()

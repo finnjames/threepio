@@ -70,7 +70,7 @@ class Threepio(QtWidgets.QMainWindow):
         # clock
         self.clock = SuperClock()
 
-        # initialize stripchart
+        # Initialize stripchart
         self.stripchart_display_seconds = 8
         self.should_clear_stripchart = False
         self.channel_visibility = (True, True)
@@ -79,11 +79,11 @@ class Threepio(QtWidgets.QMainWindow):
         self.axis_y = QtChart.QValueAxis()
         self.chart = QtChart.QChart()
         self.ui.stripchart.setRenderHint(QtGui.QPainter.Antialiasing)
-        self.initialize_stripchart()  # should this include more of the above?
+        self.initialize_stripchart()  # Should this include more of the above?
 
         self.update_stripchart_speed()
 
-        # connect buttons
+        # Connect buttons
         self.ui.stripchart_speed_slider.valueChanged.connect(
             self.update_stripchart_speed
         )
@@ -105,7 +105,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.ui.toggle_channel_button.clicked.connect(self.toggle_channels)
         self.ui.chart_clear_button.clicked.connect(self.clear_stripchart)
 
-        # bleeps and bloops
+        # Bleeps and bloops
         self.beep_sound = QtMultimedia.QSoundEffect()
         url = QtCore.QUrl()
         self.beep_sound.setSource(url.fromLocalFile("assets/beep3.wav"))
@@ -114,7 +114,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.last_beep_time = 0.0
         self.tobeepornottobeep = False
 
-        # alerts
+        # Alerts
         self.open_alert = None
         self.alert_thread: set[QtCore.QThread] = set()
         self.worker = None
@@ -126,46 +126,46 @@ class Threepio(QtWidgets.QMainWindow):
         self.minitars = MiniTars(parent=self, device=declinometer)
         self.minitars.start()
 
-        # establish observation
+        # Establish observation
         self.obs = None
         self.ui_thinks_obs_is_set = False
         self.completed_one_calibration = False
 
-        # establish data array & most recent dec
+        # Establish data array & most recent dec
         self.data = []
         self.current_dec = 0.0
         self.current_data_point = None
 
-        # tars communication interpretation
+        # Tars communication interpretation
         self.previous_transmission = None
 
-        # telescope visualization
+        # Telescope visualization
         self.dec_scene = QtWidgets.QGraphicsScene()
         self.ui.dec_view.setScene(self.dec_scene)
         self.update_dec_view()
 
-        # initial dec calibration
+        # Initial dec calibration
         self.dec_calc = DecCalc()
         try:
             self.dec_calc.load_dec_cal()
         except FileNotFoundError:
             self.alert(Alert("Dec must be calibrated", "Got it"))
 
-        # primary clock
+        # Primary clock
         self.timer = QtCore.QTimer(self)
-        self.timer.timeout.connect(self.tick)  # do everything
-        self.timer.start(self.BASE_PERIOD)  # set refresh rate
-        # assign timers to functions meant to fire periodically
+        self.timer.timeout.connect(self.tick)  # Do everything
+        self.timer.start(self.BASE_PERIOD)  # Set refresh rate
+        # Assign timers to functions meant to fire periodically
         self.clock.add_timer(1000, self.update_gui, name="update_gui")
         self.data_timer = self.clock.add_timer(1000,
                                                self.update_data,
                                                name="update_data")
 
-        # measure refresh rate
+        # Measure refresh rate
         self.time_of_last_fps_update = time.perf_counter()
         self.ticks_since_last_fps_update = 0
 
-        # alert user that threepio is done initializing
+        # Alert user that threepio is done initializing
         stripchart_log_task.set_status(0)
         self.message("Ready!!!")
 
@@ -176,36 +176,36 @@ class Threepio(QtWidgets.QMainWindow):
         else should be assigned to a timer.
         """
 
-        # attempt to grab latest data point; it won't always be stored
-        tars_data = self.tars.read_latest()  # get data from DAQ
-        minitars_data = self.minitars.read_latest()  # get data from Arduino
+        # Attempt to grab latest data point; it won't always be stored
+        tars_data = self.tars.read_latest()  # Get data from DAQ
+        minitars_data = self.minitars.read_latest()  # Get data from Arduino
         sidereal_timestamp = self.clock.get_sidereal_seconds()
 
-        # if data was available above, save it
+        # If data was available above, save it
         if tars_data is not None and minitars_data is not None:
             self.current_dec = self.dec_calc.calculate_declination(
                 minitars_data
             )  # get dec
-            self.current_data_point = DataPoint(  # create data point
-                sidereal_timestamp,  # ra
-                self.current_dec,  # dec
-                tars_data[0][1],  # channel a
-                tars_data[1][1],  # channel b
+            self.current_data_point = DataPoint(  # Create data point
+                sidereal_timestamp,  # RA
+                self.current_dec,  # Dec
+                tars_data[0][1],  # Channel a
+                tars_data[1][1],  # Channel b
             )
-            self.data.append(self.current_data_point)  # add to data list
+            self.data.append(self.current_data_point)  # Add to data list
 
-        self.clock.run_timers()  # run all timers that are due
+        self.clock.run_timers()  # Run all timers that are due
 
-        # update every tick
+        # Update every tick
         self.update_stripchart()
         self.update_dec_view()
 
-        self.ticks_since_last_fps_update += 1  # for measuring fps
+        self.ticks_since_last_fps_update += 1  # For measuring fps
 
     def update_data(self) -> None:
         if not self.check_and_set_observation_state():
             return
-        assert self.obs is not None  # the language server was complaining
+        assert self.obs is not None  # The language server was complaining
 
         period = 1000 / self.obs.freq  # Hz -> ms
         self.data_timer.set_period(period)
@@ -216,7 +216,7 @@ class Threepio(QtWidgets.QMainWindow):
 
         obs_type = self.obs.obs_type
 
-        if transmission != self.previous_transmission:  #TODO: should these be special?
+        if transmission != self.previous_transmission:  #TODO: Should these be special?
             if transmission is Comm.START_CAL:
                 alerts = [
                     Alert("Turn the calibration switches ON", "Okay"),
@@ -236,18 +236,18 @@ class Threepio(QtWidgets.QMainWindow):
 
                 def callback():
                     self.clock.reset_anchor_time()
-                    assert self.obs is not None  # the language server was complaining
+                    assert self.obs is not None
                     self.obs.next()
                     self.message("Taking calibration data!!!")
 
                 self.alert(*alerts, callback=callback)
-                self.completed_one_calibration = True  # only alert on second cal
+                self.completed_one_calibration = True  # Only alert on second cal
 
             elif transmission is Comm.START_BG:
 
                 def callback():
                     self.clock.reset_anchor_time()
-                    assert self.obs is not None  # the language server was complaining
+                    assert self.obs is not None
                     self.obs.next()
                     self.message("Taking background data!!!")
 
@@ -300,7 +300,6 @@ class Threepio(QtWidgets.QMainWindow):
     def set_state_testing(self):
         self.ui.actionNormal.setChecked(False)
         self.ui.actionTesting.setChecked(True)
-        # self.setFixedSize(self.MIN_WIDTH, 826)
         self.ui.testing_frame.show()
         self.mode = Threepio.Mode.TESTING
 
@@ -323,18 +322,17 @@ class Threepio(QtWidgets.QMainWindow):
         loaded and the ui state and update the UI accordingly."""
 
         def set_observation_ui_state(obs_is_loaded: bool):
-            if_obs_is_loaded = obs_is_loaded  # for readability
-            self.ui.actionRA.setDisabled(if_obs_is_loaded)
-            self.ui.actionDec.setDisabled(if_obs_is_loaded)
-            self.ui.actionSurvey.setDisabled(if_obs_is_loaded)
-            self.ui.actionScan.setDisabled(if_obs_is_loaded)
-            self.ui.actionSpectrum.setDisabled(if_obs_is_loaded)
-            self.ui.actionGetInfo.setDisabled(not if_obs_is_loaded)
+            self.ui.actionRA.setDisabled(obs_is_loaded)
+            self.ui.actionDec.setDisabled(obs_is_loaded)
+            self.ui.actionSurvey.setDisabled(obs_is_loaded)
+            self.ui.actionScan.setDisabled(obs_is_loaded)
+            self.ui.actionSpectrum.setDisabled(obs_is_loaded)
+            self.ui.actionGetInfo.setDisabled(not obs_is_loaded)
             self.ui_thinks_obs_is_set = obs_is_loaded
 
         if self.obs is not None:
             if not self.ui_thinks_obs_is_set:
-                set_observation_ui_state(True)  # update UI if discrepancy
+                set_observation_ui_state(True)  # Update UI if discrepancy
             return True
         else:
             if self.ui_thinks_obs_is_set:  
@@ -362,7 +360,7 @@ class Threepio(QtWidgets.QMainWindow):
         if self.obs is not None:
             self.ui.sweep_value.setText(
                 str(self.obs.sweep_number) if self.obs.sweep_number != -1 else "n/a"
-            )  # sweep number
+            )  # Sweep number
 
         self.update_progress_bar()
         self.update_fps()
@@ -385,9 +383,9 @@ class Threepio(QtWidgets.QMainWindow):
                         (current_time - start_time) / (end_time - start_time) * 1000))
                 self.ui.progressBar.setValue(val)
 
-                # set the label
+                # Set the label
                 time_until_next_step = end_time - current_time
-                # TODO: abstract this?
+                # TODO: Abstract this?
                 hours = int((atuns := abs(time_until_next_step)) / 3600)
                 minutes = int((atuns - (hours * 3600)) / 60)
                 seconds = int(round(atuns - (hours * 3600) - (minutes * 60)))
@@ -409,7 +407,7 @@ class Threepio(QtWidgets.QMainWindow):
     def update_dec_view(self):
         angle = self.current_dec - GB_LATITUDE
 
-        # telescope dish
+        # Telescope dish
         dish = QtGui.QPixmap("assets/dish.png")
         dish = QtWidgets.QGraphicsPixmapItem(dish)
         dish.setTransformOriginPoint(32, 32)
@@ -417,7 +415,7 @@ class Threepio(QtWidgets.QMainWindow):
         dish.setY(16)
         dish.setRotation(angle)
 
-        # telescope base
+        # Telescope base
         base = QtGui.QPixmap("assets/base.png")
         base = QtWidgets.QGraphicsPixmapItem(base)
         base.setTransformationMode(QtCore.Qt.SmoothTransformation)
@@ -452,22 +450,22 @@ class Threepio(QtWidgets.QMainWindow):
 
     def update_stripchart(self):
         try:
-            # parse latest data point
-            # TODO: this will duplicate points if one fails to read
+            # Parse latest data point
+            # TODO: This will duplicate points if one fails to read
             new_a = self.data[len(self.data) - 1].a
             new_b = self.data[len(self.data) - 1].b
             new_ra = self.data[len(self.data) - 1].timestamp
 
-            # add new data point to both series
+            # Add new data point to both series
             self.stripchart_series_a.append(new_a, new_ra)
             self.stripchart_series_b.append(new_b, new_ra)
 
-            # we use these value several times
+            # We use these value several times
             current_sideral_seconds = self.clock.get_sidereal_seconds()
             oldest_y = current_sideral_seconds - self.stripchart_display_seconds
 
-            # remove the trailing end of the series
-            clear_it = self.should_clear_stripchart  # prevents a race hazard?
+            # Remove the trailing end of the series
+            clear_it = self.should_clear_stripchart  # Prevents a race hazard?
             for i in [self.stripchart_series_a, self.stripchart_series_b]:
                 if clear_it:
                     i.clear()
@@ -475,13 +473,13 @@ class Threepio(QtWidgets.QMainWindow):
                     i.removePoints(0, 2)
             self.should_clear_stripchart = False
 
-            # these lines are required to prevent a Qt error
+            # These lines are required to prevent a Qt error
             self.chart.removeSeries(self.stripchart_series_b)
             self.chart.removeSeries(self.stripchart_series_a)
             self.chart.addSeries(self.stripchart_series_b)
             self.chart.addSeries(self.stripchart_series_a)
 
-            # check for visibility
+            # Check for visibility
             if self.channel_visibility[0]:
                 pen = QtGui.QPen(QtGui.QColor(self.BLUE))
             else:
@@ -503,7 +501,7 @@ class Threepio(QtWidgets.QMainWindow):
             self.stripchart_series_a.attachAxis(axis_y)
             self.stripchart_series_b.attachAxis(axis_y)
 
-        except IndexError:  # no data yet
+        except IndexError:  # No data yet
             pass
 
     def toggle_channels(self):
@@ -548,7 +546,7 @@ class Threepio(QtWidgets.QMainWindow):
     def dec_calibration(self):
         dialog = DecDialog(self.minitars, self)
         if self.mode is Threepio.Mode.TESTING:
-            dialog.show()  # TODO: why does this work?
+            dialog.show()  # TODO: Why does this work?
         dialog.exec_()
 
         self.dec_calc.load_dec_cal()
@@ -600,7 +598,7 @@ class Threepio(QtWidgets.QMainWindow):
         self.alert_thread.add(new_thread)
         self.worker = self.AlertWorker(self)
         self.worker.moveToThread(new_thread)
-        # connect signals and slots
+        # Connect signals and slots
         new_thread.started.connect(
                 lambda: self.worker is not None
                 and self.worker.run(*alerts, callback=callback)
@@ -670,7 +668,7 @@ def main():
     window.set_state_normal()
     # window.set_state_testing()
     window.show()
-    sys.exit(app.exec_())  # exit with code from app
+    sys.exit(app.exec_())  # Exit with code from app
 
 
 if __name__ == "__main__":
