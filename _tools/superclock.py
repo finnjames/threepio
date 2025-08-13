@@ -19,7 +19,6 @@ class SuperClock:
     def __init__(self):
         self.timers = []
         self.starting_epoch_time: float = 0.0
-        self.anchor_time: float = 0.0
         # Time, in seconds, since the sidereal midnight before last calibration
         self.starting_sidereal_time = 0.0
 
@@ -72,12 +71,12 @@ class SuperClock:
     def run_timers(self) -> None:
         """Run every timer that is due to run"""
         for timer in self.timers:
-            timer.run_if_appropriate(self.anchor_time)
+            timer.run_if_appropriate()
 
-    def reset_all_timer_offsets(self) -> None:
-        """Set offset of all timers to 0"""
+    def reset_all_timer_anchors(self) -> None:
+        current_time = time.time()
         for timer in self.timers:
-            timer.offset = 0
+            timer.anchor_time = current_time
 
     def add_timer(self, period: int, callback, name="", log=False) -> Timer:
         """Set a timer to call a function periodically"""
@@ -92,12 +91,12 @@ class SuperClock:
         """Set starting time and anchor time to specified time"""
         self.starting_epoch_time = epoch_time
         self.anchor_time = epoch_time
-        self.reset_all_timer_offsets()
+        self.reset_all_timer_anchors()
 
     def reset_anchor_time(self) -> None:
         """Set anchor time to current time"""
         self.anchor_time = time.time()
-        self.reset_all_timer_offsets()
+        self.reset_all_timer_anchors()
 
     def get_elapsed_time(self) -> float:
         return time.time() - self.starting_epoch_time
@@ -141,27 +140,24 @@ class Timer:
     def __init__(self, period: int, callback: Callable[[], None], name: str, log: bool):
         self.period = period  # ms
         self.callback = callback
-        self.offset = 0
+        # self.offset = 0
+        self.anchor_time: float = time.time()
         self.name = name
         self.log = log
 
     def run(self) -> None:
         self.callback()
 
-    def run_if_appropriate(self, anchor_time: float) -> bool:
+    def run_if_appropriate(self) -> bool:
         if self.period <= 0:
             return False
+
         current_time = time.time()
-
-        # TODO: This works, right?
-        if current_time > anchor_time + (self.period / 1000) * (self.offset + 1):
-            self.offset = floor((current_time - anchor_time) / (self.period / 1000))
-
-        if current_time >= (anchor_time + (self.period / 1000) * self.offset):
-            if self.log:
-                print(f"{self.name}: {self.offset=}, {anchor_time=}, {current_time=}")
+        if current_time - self.anchor_time >= (self.period / 1000):
+            if self.log or True:
+                print(f"{self.name}: {self.anchor_time=}, {current_time=}, {self.period=}")
+            self.anchor_time = current_time
             self.run()
-            self.offset += 1
             return True
         return False
 
@@ -171,7 +167,7 @@ class Timer:
             new_period (int): in milliseconds
         """
         if self.period != new_period:
-            self.offset = 0
+            self.anchor_time = time.time()
         self.period = new_period
 
     def cancel(self) -> None:
