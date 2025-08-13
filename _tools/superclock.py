@@ -18,7 +18,6 @@ class SuperClock:
 
     def __init__(self):
         self.timers = []
-        current_time = SuperClock.get_time()
         self.starting_epoch_time: float = 0.0
         self.anchor_time: float = 0.0
         # Time, in seconds, since the sidereal midnight before last calibration
@@ -121,7 +120,7 @@ class SuperClock:
         minutes, seconds = divmod(current_sidereal_time, 60)
         hours, minutes = divmod(minutes, 60)
         hours = hours % 24
-        return hours, minutes, seconds
+        return int(hours), int(minutes), int(seconds)
 
     def get_formatted_sidereal_time(self) -> str:
         """Return a string of HH:MM:SS formatted local sidereal time"""
