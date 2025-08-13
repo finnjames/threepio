@@ -274,7 +274,7 @@ class Threepio(QtWidgets.QMainWindow):
             should_beep = True
         elif transmission is Comm.SEND_TEL_SOUTH:
             self.message("Send telescope SOUTH at max speed!!!", beep=False, log=False)
-            to_beep = True
+            should_beep = True
         elif transmission is Comm.END_SEND_TEL:
             self.message(
                 f"Taking {obs_type.name.lower()} data!!!", beep=False, log=False
