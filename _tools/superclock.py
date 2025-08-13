@@ -158,7 +158,7 @@ class Timer:
             self.offset = floor((current_time - anchor_time) / (self.period / 1000))
 
         if current_time >= (anchor_time + (self.period / 1000) * self.offset):
-            if self.log:  # TODO: Should this be in production?
+            if self.log:
                 print(f"{self.name}: {self.offset=}, {anchor_time=}, {current_time=}")
             self.run()
             self.offset += 1
