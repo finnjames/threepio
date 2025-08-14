@@ -150,7 +150,7 @@ class Tars:
                 return None
             buffer = self.ser.read(2)
             return (
-                Tars.RANGE_VOLT[channel >> 8]
+                5 + Tars.RANGE_VOLT[channel >> 8]
                 * int.from_bytes(buffer, byteorder="little", signed=True)
                 / 32768
             )
