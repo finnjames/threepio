@@ -138,8 +138,6 @@ class Timer:
         log (bool): whether to print the timer's name and status when it runs
     """
 
-    PRECISION = 0.99
-
     def __init__(self, period: int, callback: Callable[[], None], name: str, log: bool):
         self.period = period  # ms
         self.callback = callback
@@ -156,10 +154,11 @@ class Timer:
             return False
 
         current_time = time.time()
-        if current_time - self.anchor_time >= ((self.period * self.PRECISION)/ 1000):
+        elapsed_periods, extra_time = divmod(current_time - self.anchor_time, self.period/ 1000)
+        if elapsed_periods > 0:
             if self.log or True:
                 print(f"{self.name}: {self.anchor_time=}, {current_time=}, {self.period=}")
-            self.anchor_time = current_time
+            self.anchor_time = current_time - extra_time
             self.run()
             return True
         return False
