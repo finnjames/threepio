@@ -3,7 +3,6 @@ from PyQt5.QtWidgets import QDialog, QWidget
 from layouts import dec_cal_ui
 from tools import DecCalc as dc
 from tools import MiniTars
-from ..threepio import Threepio
 
 class NorthSouth(Enum):
     NORTH = 0
@@ -15,7 +14,7 @@ class DecDialog(QDialog):
     CAL_FILENAME = "dec-cal.txt"
     CAL_BACKUP_FILENAME = "dec-cal-backup.txt"
 
-    def __init__(self, minitars: MiniTars, threepio: Threepio):
+    def __init__(self, minitars: MiniTars, threepio):
         QWidget.__init__(self)
         self.ui = dec_cal_ui.Ui_Dialog()
         self.ui.setupUi(self)
@@ -32,7 +31,7 @@ class DecDialog(QDialog):
         self.update_labels()
 
         self.minitars = minitars
-        self.threepio: Threepio = threepio
+        self.threepio = threepio
 
         # Connect buttons
         self.ui.record_button.clicked.connect(self.handle_record)
