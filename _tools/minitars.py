@@ -2,8 +2,6 @@
 Small version of Tars, meant to be used with the Arduino declinometer as opposed to the
 DataQ.
 """
-from typing import Optional
-
 import serial
 from .myserial import MySerial
 import serial.tools.list_ports
@@ -45,7 +43,7 @@ class MiniTars:
             self.ser.reset_input_buffer()
             self.acquiring = False
 
-    def read_one(self) -> Optional[float]:
+    def _read_one(self) -> float | None:
         """
         This reads one datapoint from the buffer.
         """
@@ -63,11 +61,11 @@ class MiniTars:
         """
         if self.testing:
             return self.random_data()
-        current = self.read_one()
+        current = self._read_one()
         latest = None
         while current is not None:
             latest = current
-            current = self.read_one()
+            current = self._read_one()
         return latest
 
     # Helpers
@@ -77,28 +75,28 @@ class MiniTars:
             return 0
         return self.ser.in_waiting
 
-    def buffer_read(self) -> Optional[float]:
+    def buffer_read(self) -> float | None:
         """Read angle from serial buffer"""
-        if not self.testing:
-            if self.in_waiting() < 1:
-                print("NO DATA IN QUEUE!")
-                return None
-            # TODO: Clean this up.
-            # print("start")
-            # print("get-360".encode("ascii"))
-            # self.ser.write(bytes("get-360".encode("ascii")))
-            # line = self.ser.read(size=8)
-            line = self.ser.read_until(
-                expected="\r".encode("ascii")
-            )  # read a byte string TODO: encoding necessary?
-            # print(line.decode())
-            # print(f"minitars: {line}")
-            try:
-                print(f"minitars: {float(line.decode())}")
-                return float(line.decode())
-            except (UnicodeDecodeError, ValueError):
-                pass
+        if self.testing:
             return None
+        if self.in_waiting() < 1:
+            print("NO DATA IN QUEUE!")
+            return None
+        # TODO: Clean this up.
+        # print("start")
+        # print("get-360".encode("ascii"))
+        # self.ser.write(bytes("get-360".encode("ascii")))
+        # line = self.ser.read(size=8)
+        line = self.ser.read_until(
+            expected="\r".encode("ascii")
+        )  # read a byte string TODO: encoding necessary?
+        # print(line.decode())
+        # print(f"minitars: {line}")
+        try:
+            print(f"minitars: {float(line.decode())}")
+            return float(line.decode())
+        except (UnicodeDecodeError, ValueError):
+            pass
         return None
 
     # Testing

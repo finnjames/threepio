@@ -2,6 +2,8 @@ from enum import Enum
 from PyQt5.QtWidgets import QDialog, QWidget
 from layouts import dec_cal_ui
 from tools import DecCalc as dc
+from tools import MiniTars
+from ..threepio import Threepio
 
 class NorthSouth(Enum):
     NORTH = 0
@@ -13,7 +15,7 @@ class DecDialog(QDialog):
     CAL_FILENAME = "dec-cal.txt"
     CAL_BACKUP_FILENAME = "dec-cal-backup.txt"
 
-    def __init__(self, minitars, threepio):
+    def __init__(self, minitars: MiniTars, threepio: Threepio):
         QWidget.__init__(self)
         self.ui = dec_cal_ui.Ui_Dialog()
         self.ui.setupUi(self)
@@ -30,7 +32,7 @@ class DecDialog(QDialog):
         self.update_labels()
 
         self.minitars = minitars
-        self.parent = threepio
+        self.threepio: Threepio = threepio
 
         # Connect buttons
         self.ui.record_button.clicked.connect(self.handle_record)
@@ -58,11 +60,11 @@ class DecDialog(QDialog):
     def get_dec_range(self):
         return range(self.starting_dec, self.ending_dec + self.step, self.step)
     
-    def get_empty_data(self):
+    def get_empty_data(self) -> dict[float, float | None]:
         return {key: None for key in self.get_dec_range()}
     
     def handle_record(self):
-        self.parent.beep()
+        self.threepio.beep(message="DecDialog.handle_record")
 
         # Read just the declination value
         new_dec = None
@@ -82,7 +84,7 @@ class DecDialog(QDialog):
         else:
             self.ui.warning_label.hide()
 
-        self.move(self.step)
+        self.move_step(self.step)
 
         self.update_labels()
 
@@ -90,7 +92,7 @@ class DecDialog(QDialog):
         try:
             self.complete_calibration()
         except Exception as e:
-            self.parent.log(f"Dec cal failed: {e.__str__()}")
+            self.threepio.log(f"Dec cal failed: {e.__str__()}")
         finally:
             self.close()
     
@@ -139,12 +141,12 @@ class DecDialog(QDialog):
                 pass
 
     def handle_previous(self):
-        self.move(-self.step)
+        self.move_step(-self.step)
 
     def handle_next(self):
-        self.move(self.step)
+        self.move_step(self.step)
 
-    def move(self, step: int):
+    def move_step(self, step: int):
         new_dec = self.current_dec + step
 
         if dc.SOUTH_DEC <= new_dec <= dc.NORTH_DEC:

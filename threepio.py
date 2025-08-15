@@ -175,21 +175,21 @@ class Threepio(QtWidgets.QMainWindow):
         else should be assigned to a timer.
         """
 
-        # Attempt to grab latest data point; it won't always be stored
-        tars_data = self.tars.read_latest()  # Get data from DAQ
-        minitars_data = self.minitars.read_latest()  # Get data from Arduino
+        # Attempt to grab latest data point; it won't always be written to the data file
+        tars_datum = self.tars.read_latest()  # Get data from DAQ
+        minitars_datum = self.minitars.read_latest()  # Get data from Arduino
         sidereal_timestamp = self.clock.get_sidereal_seconds()
 
         # If data was available above, save it
-        if tars_data is not None and minitars_data is not None:
-            self.current_dec = self.dec_calc.calculate_declination(
-                minitars_data
-            )  # Get dec
+        if tars_datum is not None and minitars_datum is not None:
+            assert tars_datum
+            assert minitars_datum
+            self.current_dec = self.dec_calc.calculate_declination(minitars_datum)
             self.current_data_point = DataPoint(  # Create data point
                 sidereal_timestamp,  # RA
                 self.current_dec,  # Dec
-                tars_data[0][1],  # Channel A
-                tars_data[1][1],  # Channel B
+                tars_datum.a,  # Channel A
+                tars_datum.b,  # Channel B
             )
             self.data.append(self.current_data_point)  # Add to data list
 

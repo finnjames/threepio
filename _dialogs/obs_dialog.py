@@ -1,6 +1,5 @@
 """Dialogue box for keying in a new observation"""
 import time
-from typing import Optional
 
 from PyQt5.QtWidgets import QDialog, QWidget
 from PyQt5.QtCore import Qt, QTime
@@ -54,7 +53,7 @@ class ObsDialog(QDialog):
 
         # Just checking data
         self.info = info
-        self.records: Optional[ObsRecord] = None
+        self.records: ObsRecord | None = None
         if self.info:
             assert obs.input_record is not None
             self.unwrap(obs.input_record)

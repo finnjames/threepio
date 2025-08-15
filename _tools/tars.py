@@ -5,8 +5,6 @@ the DATAQ device connected via a USB serial connection. The module also includes
 a few helper functions relevant to the tasks.
 """
 
-from typing import Optional
-
 import serial
 from .myserial import MySerial
 import serial.tools.list_ports
@@ -14,6 +12,12 @@ import time
 
 import random as r  # For testing
 import math
+
+
+class SignalDatum:
+    def __init__(self, a, b):
+        self.a = a
+        self.b = b
 
 
 def discovery() -> tuple:
@@ -37,8 +41,8 @@ def convert(buffer: list, volt: int) -> float:
 
 class Tars:
     """
-    A wrapper class of a serial object which supports functionalities
-    specifically useful for DATAQ instruments.
+    A wrapper class of a serial object which supports functionalities specifically
+    useful for DATAQ instruments.
     """
 
     RANGE_VOLT = (10, 5, 2, 1, 0.5, 0.2)
@@ -46,21 +50,20 @@ class Tars:
 
     def __init__(self, parent, device=None):
         self.parent = parent
-        if device is not None:
-            self.testing = False
-
-            self.ser = MySerial(device)
-            self.channels = [
-                0x0100,  # Channel 0, telescope channel A, ±5 V range
-                0x0101,  # Channel 1, telescope channel B, ±5 V range
-                0x0102,  # Channel 2, declinometer, ±5 V range
-            ]
-            self.acquiring = False
-
-            self.setup()
-        else:
+        if device is None:
             self.testing = True
             self.parent.log("DataQ not found, simulating data")
+
+        self.testing = False
+
+        self.ser = MySerial(device)
+        self.channels = [
+            0x0100,  # Channel 0, telescope channel A, ±5 V range
+            0x0101,  # Channel 1, telescope channel B, ±5 V range
+        ]
+        self.acquiring = False
+
+        self.setup()
 
     def start(self):
         if not self.testing:
@@ -77,37 +80,34 @@ class Tars:
             self.ser.reset_input_buffer()
             self.acquiring = False
 
-    def read_one(self) -> Optional[list]:
+    def _read_one(self) -> SignalDatum | None:
         """
         This reads one datapoint from the buffer. Each datapoint has three channels:
         channel 0: telescope channel A
         channel 1: telescope channel B
-        channel 2: declinometer
         """
         if self.testing:
             return self.random_data()
 
         if self.in_waiting() < (2 * len(self.channels)):
             return None
-        return [
+        buffer_output = [
             (channel & 3, self.buffer_read(channel)) for channel in self.channels
         ]
+        return SignalDatum(a=buffer_output[0], b=buffer_output[1])
 
-    def read_latest(self) -> list[float] | None:
+    def read_latest(self) -> SignalDatum | None:
         """
         This function reads the last datapoint from the buffer and clears the buffer.
-        Use this as a real-time sampling method. Each datapoint has three channels:
-        channel 0: telescope channel A
-        channel 1: telescope channel B
-        channel 2, declinometer
+        Use this as a real-time sampling method.
         """
         if self.testing:
             return self.random_data()
-        current = self.read_one()
+        current = self._read_one()
         latest = None
         while current is not None:
             latest = current
-            current = self.read_one()
+            current = self._read_one()
         return latest
 
     # Helpers
@@ -138,11 +138,11 @@ class Tars:
             return 0
         return self.ser.in_waiting
 
-    def buffer_read(self, channel: int) -> Optional[float]:
+    def buffer_read(self, channel: int) -> float | None:
         """
-        This function reads one value from the serial buffer. I.E. it will only read *one channel* at a time.
-        Therefore, do not use this function by itself. If data is not always read in pairs of three there's no
-        way to tell the channels apart.
+        This function reads one value from the serial buffer. I.E. it will only read
+        *one channel* at a time. Therefore, do not use this function by itself. If data
+        is not always read in pairs of three there's no way to tell the channels apart.
         """
         if self.testing:
             return None
@@ -150,14 +150,15 @@ class Tars:
             return None
         buffer = self.ser.read(2)
         return (
-            5 + Tars.RANGE_VOLT[channel >> 8]
+            5
+            + Tars.RANGE_VOLT[channel >> 8]
             * int.from_bytes(buffer, byteorder="little", signed=True)
             / 32768
         )
 
     # Testing
 
-    def random_data(self):
+    def random_data(self) -> SignalDatum:
         """This gives something that kind of looks like real data, for UI testing."""
         x = time.time() / 8
 
@@ -183,9 +184,4 @@ class Tars:
 
         a, b = (i / 272 + c + 1 for i in (a, b))  # Normalize, kinda
 
-        # a, b, dec
-        return [
-            (0, a),
-            (1, b),
-            (2, float(self.parent.ui.declination_slider.value()) / 100),
-        ]
+        return SignalDatum(a, b)

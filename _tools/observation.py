@@ -1,7 +1,6 @@
 import time
 from enum import Enum
 from math import floor
-from typing import Optional
 
 from tools import Comm, DataPoint, MyPrecious, ObsRecord
 
@@ -79,7 +78,7 @@ class Observation:
         self.file_comp = None
 
         # Record keeping for later display/testing
-        self.input_record: Optional[ObsRecord] = None
+        self.input_record: ObsRecord | None = None
 
         # Temporary bookkeeping
         self.cal_start = None
@@ -93,7 +92,7 @@ class Observation:
         self.start_time = start_time
         self.end_time = end_time
 
-    def set_dec(self, min_dec: Optional[float], max_dec: Optional[float]):
+    def set_dec(self, min_dec: float | None, max_dec: float | None):
         if min_dec is None:
             raise ValueError("Min dec is not defined")
         assert min_dec
