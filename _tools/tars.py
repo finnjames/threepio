@@ -101,7 +101,7 @@ class Tars:
         channel 1: telescope channel B
         channel 2, declinometer
         """
-        if not self.testing:
+        if self.testing:
             return self.random_data()
         current = self.read_one()
         latest = None
@@ -134,9 +134,9 @@ class Tars:
             # self.send("srate 11718")
 
     def in_waiting(self) -> int | None:
-        if not self.testing:
-            return self.ser.in_waiting
-        return None
+        if self.testing:
+            return None
+        return self.ser.in_waiting
 
     def buffer_read(self, channel: int) -> Optional[float]:
         """
@@ -144,16 +144,16 @@ class Tars:
         Therefore, do not use this function by itself. If data is not always read in pairs of three there's no
         way to tell the channels apart.
         """
-        if not self.testing:
-            if self.in_waiting() < 2:
-                return None
-            buffer = self.ser.read(2)
-            return (
-                5 + Tars.RANGE_VOLT[channel >> 8]
-                * int.from_bytes(buffer, byteorder="little", signed=True)
-                / 32768
-            )
-        return None
+        if self.testing:
+            return None
+        if self.in_waiting() < 2:
+            return None
+        buffer = self.ser.read(2)
+        return (
+            5 + Tars.RANGE_VOLT[channel >> 8]
+            * int.from_bytes(buffer, byteorder="little", signed=True)
+            / 32768
+        )
 
     # Testing
 
