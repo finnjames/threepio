@@ -639,7 +639,7 @@ class Threepio(QtWidgets.QMainWindow):
     def beep(self, message=""):
         """Make beep play for user. Message param is only for debugging."""
         if time.time() - self.last_beep_time > 0.1:
-            self.beep_sound.play()
+            # self.beep_sound.play()
             self.last_beep_time = time.time()
             print("beep!", message, time.time())
 

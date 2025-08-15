@@ -2,7 +2,7 @@ import time
 from enum import Enum
 from math import floor
 
-from tools import Comm, DataPoint, MyPrecious, ObsRecord
+from tools import Comm, DataPoint, ObsRecord
 
 
 class ObsType(Enum):
@@ -300,101 +300,6 @@ class Observation:
         else:
             self.file_a.close()
             self.file_b.close()
-
-
-class Scan(Observation):
-    """A 'drift scan' across a source."""
-
-    def __init__(self):
-        super().__init__()
-        self.obs_type = ObsType.SCAN
-
-    def set_files(self):
-        self.file_a = MyPrecious(self.name + "_a.md1")
-        self.file_b = MyPrecious(self.name + "_b.md1")
-        self.file_comp = MyPrecious(self.name + "_comp.md1")
-
-    def data_logic(self, data_point) -> Comm:
-        self.write_data(data_point)
-        return Comm.NO_ACTION
-
-
-class Survey(Observation):
-    """2D 'nodding' map of a region of the radio sky."""
-
-    def __init__(self):
-        super().__init__()
-        self.obs_type = ObsType.SURVEY
-
-        self.sweep_number = 1
-
-        self.outside = True
-
-    def set_files(self):
-        assert self.name
-        self.file_a = MyPrecious(self.name + "_a.md2")
-        self.file_b = MyPrecious(self.name + "_b.md2")
-        self.file_comp = MyPrecious(self.name + "_comp.md2")
-
-    def data_logic(self, data_point) -> Comm:
-        if data_point.dec < self.min_dec or data_point.dec > self.max_dec:
-            if not self.outside:
-                self.write("*")
-            self.outside = True
-            if data_point.dec < self.min_dec:
-                return Comm.SEND_TEL_NORTH
-            elif data_point.dec > self.max_dec:
-                return Comm.SEND_TEL_SOUTH
-        else:
-            if self.outside:
-                self.outside = False
-                self.sweep_number += 1
-                return Comm.END_SEND_TEL
-        self.write_data(data_point)
-        return Comm.NO_ACTION
-
-
-class Spectrum(Observation):
-    """Spectrums are similar to Scans, except that they measure many frequencies."""
-
-    def __init__(self):
-        super().__init__()
-        self.obs_type = ObsType.SPECTRUM
-
-        self.cal_dur = 20
-        self.bg_dur = 20
-
-        self.cal_freq = 3
-        self.data_freq = 10
-
-        # These are the radio frequency (e.g. 1319.5 Mhz), not the sampling frequency!
-        self.interval = 1
-        self.freq_time = None
-        self.timing_margin = 0.97
-
-    # def set_start_and_end_times(self, start_time, end_time):
-    #     super().set_start_and_end_times(start_time, start_time + 180)
-
-    def set_data_time(self, data_start, data_end):
-        super().set_data_time(data_start, data_start + 180)
-
-    def set_files(self):
-        self.file_a = MyPrecious(self.name + "_a.md1")
-        self.file_b = MyPrecious(self.name + "_b.md1")
-        self.file_comp = MyPrecious(self.name + "_comp.md1")
-
-    def data_logic(self, data_point) -> Comm:
-        if self.freq_time is None:
-            self.freq_time = time.time()
-            self.write_data(data_point)
-            return Comm.NO_ACTION
-        elif time.time() - self.freq_time < self.timing_margin * self.interval:
-            self.write_data(data_point)
-            return Comm.NO_ACTION
-        else:
-            self.freq_time = time.time()
-            self.write_data(data_point)
-            return Comm.BEEP
 
 
 def get_date(epoch_time) -> str:

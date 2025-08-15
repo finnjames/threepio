@@ -50,11 +50,10 @@ class Tars:
 
     def __init__(self, parent, device=None):
         self.parent = parent
-        if device is None:
-            self.testing = True
+        
+        self.testing = device is None
+        if self.testing:
             self.parent.log("DataQ not found, simulating data")
-
-        self.testing = False
 
         self.ser = MySerial(device)
         self.channels = [
@@ -75,10 +74,11 @@ class Tars:
             self.send("reset 1")
 
     def stop(self):
-        if not self.testing:
-            self.send("stop")
-            self.ser.reset_input_buffer()
-            self.acquiring = False
+        if self.testing:
+            return
+        self.send("stop")
+        self.ser.reset_input_buffer()
+        self.acquiring = False
 
     def _read_one(self) -> SignalDatum | None:
         """
@@ -113,25 +113,28 @@ class Tars:
     # Helpers
 
     def send(self, command: str):
-        if not self.testing:
-            self.ser.write((command + "\r").encode())
+        if self.testing:
+            return
+        self.ser.write((command + "\r").encode())
 
     def setup(self):
-        if not self.testing:
-            self.send("stop")
-            self.send("encode 0")  # 0 = binary, 1 = ascii
-            self.send("ps 0")  # Small pocketsize for responsiveness
+        if self.testing:
+            return
 
-            for i in range(0, len(self.channels)):
-                self.send("slist " + str(i) + " " + str(self.channels[i]))
+        self.send("stop")
+        self.send("encode 0")  # 0 = binary, 1 = ascii
+        self.send("ps 0")  # Small pocketsize for responsiveness
 
-            # Define sample rate = 100 Hz:
-            # 60,000,000/(srate * dec) = 60,000,000/(1171 * 512) = 100 Hz
-            self.send("dec 512")
-            self.send("srate 1171")
+        for i in range(0, len(self.channels)):
+            self.send("slist " + str(i) + " " + str(self.channels[i]))
 
-            # self.send("dec 512")
-            # self.send("srate 11718")
+        # Define sample rate = 100 Hz:
+        # 60,000,000/(srate * dec) = 60,000,000/(1171 * 512) = 100 Hz
+        self.send("dec 512")
+        self.send("srate 1171")
+
+        # self.send("dec 512")
+        # self.send("srate 11718")
 
     def in_waiting(self) -> int:
         if self.testing:
@@ -146,6 +149,7 @@ class Tars:
         """
         if self.testing:
             return None
+
         if self.in_waiting() < 2:
             return None
         buffer = self.ser.read(2)
@@ -156,7 +160,7 @@ class Tars:
             / 32768
         )
 
-    # Testing
+    # - MARK: Testing
 
     def random_data(self) -> SignalDatum:
         """This gives something that kind of looks like real data, for UI testing."""
