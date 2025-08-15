@@ -40,7 +40,7 @@ class Observation:
     """
 
     def __init__(self):
-        self.name = None
+        self.name = "Untitled"
         self.composite = False
         self.obs_type = ObsType.UNSPECIFIED
 
@@ -93,13 +93,15 @@ class Observation:
         self.start_time = start_time
         self.end_time = end_time
 
-    def set_dec(self, min_dec, max_dec=None):
+    def set_dec(self, min_dec: Optional[float], max_dec: Optional[float]):
         if min_dec is None:
             raise ValueError("Min dec is not defined")
+        assert min_dec
         if max_dec is not None and max_dec < min_dec:
             raise ValueError("Max dec must be greater min dec")
-        self.min_dec = min_dec
-        self.max_dec = max_dec
+        assert max_dec
+        self.min_dec = float(min_dec)
+        self.max_dec = float(max_dec)
 
     def set_data_time(self, data_start, data_end):
         self.data_start = data_start
@@ -116,7 +118,11 @@ class Observation:
         self.input_record = input_record
 
     # Communication API
-    def communicate(self, data_point, timestamp: float):
+    def communicate(self, data_point, timestamp: float) -> Comm:
+        # assert self.start_time
+        # assert self.end_time
+        # assert self.cal_start
+        # assert self.bg_start
 
         user_start_time = self.start_time - (self.bg_dur + self.cal_dur + 30)
 
@@ -151,10 +157,7 @@ class Observation:
             # TODO: This logic should probably not be here
             elif self.obs_type is ObsType.SURVEY and self.data_logic(
                 data_point
-            ) not in [
-                Comm.SEND_TEL_NORTH,
-                Comm.SEND_TEL_SOUTH,
-            ]:
+            ) not in [Comm.SEND_TEL_NORTH, Comm.SEND_TEL_SOUTH]:
                 return Comm.FINISH_SWEEP
             else:
                 return Comm.START_CAL
@@ -172,6 +175,7 @@ class Observation:
                 return Comm.FINISHED
         elif self.state == State.DONE:
             return Comm.FINISHED
+        return Comm.NO_ACTION
 
     # This is the action API
     def next(self, override=None):
@@ -246,18 +250,21 @@ class Observation:
         observation type."""
         pass
 
-    def data_logic(self, data_point):
+    def data_logic(self, data_point) -> Comm:
         """
         This function defines the behavior of observation during the main data
         collection period. For example, in Survey this method is responsible for
         tracking if the dec is too high or too low. In Spectrum, this method tells
         the UI to beep to remind the user to change frequency.
         """
-        pass
+        return Comm.NO_ACTION
 
     # Helpers
 
     def write(self, string: str):
+        assert self.file_comp
+        assert self.file_a
+        assert self.file_b
         if self.composite:
             self.file_comp.write(string)
         else:
@@ -268,6 +275,9 @@ class Observation:
         # print(f"{point.timestamp}, dec: {point.dec}")
         self.write("%.2f" % point.timestamp)
         self.write("%.4f" % point.dec)
+        assert self.file_comp
+        assert self.file_a
+        assert self.file_b
         if self.composite:
             self.file_comp.write("%.4f" % point.a)
             self.file_comp.write("%.4f" % point.b)
@@ -283,6 +293,9 @@ class Observation:
         self.write("LOCAL STOP TIME: " + get_time(self.end_time))
 
     def close_file(self):
+        assert self.file_comp
+        assert self.file_a
+        assert self.file_b
         if self.composite:
             self.file_comp.close()
         else:
@@ -302,7 +315,7 @@ class Scan(Observation):
         self.file_b = MyPrecious(self.name + "_b.md1")
         self.file_comp = MyPrecious(self.name + "_comp.md1")
 
-    def data_logic(self, data_point):
+    def data_logic(self, data_point) -> Comm:
         self.write_data(data_point)
         return Comm.NO_ACTION
 
@@ -319,11 +332,12 @@ class Survey(Observation):
         self.outside = True
 
     def set_files(self):
+        assert self.name
         self.file_a = MyPrecious(self.name + "_a.md2")
         self.file_b = MyPrecious(self.name + "_b.md2")
         self.file_comp = MyPrecious(self.name + "_comp.md2")
 
-    def data_logic(self, data_point):
+    def data_logic(self, data_point) -> Comm:
         if data_point.dec < self.min_dec or data_point.dec > self.max_dec:
             if not self.outside:
                 self.write("*")
@@ -337,8 +351,8 @@ class Survey(Observation):
                 self.outside = False
                 self.sweep_number += 1
                 return Comm.END_SEND_TEL
-            self.write_data(data_point)
-            return Comm.NO_ACTION
+        self.write_data(data_point)
+        return Comm.NO_ACTION
 
 
 class Spectrum(Observation):
@@ -359,8 +373,8 @@ class Spectrum(Observation):
         self.freq_time = None
         self.timing_margin = 0.97
 
-    def set_start_and_end_times(self, start_ra, end_ra):
-        super().set_start_and_end_times(start_ra, start_ra + 180)
+    # def set_start_and_end_times(self, start_time, end_time):
+    #     super().set_start_and_end_times(start_time, start_time + 180)
 
     def set_data_time(self, data_start, data_end):
         super().set_data_time(data_start, data_start + 180)
@@ -370,7 +384,7 @@ class Spectrum(Observation):
         self.file_b = MyPrecious(self.name + "_b.md1")
         self.file_comp = MyPrecious(self.name + "_comp.md1")
 
-    def data_logic(self, data_point):
+    def data_logic(self, data_point) -> Comm:
         if self.freq_time is None:
             self.freq_time = time.time()
             self.write_data(data_point)

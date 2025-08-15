@@ -79,7 +79,7 @@ class ObsDialog(QDialog):
         if self.obs.obs_type in [ObsType.SCAN, ObsType.SPECTRUM]:
             for i in [self.ui.max_dec, self.ui.end_dec_label]:
                 i.hide()
-            self.ui.max_dec.setText("65535")  # Arbitrary large number
+            self.ui.max_dec.setText("65535.0")  # Arbitrary large number
             self.ui.start_dec_label.setText("Declination")
         if self.obs.obs_type in [ObsType.SPECTRUM, ObsType.SURVEY]:
             for i in [
@@ -92,7 +92,7 @@ class ObsDialog(QDialog):
         if self.obs.obs_type is ObsType.SPECTRUM:
             for i in [self.ui.end_label, self.ui.end_time]:
                 i.hide()
-            # All spectra have a duration of 120 seconds
+            # All spectra have a duration of 180 seconds
             self.ui.end_time.setTime(QTime(23, 59, 59))  # TODO: failure at 23:59:59?
         self.adjustSize()
 
@@ -117,7 +117,7 @@ class ObsDialog(QDialog):
 
                 assert self.obs.min_dec is not None
                 target_dec = self.obs.min_dec - (
-                    2 if (self.obs.obs_type is ObsType.SURVEY) else 0
+                    2.0 if (self.obs.obs_type is ObsType.SURVEY) else 0.0
                 )
 
                 def callback():
@@ -184,13 +184,11 @@ class ObsDialog(QDialog):
 
         # Calculate start and end times
         solar = self.clock.get_starting_epoch_time()  # Solar time of last calibration
-        sidereal = self.clock.get_starting_sidereal_time()  # Sidereal seconds since midnight before last calibration
+        sidereal = self.clock.get_starting_sidereal_time()  # Sidereal seconds since sidereal midnight before last calibration
         start_time = solar + SuperClock.sidereal_to_solar(starting_ra - sidereal)
         print(f"{solar=}, {sidereal=}, {starting_ra=}, {start_time=}, current time={time.time()}")
         end_time = (
-            (solar + self.clock.sidereal_to_solar(ending_ra - sidereal))
-            if self.obs.obs_type is not ObsType.SPECTRUM
-            else start_time + 180
+            start_time + 180 if self.obs.obs_type is ObsType.SPECTRUM else (solar + self.clock.sidereal_to_solar(ending_ra - sidereal))
         )
         print(f"{ending_ra=}, {end_time=}, current time={time.time()}")
 
@@ -203,10 +201,10 @@ class ObsDialog(QDialog):
         # Attempt to set observation data
         self.obs.set_start_and_end_times(start_time, end_time)
         try:
-            new_min_dec = int(self.ui.min_dec.text())
-            new_max_dec = int(self.ui.max_dec.text())
+            new_min_dec = int(float(self.ui.min_dec.text()))
+            new_max_dec = int(float(self.ui.max_dec.text()))
         except ValueError:
-            raise ValueError("Dec vals must be integers")
+            raise ValueError("Dec vals must be numbers")
         self.obs.set_dec(new_min_dec, new_max_dec)
 
         self.obs.set_data_freq(int(self.ui.data_acquisition_rate_value.text()))

@@ -18,9 +18,6 @@ class SuperClock:
 
     def __init__(self):
         self.timers = []
-        self.starting_epoch_time: float = 0.0
-        # Time, in seconds, since the sidereal midnight before last calibration
-        self.starting_sidereal_time = 0.0
 
         loc = EarthLocation(lat=GB_LATITUDE, lon=GB_LONGITUDE)
         t = Time(time.time(), format="unix", scale="utc", location=loc)
@@ -30,6 +27,10 @@ class SuperClock:
     def calibrate_sidereal_time(self, starting_sidereal_time: float):
         current_time = time.time()
         corrected_sidereal_time = (starting_sidereal_time) % 86400
+
+        self.starting_epoch_time: float = 0.0
+        # Time, in seconds, since the sidereal midnight before last calibration
+        self.starting_sidereal_time = 0.0
 
         self.set_starting_time(current_time)
         self.set_starting_sidereal_time(corrected_sidereal_time)

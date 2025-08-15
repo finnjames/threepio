@@ -368,7 +368,6 @@ class Threepio(QtWidgets.QMainWindow):
         self.update_voltage()
 
     def update_progress_bar(self):
-        # T=start_RA
         try:
             assert self.obs is not None
             (start_time, end_time) = self.obs.state_time_interval # type: ignore
@@ -411,14 +410,14 @@ class Threepio(QtWidgets.QMainWindow):
         dish = QtGui.QPixmap("assets/dish.png")
         dish = QtWidgets.QGraphicsPixmapItem(dish)
         dish.setTransformOriginPoint(32, 32)
-        dish.setTransformationMode(QtCore.Qt.SmoothTransformation)
+        dish.setTransformationMode(QtCore.Qt.SmoothTransformation) # type: ignore
         dish.setY(16)
         dish.setRotation(angle)
 
         # Telescope base
         base = QtGui.QPixmap("assets/base.png")
         base = QtWidgets.QGraphicsPixmapItem(base)
-        base.setTransformationMode(QtCore.Qt.SmoothTransformation)
+        base.setTransformationMode(QtCore.Qt.SmoothTransformation) # type: ignore
 
         self.dec_scene.clear()
         for i in [dish, base]:
@@ -444,7 +443,9 @@ class Threepio(QtWidgets.QMainWindow):
         self.chart.addSeries(self.stripchart_series_b)
         self.chart.addSeries(self.stripchart_series_a)
 
-        self.chart.legend().hide()
+        legend = self.chart.legend()
+        if legend is not None:
+            legend.hide()
 
         self.ui.stripchart.setChart(self.chart)
 
@@ -601,7 +602,7 @@ class Threepio(QtWidgets.QMainWindow):
         # Connect signals and slots
         new_thread.started.connect(
                 lambda: self.worker is not None
-                and self.worker.run(*alerts, callback=callback)
+                and self.worker.run(*alerts, callback=callback) # type: ignore
             )
         self.worker.finished.connect(new_thread.quit)
         self.worker.finished.connect(self.worker.deleteLater)
@@ -636,20 +637,20 @@ class Threepio(QtWidgets.QMainWindow):
         alert.exec_()
 
     def beep(self, message=""):
-        """Make beep play for user. Message param is only for debugging"""
-        if time.time() - self.last_beep_time > 1:
+        """Make beep play for user. Message param is only for debugging."""
+        if time.time() - self.last_beep_time > 0.1:
             self.beep_sound.play()
             self.last_beep_time = time.time()
             print("beep!", message, time.time())
 
-    def closeEvent(self, event):
+    def closeEvent(self, event):  # type: ignore
         """Override quit action to confirm before closing"""
         quit_dialog = QtWidgets.QDialog()
-        quit_dialog.ui = quit_ui.Ui_Dialog() # type: ignore
+        quit_dialog.ui = quit_ui.Ui_Dialog()  # type: ignore
         quit_dialog.ui.setupUi(quit_dialog)
 
         quit_dialog.setWindowFlags(
-            QtCore.Qt.Window | QtCore.Qt.WindowTitleHint | QtCore.Qt.CustomizeWindowHint # type: ignore
+            QtCore.Qt.Window | QtCore.Qt.WindowTitleHint | QtCore.Qt.CustomizeWindowHint  # type: ignore
         )
 
         close = quit_dialog.exec()

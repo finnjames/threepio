@@ -25,7 +25,7 @@ def discovery():
 
 
 class MiniTars:
-    def __init__(self, parent=None, device=None):
+    def __init__(self, parent, device=None):
         self.parent = parent
         self.testing = True
         self.acquiring = False
@@ -56,32 +56,32 @@ class MiniTars:
         else:
             return self.random_data()
 
-    def read_latest(self) -> float:
+    def read_latest(self) -> float | None:
         """
         This function reads the last datapoint from the buffer and clears the buffer.
         Use this as a real-time sampling method.
         """
-        if not self.testing:
-            current = self.read_one()
-            latest = None
-            while current is not None:
-                latest = current
-                current = self.read_one()
-            return latest
-        else:
+        if self.testing:
             return self.random_data()
+        current = self.read_one()
+        latest = None
+        while current is not None:
+            latest = current
+            current = self.read_one()
+        return latest
 
     # Helpers
 
     def in_waiting(self) -> int:
-        if not self.testing:
-            return self.ser.in_waiting
-        return None
+        if self.testing:
+            return 0
+        return self.ser.in_waiting
 
     def buffer_read(self) -> Optional[float]:
         """Read angle from serial buffer"""
         if not self.testing:
             if self.in_waiting() < 1:
+                print("NO DATA IN QUEUE!")
                 return None
             # TODO: Clean this up.
             # print("start")
@@ -108,28 +108,3 @@ class MiniTars:
         if self.parent.ui.dec_auto_check_box.isChecked():
             return math.sin(time.time() / 2) * 100
         return float(self.parent.ui.declination_slider.value())
-
-
-def main():
-    declinometer = discovery()
-
-    while not declinometer:
-        print("No declinometer detected, retrying in 3 seconds.")
-        time.sleep(3)
-        declinometer = discovery()
-
-    print("Found a declinometer on", declinometer)
-    minitars = MiniTars(device=declinometer)
-
-    minitars.start()
-
-    while True:
-        data = minitars.read_latest()
-        # print(data)
-        if data is not None:
-            print(minitars.testing)
-            print(data)
-
-
-if __name__ == "__main__":
-    main()

@@ -44,7 +44,7 @@ class Tars:
     RANGE_VOLT = (10, 5, 2, 1, 0.5, 0.2)
     RANGE_RATE = (50000, 20000, 10000, 5000, 2000, 1000, 500, 200, 100, 50, 20, 10)
 
-    def __init__(self, parent=None, device=None):
+    def __init__(self, parent, device=None):
         self.parent = parent
         if device is not None:
             self.testing = False
@@ -93,7 +93,7 @@ class Tars:
             (channel & 3, self.buffer_read(channel)) for channel in self.channels
         ]
 
-    def read_latest(self) -> list:
+    def read_latest(self) -> list[float] | None:
         """
         This function reads the last datapoint from the buffer and clears the buffer.
         Use this as a real-time sampling method. Each datapoint has three channels:
@@ -102,14 +102,13 @@ class Tars:
         channel 2, declinometer
         """
         if not self.testing:
-            current = self.read_one()
-            latest = None
-            while current is not None:
-                latest = current
-                current = self.read_one()
-            return latest
-        else:
             return self.random_data()
+        current = self.read_one()
+        latest = None
+        while current is not None:
+            latest = current
+            current = self.read_one()
+        return latest
 
     # Helpers
 
@@ -190,28 +189,3 @@ class Tars:
             (1, b),
             (2, float(self.parent.ui.declination_slider.value()) / 100),
         ]
-
-
-def main():
-    device_name = discovery()
-
-    while not device_name:
-        print("No DATAQ Device detected, retrying in 3 seconds.")
-        time.sleep(3)
-        device_name = discovery()
-
-    print("Found a DATAQ Instruments device on", device_name)
-    device = Tars(device_name)
-
-    device.setup()
-    time.sleep(3)
-    device.start()
-
-    while True:
-        data = device.read_latest()
-        if data is not None:
-            print(data)
-
-
-if __name__ == "__main__":
-    main()
