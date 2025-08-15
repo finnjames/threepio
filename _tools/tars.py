@@ -133,9 +133,9 @@ class Tars:
             # self.send("dec 512")
             # self.send("srate 11718")
 
-    def in_waiting(self) -> int | None:
+    def in_waiting(self) -> int:
         if self.testing:
-            return None
+            return 0
         return self.ser.in_waiting
 
     def buffer_read(self, channel: int) -> Optional[float]:
