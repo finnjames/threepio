@@ -1,5 +1,6 @@
 from tools import Comm, MyPrecious, Observation, ObsType
 
+
 class Scan(Observation):
     """A 'drift scan' across a source."""
 

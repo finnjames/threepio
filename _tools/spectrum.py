@@ -1,6 +1,7 @@
 import time
 from tools import Comm, MyPrecious, Observation, ObsType
 
+
 class Spectrum(Observation):
     """Spectrums are similar to Scans, except that they measure many frequencies."""
 

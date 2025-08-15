@@ -1,4 +1,5 @@
 """Dialogue box for keying in a new observation"""
+
 import time
 
 from PyQt5.QtWidgets import QDialog, QWidget
@@ -20,7 +21,7 @@ class ObsDialog(QDialog):
         QWidget.__init__(self)
         self.ui = obs_ui.Ui_Dialog()
         self.ui.setupUi(self)
-        self.setWindowFlags(Qt.Window | Qt.WindowTitleHint | Qt.CustomizeWindowHint) # type: ignore
+        self.setWindowFlags(Qt.Window | Qt.WindowTitleHint | Qt.CustomizeWindowHint)  # type: ignore
 
         self.obs = obs
         self.clock: SuperClock = clock
@@ -183,11 +184,17 @@ class ObsDialog(QDialog):
 
         # Calculate start and end times
         solar = self.clock.get_starting_epoch_time()  # Solar time of last calibration
-        sidereal = self.clock.get_starting_sidereal_time()  # Sidereal seconds since sidereal midnight before last calibration
+        sidereal = (
+            self.clock.get_starting_sidereal_time()
+        )  # Sidereal seconds since sidereal midnight before last calibration
         start_time = solar + SuperClock.sidereal_to_solar(starting_ra - sidereal)
-        print(f"{solar=}, {sidereal=}, {starting_ra=}, {start_time=}, current time={time.time()}")
+        print(
+            f"{solar=}, {sidereal=}, {starting_ra=}, {start_time=}, current time={time.time()}"
+        )
         end_time = (
-            start_time + 180 if self.obs.obs_type is ObsType.SPECTRUM else (solar + self.clock.sidereal_to_solar(ending_ra - sidereal))
+            start_time + 180
+            if self.obs.obs_type is ObsType.SPECTRUM
+            else (solar + self.clock.sidereal_to_solar(ending_ra - sidereal))
         )
         print(f"{ending_ra=}, {end_time=}, current time={time.time()}")
 

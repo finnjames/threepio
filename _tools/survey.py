@@ -1,5 +1,6 @@
 from tools import Comm, MyPrecious, Observation, ObsType
 
+
 class Survey(Observation):
     """2D 'nodding' map of a region of the radio sky."""
 
